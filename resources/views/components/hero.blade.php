@@ -5,8 +5,8 @@
         <div class="absolute inset-0">
             <img src="{{ $image }}" alt="" class="h-full w-full animate-slow-zoom object-cover object-center brightness-[1.15] saturate-[0.95]" loading="eager" referrerpolicy="no-referrer">
             {{-- Lighter overlay: imagery visible, bottom-weighted scrim keeps text readable --}}
-            <div class="absolute inset-0 bg-gradient-to-t from-pine-deep via-pine-deep/30 to-pine-deep/10"></div>
-            <div class="absolute inset-0 bg-gradient-to-r from-pine-deep/45 via-pine-deep/10 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-pine-deep via-pine-deep/20 to-pine-deep/5"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-pine-deep/30 via-pine-deep/10 to-transparent"></div>
         </div>
     @else
         <div class="absolute inset-0 bg-gradient-to-br from-pine-deep via-pine to-moss"></div>
@@ -16,7 +16,7 @@
     <div class="relative mx-auto w-full max-w-[1240px] px-6">
         <div class="max-w-3xl">
             @if ($eyebrow)
-                <p class="animate-fade-up text-[0.8125rem] font-bold uppercase tracking-[0.22em] text-royal-bright" style="animation-delay: 120ms">
+                <p class="animate-fade-up text-xs font-bold uppercase tracking-[0.12em] text-royal-bright sm:text-[0.8125rem] sm:tracking-[0.22em]" style="animation-delay: 120ms">
                     {{ $eyebrow }}
                 </p>
             @endif

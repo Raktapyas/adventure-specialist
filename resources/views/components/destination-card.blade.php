@@ -7,9 +7,7 @@
             <img src="{{ $destination->cover_image }}" alt="{{ $destination->title }}" loading="lazy"
                 class="h-full w-full object-cover">
         @else
-            <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-pine via-moss to-pine-deep">
-                <span class="text-2xl font-bold text-paper">{{ $destination->title }}</span>
-            </div>
+            <div class="h-full w-full bg-gradient-to-br from-pine via-moss to-pine-deep"></div>
         @endif
         <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/15 to-transparent"></div>
 

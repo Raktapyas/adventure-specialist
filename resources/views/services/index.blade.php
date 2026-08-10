@@ -16,7 +16,7 @@
             lede="Hover or tap a card to flip it and read more about each adventure." />
 
         @if ($services->isNotEmpty())
-            <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($services as $service)
                     <x-service-card :service="$service" />
                 @endforeach

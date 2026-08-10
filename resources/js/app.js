@@ -49,7 +49,7 @@ function animateCount(el) {
 }
 
 if (prefersReducedMotion) {
-    document.querySelectorAll('.reveal, .reveal-rise, .reveal-mask, .split-reveal').forEach((el) =>
+    document.querySelectorAll('.reveal, .split-reveal').forEach((el) =>
         el.classList.add('is-visible'),
     );
     document.querySelectorAll('[data-count]').forEach((el) => {
@@ -68,7 +68,7 @@ if (prefersReducedMotion) {
         { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
     );
 
-    document.querySelectorAll('.reveal, .reveal-rise, .reveal-mask').forEach((el) => observer.observe(el));
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
     document.querySelectorAll('.split-reveal').forEach((el) => {
         splitReveal(el);

@@ -9,10 +9,6 @@
                 </p>
                 <div class="mt-6 flex items-center gap-4 text-xs tracking-wider text-paper/60">
                     <a href="https://www.facebook.com/Adventure-Specialist-Travel-PvtLtd-318003508387072" target="_blank" rel="noopener" class="hover:text-royal-bright">Facebook</a>
-                    <span aria-hidden="true">·</span>
-                    <a href="https://twitter.com" target="_blank" rel="noopener" class="hover:text-royal-bright">Twitter</a>
-                    <span aria-hidden="true">·</span>
-                    <a href="https://mail.hostinger.com" target="_blank" rel="noopener" class="hover:text-royal-bright">Mail</a>
                 </div>
             </div>
 
@@ -54,7 +50,7 @@
             {{-- Contact --}}
             <div>
                 <p class="eyebrow text-paper/50">Contact Info</p>
-                <address class="mt-5 space-y-3 text-sm not-italic">
+                <address class="mt-5 space-y-3 text-sm not-italic [overflow-wrap:anywhere]">
                     <p class="text-paper/75">ADVENTURE SPECIALIST TRAVEL</p>
                     <p class="text-paper/75">Bungamati, Lalitpur, Nepal</p>
                     <p class="text-paper/75">

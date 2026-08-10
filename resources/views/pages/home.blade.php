@@ -55,8 +55,8 @@
             </div>
 
             @if ($services->isNotEmpty())
-                <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    @foreach ($services->take(8) as $service)
+                <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($services->take(6) as $service)
                         <x-service-card :service="$service" />
                     @endforeach
                 </div>

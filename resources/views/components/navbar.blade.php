@@ -53,7 +53,7 @@
             {{-- Brand: real reference logo (white over hero, colored when scrolled) --}}
             <a href="/" class="flex items-center" aria-label="Adventure Specialist Travel — Home">
                 <span class="relative block">
-                    <img src="{{ asset('images/logo-white.png') }}" alt="" x-show="!scrolled" x-cloak
+                    <img src="{{ asset('images/logo-white.png') }}" alt="" x-show="!scrolled"
                         class="h-11 w-auto sm:h-12">
                     <img src="{{ asset('images/logo.png') }}" alt="Adventure Specialist Travel" x-show="scrolled" x-cloak
                         class="h-11 w-auto sm:h-12">

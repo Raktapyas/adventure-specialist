@@ -5,6 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        <script>document.documentElement.classList.add('js');</script>
+
         <title>@yield('title', 'Adventure Specialist Travel') · Adventure Specialist Travel Pvt. Ltd.</title>
         <meta name="description" content="@yield('meta_description', 'Specialist in preparing your holiday programs in Nepal, Bhutan, Sikkim, Tibet and Myanmar.')">
 
