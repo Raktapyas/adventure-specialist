@@ -7,7 +7,7 @@
         eyebrow="Adventure Specialist Travel"
         title="AST Services"
         lede="Culture, adventure and jungle safari packages for groups and individuals across Nepal and the Himalaya."
-        image="https://adventurespecialist.com.np/wp-content/themes/trekking/images/2.jpg" />
+        image="/assets/images/banners/2.jpg" />
 
     <section class="mx-auto max-w-[1240px] px-6 py-20 lg:py-28">
         <x-section-heading

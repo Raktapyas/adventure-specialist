@@ -7,7 +7,7 @@
         eyebrow="Adventure Specialist Travel"
         title="Contact Us"
         lede="We would love to hear from you. Send us a message and our team will respond as soon as possible."
-        image="https://adventurespecialist.com.np/wp-content/themes/trekking/images/1.jpg" />
+        image="/assets/images/banners/1.jpg" />
 
     <section class="mx-auto max-w-[1240px] px-6 py-20 lg:py-28">
         <div class="grid gap-14 lg:grid-cols-12">

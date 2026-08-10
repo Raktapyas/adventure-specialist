@@ -8,7 +8,7 @@
         eyebrow="Adventure Specialist Travel Pvt. Ltd."
         title="The Himalayas, thoughtfully arranged."
         lede="Specialist in preparing your holiday programs in Nepal, Bhutan, Sikkim, Tibet and Myanmar."
-        image="https://adventurespecialist.com.np/wp-content/themes/trekking/images/1.jpg">
+        image="/assets/images/banners/1.jpg">
         <div class="flex flex-wrap gap-3">
             <a href="/ast-services/" class="btn btn-royal">Explore Services</a>
             <a href="/contact/#enquiry" class="btn btn-outline">Plan a Trip</a>

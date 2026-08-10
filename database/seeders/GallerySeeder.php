@@ -14,9 +14,9 @@ class GallerySeeder extends Seeder
 
         foreach ($rows as $row) {
             GalleryImage::updateOrCreate(
-                ['image_url' => $row['image_url']],
+                ['caption' => $row['caption']],
                 [
-                    'caption' => $row['caption'],
+                    'image_url' => $row['image_url'],
                     'sort_order' => $row['sort_order'],
                 ]
             );

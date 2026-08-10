@@ -7,7 +7,7 @@
         eyebrow="Adventure Specialist Travel"
         title="AST Photo Gallery"
         lede="Moments from the mountains, the jungles and the valleys we call home."
-        image="https://adventurespecialist.com.np/wp-content/uploads/2017/02/20170320_2059091-1024x576.jpg" />
+        image="/assets/images/gallery/20170320_2059091-1024x576.jpg" />
 
     <section class="mx-auto max-w-[1240px] px-6 py-20 lg:py-28">
         @if ($images->isNotEmpty())

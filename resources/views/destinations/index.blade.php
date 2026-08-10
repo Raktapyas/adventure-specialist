@@ -7,7 +7,7 @@
         eyebrow="Adventure Specialist Travel"
         title="Destinations"
         lede="Specialist in preparing your holiday programs in Nepal, Bhutan, Sikkim, Tibet and Myanmar."
-        image="https://adventurespecialist.com.np/wp-content/themes/trekking/images/3.jpg" />
+        image="/assets/images/banners/3.jpg" />
 
     <section class="mx-auto max-w-[1240px] px-6 py-20 lg:py-28">
         <x-section-heading

@@ -1,38 +1,38 @@
 [
-    {
-        "slug": "special-package-one",
-        "parent_slug": null,
-        "title": "Special Tour Package",
-        "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
-        "content": "<img src=\"https://adventurespecialist.com.np/wp-content/uploads/2017/02/1.jpg\" class=\"page_image\" alt=\"Special Tour Package\"/>",
-        "cover_image": "https://adventurespecialist.com.np/wp-content/uploads/2017/02/1.jpg",
-        "sort_order": 1
-    },
-    {
-        "slug": "special-package-two",
-        "parent_slug": null,
-        "title": "Special Tour Package",
-        "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
-        "content": "<img src=\"https://adventurespecialist.com.np/wp-content/uploads/2017/02/2-1.jpg\" class=\"page_image\" alt=\"Special Tour Package\"/>",
-        "cover_image": "https://adventurespecialist.com.np/wp-content/uploads/2017/02/2-1.jpg",
-        "sort_order": 2
-    },
-    {
-        "slug": "special-package-two-2",
-        "parent_slug": null,
-        "title": "Special Package",
-        "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
-        "content": "<img src=\"https://adventurespecialist.com.np/wp-content/uploads/2017/02/3-1-e1498198298716.jpg\" class=\"page_image\" alt=\"Special Package\"/>",
-        "cover_image": "https://adventurespecialist.com.np/wp-content/uploads/2017/02/3-1-e1498198298716.jpg",
-        "sort_order": 3
-    },
-    {
-        "slug": "special-package-two-3",
-        "parent_slug": null,
-        "title": "Special Package Two",
-        "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
-        "content": "<img src=\"https://adventurespecialist.com.np/wp-content/uploads/2017/02/4.jpg\" class=\"page_image\" alt=\"Special Package Two\"/>",
-        "cover_image": "https://adventurespecialist.com.np/wp-content/uploads/2017/02/4.jpg",
-        "sort_order": 4
-    }
+  {
+    "slug": "special-package-one",
+    "parent_slug": null,
+    "title": "Special Tour Package",
+    "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
+    "content": "<img src=\"/assets/images/packages/1.jpg\" class=\"page_image\" alt=\"Special Tour Package\"/>",
+    "cover_image": "/assets/images/packages/1.jpg",
+    "sort_order": 1
+  },
+  {
+    "slug": "special-package-two",
+    "parent_slug": null,
+    "title": "Special Tour Package",
+    "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
+    "content": "<img src=\"/assets/images/packages/2-1.jpg\" class=\"page_image\" alt=\"Special Tour Package\"/>",
+    "cover_image": "/assets/images/packages/2-1.jpg",
+    "sort_order": 2
+  },
+  {
+    "slug": "special-package-two-2",
+    "parent_slug": null,
+    "title": "Special Package",
+    "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
+    "content": "<img src=\"/assets/images/packages/3-1-e1498198298716.jpg\" class=\"page_image\" alt=\"Special Package\"/>",
+    "cover_image": "/assets/images/packages/3-1-e1498198298716.jpg",
+    "sort_order": 3
+  },
+  {
+    "slug": "special-package-two-3",
+    "parent_slug": null,
+    "title": "Special Package Two",
+    "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
+    "content": "<img src=\"/assets/images/packages/4.jpg\" class=\"page_image\" alt=\"Special Package Two\"/>",
+    "cover_image": "/assets/images/packages/4.jpg",
+    "sort_order": 4
+  }
 ]
