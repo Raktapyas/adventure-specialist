@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\RedirectsFromUrlHistory;
 use App\Models\Destination;
 
 class DestinationController extends Controller
 {
+    use RedirectsFromUrlHistory;
+
     public function index()
     {
         return view('destinations.index', [
@@ -15,7 +18,11 @@ class DestinationController extends Controller
 
     public function show(string $slug)
     {
-        $destination = Destination::where('slug', $slug)->with('children.parent')->firstOrFail();
+        $destination = Destination::where('slug', $slug)->with('children.parent')->first();
+
+        if (! $destination) {
+            return $this->redirectFromHistory();
+        }
 
         return $this->render($destination);
     }
@@ -36,7 +43,9 @@ class DestinationController extends Controller
 
         $destination = Destination::resolvePath($segments);
 
-        abort_unless($destination, 404);
+        if (! $destination) {
+            return $this->redirectFromHistory();
+        }
 
         return $this->render($destination);
     }

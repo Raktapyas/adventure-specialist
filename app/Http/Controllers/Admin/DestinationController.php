@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreDestinationRequest;
 use App\Http\Requests\Admin\UpdateDestinationRequest;
 use App\Models\Destination;
+use App\Services\UrlHistoryService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -49,6 +51,7 @@ class DestinationController extends Controller
     {
         return view('admin.destinations.edit', [
             'destination' => $destination,
+            'destinations' => $this->selectableParents($destination),
         ]);
     }
 
@@ -57,7 +60,7 @@ class DestinationController extends Controller
      */
     public function update(UpdateDestinationRequest $request, Destination $destination): RedirectResponse
     {
-        $destination->update($request->validated());
+        app(UrlHistoryService::class)->update($destination, $request->validated());
 
         return redirect()->route('admin.destinations.edit', $destination)
             ->with('status', 'Destination updated.');
@@ -74,8 +77,16 @@ class DestinationController extends Controller
         }
 
         $destination->delete();
+        app(UrlHistoryService::class)->purge($destination);
 
         return redirect()->route('admin.destinations.index')
             ->with('status', 'Destination deleted.');
+    }
+
+    protected function selectableParents(Destination $destination): Collection
+    {
+        $excluded = array_merge([$destination->id], $destination->descendantIds());
+
+        return Destination::whereNotIn('id', $excluded)->orderBy('sort_order')->get();
     }
 }

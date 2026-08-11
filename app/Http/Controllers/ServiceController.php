@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\RedirectsFromUrlHistory;
 use App\Models\Service;
 
 class ServiceController extends Controller
 {
+    use RedirectsFromUrlHistory;
+
     public function index()
     {
         return view('services.index', [
@@ -15,7 +18,11 @@ class ServiceController extends Controller
 
     public function show(string $slug)
     {
-        $service = Service::where('slug', $slug)->with('children.parent')->firstOrFail();
+        $service = Service::where('slug', $slug)->with('children.parent')->first();
+
+        if (! $service) {
+            return $this->redirectFromHistory();
+        }
 
         return $this->render($service);
     }
@@ -24,7 +31,9 @@ class ServiceController extends Controller
     {
         $service = Service::resolvePath([$parent, $child]);
 
-        abort_unless($service, 404);
+        if (! $service) {
+            return $this->redirectFromHistory();
+        }
 
         return $this->render($service);
     }

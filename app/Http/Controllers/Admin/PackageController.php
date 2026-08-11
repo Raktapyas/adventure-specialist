@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePackageRequest;
 use App\Http\Requests\Admin\UpdatePackageRequest;
 use App\Models\Package;
+use App\Services\UrlHistoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -55,7 +56,7 @@ class PackageController extends Controller
      */
     public function update(UpdatePackageRequest $request, Package $package): RedirectResponse
     {
-        $package->update($request->validated());
+        app(UrlHistoryService::class)->update($package, $request->validated());
 
         return redirect()->route('admin.packages.edit', $package)
             ->with('status', 'Package updated.');
@@ -67,6 +68,7 @@ class PackageController extends Controller
     public function destroy(Package $package): RedirectResponse
     {
         $package->delete();
+        app(UrlHistoryService::class)->purge($package);
 
         return redirect()->route('admin.packages.index')
             ->with('status', 'Package deleted.');

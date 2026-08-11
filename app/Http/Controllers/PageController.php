@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\RedirectsFromUrlHistory;
 use App\Models\Page;
 
 class PageController extends Controller
 {
+    use RedirectsFromUrlHistory;
+
     public function show(string $slug)
     {
-        $page = Page::where('slug', $slug)->with('children')->firstOrFail();
+        $page = Page::where('slug', $slug)->with('children')->first();
+
+        if (! $page) {
+            return $this->redirectFromHistory();
+        }
 
         $canonical = $page->getPath();
 
@@ -24,7 +31,11 @@ class PageController extends Controller
 
     public function managingDirector()
     {
-        $page = Page::where('slug', 'managing-director')->firstOrFail();
+        $page = Page::where('slug', 'managing-director')->first();
+
+        if (! $page) {
+            return $this->redirectFromHistory();
+        }
 
         return view('pages.managing-director', ['page' => $page]);
     }

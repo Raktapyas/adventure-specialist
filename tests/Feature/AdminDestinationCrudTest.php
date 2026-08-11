@@ -67,7 +67,7 @@ class AdminDestinationCrudTest extends TestCase
         $this->assertDatabaseMissing('destinations', ['slug' => 'too-deep']);
     }
 
-    public function test_destination_parent_cannot_be_changed_on_update(): void
+    public function test_destination_parent_can_be_changed_on_update(): void
     {
         $root = Destination::factory()->create();
         $child = Destination::factory()->create(['parent_id' => $root->id]);
@@ -75,10 +75,17 @@ class AdminDestinationCrudTest extends TestCase
         $this->actingAs($this->admin())
             ->put("/admin/destinations/{$child->id}", [
                 'title' => 'Renamed Child',
+                'slug' => $child->slug,
                 'parent_id' => null,
-            ]);
+            ])
+            ->assertRedirect(route('admin.destinations.edit', $child));
 
-        $this->assertDatabaseHas('destinations', ['id' => $child->id, 'parent_id' => $root->id]);
+        $this->assertDatabaseHas('destinations', ['id' => $child->id, 'parent_id' => null]);
+        $this->assertDatabaseHas('redirects', [
+            'old_path' => $root->getPath().$child->slug.'/',
+            'model_type' => 'destination',
+            'model_id' => $child->id,
+        ]);
     }
 
     public function test_admin_can_delete_a_leaf_destination(): void

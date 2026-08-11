@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePageRequest;
 use App\Http\Requests\Admin\UpdatePageRequest;
 use App\Models\Page;
+use App\Services\UrlHistoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -58,7 +59,7 @@ class PageController extends Controller
      */
     public function update(UpdatePageRequest $request, Page $page): RedirectResponse
     {
-        $page->update($request->validated());
+        app(UrlHistoryService::class)->update($page, $request->validated());
 
         return redirect()->route('admin.pages.edit', $page)
             ->with('status', 'Page updated.');
@@ -75,6 +76,7 @@ class PageController extends Controller
         }
 
         $page->delete();
+        app(UrlHistoryService::class)->purge($page);
 
         return redirect()->route('admin.pages.index')
             ->with('status', 'Page deleted.');

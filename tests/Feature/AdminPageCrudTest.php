@@ -74,23 +74,29 @@ class AdminPageCrudTest extends TestCase
         $page = Page::factory()->create(['title' => 'Old Title']);
 
         $this->actingAs($this->admin())
-            ->put("/admin/pages/{$page->id}", ['title' => 'New Title'])
+            ->put("/admin/pages/{$page->id}", ['title' => 'New Title', 'slug' => $page->slug])
             ->assertRedirect(route('admin.pages.edit', $page));
 
         $this->assertDatabaseHas('pages', ['id' => $page->id, 'title' => 'New Title']);
     }
 
-    public function test_page_slug_cannot_be_changed_on_update(): void
+    public function test_page_slug_can_be_changed_on_update(): void
     {
         $page = Page::factory()->create(['slug' => 'original']);
 
         $this->actingAs($this->admin())
             ->put("/admin/pages/{$page->id}", [
                 'title' => 'Renamed',
-                'slug' => 'hijacked',
-            ]);
+                'slug' => 'renamed',
+            ])
+            ->assertRedirect(route('admin.pages.edit', $page));
 
-        $this->assertDatabaseHas('pages', ['id' => $page->id, 'slug' => 'original']);
+        $this->assertDatabaseHas('pages', ['id' => $page->id, 'slug' => 'renamed']);
+        $this->assertDatabaseHas('redirects', [
+            'old_path' => '/about-us/original/',
+            'model_type' => 'page',
+            'model_id' => $page->id,
+        ]);
     }
 
     public function test_page_cannot_be_its_own_parent(): void

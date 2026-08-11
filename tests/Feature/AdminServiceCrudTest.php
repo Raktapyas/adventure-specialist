@@ -51,7 +51,7 @@ class AdminServiceCrudTest extends TestCase
             ->assertSessionHasErrors('slug');
     }
 
-    public function test_service_parent_cannot_be_changed_on_update(): void
+    public function test_service_parent_can_be_changed_on_update(): void
     {
         $root = Service::factory()->create();
         $child = Service::factory()->create(['parent_id' => $root->id]);
@@ -59,10 +59,17 @@ class AdminServiceCrudTest extends TestCase
         $this->actingAs($this->admin())
             ->put("/admin/services/{$child->id}", [
                 'title' => 'Renamed Child',
+                'slug' => $child->slug,
                 'parent_id' => null,
-            ]);
+            ])
+            ->assertRedirect(route('admin.services.edit', $child));
 
-        $this->assertDatabaseHas('services', ['id' => $child->id, 'parent_id' => $root->id]);
+        $this->assertDatabaseHas('services', ['id' => $child->id, 'parent_id' => null]);
+        $this->assertDatabaseHas('redirects', [
+            'old_path' => $root->getPath().$child->slug.'/',
+            'model_type' => 'service',
+            'model_id' => $child->id,
+        ]);
     }
 
     public function test_service_nesting_limited_to_two_levels(): void
@@ -86,7 +93,7 @@ class AdminServiceCrudTest extends TestCase
         $service = Service::factory()->create();
 
         $this->actingAs($this->admin())
-            ->put("/admin/services/{$service->id}", ['title' => 'Updated'])
+            ->put("/admin/services/{$service->id}", ['title' => 'Updated', 'slug' => $service->slug])
             ->assertRedirect(route('admin.services.edit', $service));
 
         $this->assertDatabaseHas('services', ['id' => $service->id, 'title' => 'Updated']);

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreServiceRequest;
 use App\Http\Requests\Admin\UpdateServiceRequest;
 use App\Models\Service;
+use App\Services\UrlHistoryService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -49,6 +51,7 @@ class ServiceController extends Controller
     {
         return view('admin.services.edit', [
             'service' => $service,
+            'services' => $this->selectableParents($service),
         ]);
     }
 
@@ -57,7 +60,7 @@ class ServiceController extends Controller
      */
     public function update(UpdateServiceRequest $request, Service $service): RedirectResponse
     {
-        $service->update($request->validated());
+        app(UrlHistoryService::class)->update($service, $request->validated());
 
         return redirect()->route('admin.services.edit', $service)
             ->with('status', 'Service updated.');
@@ -74,8 +77,16 @@ class ServiceController extends Controller
         }
 
         $service->delete();
+        app(UrlHistoryService::class)->purge($service);
 
         return redirect()->route('admin.services.index')
             ->with('status', 'Service deleted.');
+    }
+
+    protected function selectableParents(Service $service): Collection
+    {
+        $excluded = array_merge([$service->id], $service->descendantIds());
+
+        return Service::whereNotIn('id', $excluded)->orderBy('sort_order')->get();
     }
 }

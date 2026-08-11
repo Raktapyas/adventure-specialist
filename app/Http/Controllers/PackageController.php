@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\RedirectsFromUrlHistory;
 use App\Models\Package;
 
 class PackageController extends Controller
 {
+    use RedirectsFromUrlHistory;
+
     public function index()
     {
         return view('packages.index', [
@@ -15,7 +18,11 @@ class PackageController extends Controller
 
     public function show(string $slug)
     {
-        $package = Package::where('slug', $slug)->firstOrFail();
+        $package = Package::where('slug', $slug)->first();
+
+        if (! $package) {
+            return $this->redirectFromHistory();
+        }
 
         $canonical = $package->getPath();
 

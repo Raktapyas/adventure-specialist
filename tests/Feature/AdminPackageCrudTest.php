@@ -54,17 +54,23 @@ class AdminPackageCrudTest extends TestCase
             ->assertSessionHasErrors('slug');
     }
 
-    public function test_package_slug_cannot_be_changed_on_update(): void
+    public function test_package_slug_can_be_changed_on_update(): void
     {
         $package = Package::factory()->create(['slug' => 'original']);
 
         $this->actingAs($this->admin())
             ->put("/admin/packages/{$package->id}", [
                 'title' => 'Renamed',
-                'slug' => 'hijacked',
-            ]);
+                'slug' => 'renamed',
+            ])
+            ->assertRedirect(route('admin.packages.edit', $package));
 
-        $this->assertDatabaseHas('packages', ['id' => $package->id, 'slug' => 'original']);
+        $this->assertDatabaseHas('packages', ['id' => $package->id, 'slug' => 'renamed']);
+        $this->assertDatabaseHas('redirects', [
+            'old_path' => '/special-package/original/',
+            'model_type' => 'package',
+            'model_id' => $package->id,
+        ]);
     }
 
     public function test_admin_can_edit_a_package(): void
@@ -72,7 +78,7 @@ class AdminPackageCrudTest extends TestCase
         $package = Package::factory()->create();
 
         $this->actingAs($this->admin())
-            ->put("/admin/packages/{$package->id}", ['title' => 'Updated'])
+            ->put("/admin/packages/{$package->id}", ['title' => 'Updated', 'slug' => $package->slug])
             ->assertRedirect(route('admin.packages.edit', $package));
 
         $this->assertDatabaseHas('packages', ['id' => $package->id, 'title' => 'Updated']);

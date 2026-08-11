@@ -19,16 +19,20 @@
             </div>
 
             <div>
-                <x-input-label value="Slug" />
-                <x-text-input class="mt-1 w-full bg-gray-100" value="{{ $destination->slug }}" disabled />
-                <p class="mt-1 text-xs text-gray-500">Immutable. Changing it would break public URLs.</p>
+                <x-input-label for="slug" value="Slug" />
+                <x-text-input id="slug" name="slug" class="mt-1 w-full" value="{{ old('slug', $destination->slug) }}" required />
+                <p class="mt-1 text-xs text-gray-500">Unique. Lowercase letters, numbers and dashes. Changing it keeps old links working via redirects.</p>
+                <x-input-error :messages="$errors->get('slug')" class="mt-2" />
             </div>
 
             <div>
-                <x-input-label value="Parent Destination" />
-                <x-text-input class="mt-1 w-full bg-gray-100" value="{{ $destination->parent?->title ?? 'None (top level)' }}" disabled />
-                <p class="mt-1 text-xs text-gray-500">Immutable. Changing it would break public URLs.</p>
+                <x-input-label for="parent_id" value="Parent Destination" />
+                <x-select-input name="parent_id" :options="$destinations->pluck('title', 'id')" :selected="old('parent_id', $destination->parent_id)" placeholder="None (top level)" />
+                <p class="mt-1 text-xs text-gray-500">Maximum three levels of nesting. Moving changes the destination URL; old links keep working via redirects.</p>
+                <x-input-error :messages="$errors->get('parent_id')" class="mt-2" />
             </div>
+
+            @include('admin.partials.url-preview', ['model' => $destination])
 
             <div>
                 <x-input-label for="excerpt" value="Excerpt" />

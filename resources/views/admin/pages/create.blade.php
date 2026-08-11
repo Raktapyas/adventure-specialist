@@ -16,7 +16,7 @@
             <div>
                 <x-input-label for="slug" value="Slug" />
                 <x-text-input id="slug" name="slug" class="mt-1 w-full" value="{{ old('slug') }}" placeholder="about-company" required />
-                <p class="mt-1 text-xs text-gray-500">Unique. Lowercase letters, numbers and dashes. Cannot be changed later.</p>
+                <p class="mt-1 text-xs text-gray-500">Unique. Lowercase letters, numbers and dashes. Can be changed later — old links keep working via redirects.</p>
                 <x-input-error :messages="$errors->get('slug')" class="mt-2" />
             </div>
 

@@ -19,16 +19,20 @@
             </div>
 
             <div>
-                <x-input-label value="Slug" />
-                <x-text-input class="mt-1 w-full bg-gray-100" value="{{ $page->slug }}" disabled />
-                <p class="mt-1 text-xs text-gray-500">Immutable. To rename, create a new page and delete this one.</p>
+                <x-input-label for="slug" value="Slug" />
+                <x-text-input id="slug" name="slug" class="mt-1 w-full" value="{{ old('slug', $page->slug) }}" required />
+                <p class="mt-1 text-xs text-gray-500">Unique. Lowercase letters, numbers and dashes. Changing it keeps old links working via redirects.</p>
+                <x-input-error :messages="$errors->get('slug')" class="mt-2" />
             </div>
 
             <div>
                 <x-input-label for="parent_id" value="Parent Page" />
                 <x-select-input name="parent_id" :options="$pages->where('id', '!=', $page->id)->pluck('title', 'id')" :selected="old('parent_id', $page->parent_id)" placeholder="None (top level)" />
+                <p class="mt-1 text-xs text-gray-500">Parent only affects the admin tree; page URLs stay at /about-us/... regardless.</p>
                 <x-input-error :messages="$errors->get('parent_id')" class="mt-2" />
             </div>
+
+            @include('admin.partials.url-preview', ['model' => $page])
 
             <div>
                 <x-input-label for="excerpt" value="Excerpt" />

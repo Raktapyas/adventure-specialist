@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class UpdatePageRequest extends FormRequest
@@ -36,6 +37,7 @@ class UpdatePageRequest extends FormRequest
         return [
             'parent_id' => ['nullable', 'integer', 'exists:pages,id'],
             'title' => ['required', 'string', 'max:255'],
+            'slug' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('pages', 'slug')->ignore($this->route('page'))],
             'excerpt' => ['nullable', 'string', 'max:1000'],
             'content' => ['nullable', 'string'],
             'cover_image' => ['nullable', 'string', 'max:255'],

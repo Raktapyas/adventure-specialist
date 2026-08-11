@@ -19,10 +19,13 @@
             </div>
 
             <div>
-                <x-input-label value="Slug" />
-                <x-text-input class="mt-1 w-full bg-gray-100" value="{{ $package->slug }}" disabled />
-                <p class="mt-1 text-xs text-gray-500">Immutable. Changing it would break public URLs.</p>
+                <x-input-label for="slug" value="Slug" />
+                <x-text-input id="slug" name="slug" class="mt-1 w-full" value="{{ old('slug', $package->slug) }}" required />
+                <p class="mt-1 text-xs text-gray-500">Unique. Lowercase letters, numbers and dashes. Changing it keeps old links working via redirects.</p>
+                <x-input-error :messages="$errors->get('slug')" class="mt-2" />
             </div>
+
+            @include('admin.partials.url-preview', ['model' => $package])
 
             <div>
                 <x-input-label for="duration_days" value="Duration (days)" />

@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePackageRequest extends FormRequest
 {
@@ -24,6 +25,7 @@ class UpdatePackageRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
+            'slug' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('packages', 'slug')->ignore($this->route('package'))],
             'excerpt' => ['nullable', 'string', 'max:1000'],
             'content' => ['nullable', 'string'],
             'duration_days' => ['nullable', 'integer', 'min:1', 'max:365'],
