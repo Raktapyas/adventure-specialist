@@ -13,10 +13,10 @@ class GallerySeeder extends Seeder
         $rows = json_decode(File::get(database_path('data/gallery.json')), true);
 
         foreach ($rows as $row) {
-            GalleryImage::updateOrCreate(
-                ['caption' => $row['caption']],
+            GalleryImage::firstOrCreate(
+                ['image_url' => $row['image_url']],
                 [
-                    'image_url' => $row['image_url'],
+                    'caption' => $row['caption'],
                     'sort_order' => $row['sort_order'],
                 ]
             );

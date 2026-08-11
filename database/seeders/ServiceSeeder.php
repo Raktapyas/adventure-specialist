@@ -15,7 +15,7 @@ class ServiceSeeder extends Seeder
         foreach ($rows as $row) {
             $parent = $row['parent_slug'] ? Service::where('slug', $row['parent_slug'])->first() : null;
 
-            Service::updateOrCreate(
+            Service::firstOrCreate(
                 ['slug' => $row['slug']],
                 [
                     'parent_id' => $parent?->id,

@@ -27,6 +27,30 @@
                        class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.dashboard') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
                         Dashboard
                     </a>
+                    <a href="{{ route('admin.pages.index') }}"
+                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.pages.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                        Pages
+                    </a>
+                    <a href="{{ route('admin.services.index') }}"
+                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.services.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                        Services
+                    </a>
+                    <a href="{{ route('admin.destinations.index') }}"
+                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.destinations.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                        Destinations
+                    </a>
+                    <a href="{{ route('admin.packages.index') }}"
+                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.packages.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                        Packages
+                    </a>
+                    <a href="{{ route('admin.gallery.index') }}"
+                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.gallery.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                        Gallery
+                    </a>
+                    <a href="{{ route('admin.inquiries.index') }}"
+                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.inquiries.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                        Inquiries
+                    </a>
                     <a href="{{ route('home') }}"
                        class="block px-3 py-2 rounded-md text-paper/70 hover:bg-paper/10 hover:text-paper">
                         View Site

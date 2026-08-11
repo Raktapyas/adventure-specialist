@@ -15,7 +15,7 @@ class DestinationSeeder extends Seeder
         foreach ($rows as $row) {
             $parent = $row['parent_slug'] ? Destination::where('slug', $row['parent_slug'])->first() : null;
 
-            Destination::updateOrCreate(
+            Destination::firstOrCreate(
                 ['slug' => $row['slug']],
                 [
                     'parent_id' => $parent?->id,

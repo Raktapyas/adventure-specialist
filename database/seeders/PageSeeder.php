@@ -15,7 +15,7 @@ class PageSeeder extends Seeder
         foreach ($rows as $row) {
             $parent = $row['parent_slug'] ? Page::where('slug', $row['parent_slug'])->first() : null;
 
-            Page::updateOrCreate(
+            Page::firstOrCreate(
                 ['slug' => $row['slug']],
                 [
                     'parent_id' => $parent?->id,

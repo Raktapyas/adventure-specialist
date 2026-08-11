@@ -13,7 +13,7 @@ class PackageSeeder extends Seeder
         $rows = json_decode(File::get(database_path('data/packages.json')), true);
 
         foreach ($rows as $row) {
-            Package::updateOrCreate(
+            Package::firstOrCreate(
                 ['slug' => $row['slug']],
                 [
                     'title' => $row['title'],

@@ -11,6 +11,10 @@ class NavComposer
 {
     public function compose(View $view): void
     {
+        if (request()->is('admin/*') || request()->is('admin')) {
+            return;
+        }
+
         $view->with('navAboutPages', Page::whereHas('parent', fn ($q) => $q->where('slug', 'about'))->with('parent')->orderBy('sort_order')->get());
 
         $view->with('navServices', Service::whereNull('parent_id')->orderBy('sort_order')->with('children.parent')->get());

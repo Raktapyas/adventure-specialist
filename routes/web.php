@@ -1,6 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DestinationController as AdminDestinationController;
+use App\Http\Controllers\Admin\GalleryImageController;
+use App\Http\Controllers\Admin\InquiryController;
+use App\Http\Controllers\Admin\PackageController as AdminPackageController;
+use App\Http\Controllers\Admin\PageController as AdminPageController;
+use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\GalleryController;
@@ -124,4 +130,14 @@ require __DIR__.'/auth.php';
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
+
+    Route::resource('pages', AdminPageController::class)->except(['show']);
+    Route::resource('services', AdminServiceController::class)->except(['show']);
+    Route::resource('destinations', AdminDestinationController::class)->except(['show']);
+    Route::resource('packages', AdminPackageController::class)->except(['show']);
+    Route::resource('gallery', GalleryImageController::class)->except(['show']);
+
+    Route::get('inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
+    Route::get('inquiries/{inquiry}', [InquiryController::class, 'show'])->name('inquiries.show');
+    Route::delete('inquiries/{inquiry}', [InquiryController::class, 'destroy'])->name('inquiries.destroy');
 });

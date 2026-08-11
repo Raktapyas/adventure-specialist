@@ -2,13 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Page extends Model
 {
-    protected $guarded = [];
+    use HasFactory;
+
+    protected $fillable = [
+        'parent_id',
+        'title',
+        'slug',
+        'excerpt',
+        'content',
+        'cover_image',
+        'sort_order',
+    ];
 
     public function parent(): BelongsTo
     {
@@ -18,6 +29,24 @@ class Page extends Model
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order');
+    }
+
+    public function descendantIds(): array
+    {
+        return $this->children()->pluck('id')->flatMap(function (int $id) {
+            return array_merge([$id], static::find($id)?->descendantIds() ?? []);
+        })->all();
+    }
+
+    public function chainDepth(): int
+    {
+        $depth = 0;
+
+        for ($current = $this->parent; $current; $current = $current->parent) {
+            $depth++;
+        }
+
+        return $depth;
     }
 
     public function getPath(): string
