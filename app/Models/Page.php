@@ -20,7 +20,20 @@ class Page extends Model
         'content',
         'cover_image',
         'sort_order',
+        'is_published',
     ];
+
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', true);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_published' => 'boolean',
+        ];
+    }
 
     public function parent(): BelongsTo
     {
@@ -29,7 +42,7 @@ class Page extends Model
 
     public function children(): HasMany
     {
-        return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order');
+        return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order')->orderBy('title');
     }
 
     public function mediaUsages(): MorphMany

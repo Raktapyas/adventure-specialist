@@ -11,6 +11,16 @@ use Illuminate\Validation\Validator;
 class UpdateDestinationRequest extends FormRequest
 {
     /**
+     * Normalize the publishing checkbox (absent when unchecked).
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->exists('is_published')) {
+            $this->merge(['is_published' => $this->boolean('is_published')]);
+        }
+    }
+
+    /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
@@ -33,6 +43,7 @@ class UpdateDestinationRequest extends FormRequest
             'content' => ['nullable', 'string'],
             'cover_image' => ['nullable', 'string', 'max:255'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
+            'is_published' => ['boolean'],
         ];
     }
 

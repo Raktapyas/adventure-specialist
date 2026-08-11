@@ -24,6 +24,7 @@
                         <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Slug</th>
                         <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Public URL</th>
                         <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Sort</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
                         <th class="px-5 py-3"></th>
                     </tr>
                 </thead>
@@ -36,7 +37,7 @@
                         />
                     @empty
                         <tr>
-                            <td colspan="5" class="px-5 py-6 text-center text-gray-500">No services yet.</td>
+                            <td colspan="6" class="px-5 py-6 text-center text-gray-500">No services yet.</td>
                         </tr>
                     @endforelse
                 </tbody>

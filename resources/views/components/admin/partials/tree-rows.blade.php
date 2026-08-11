@@ -15,6 +15,7 @@
         <td class="px-5 py-3 text-gray-500 font-mono text-xs">{{ $node->slug }}</td>
         <td class="px-5 py-3 text-gray-500 font-mono text-xs">{{ $node->publicUrl() }}</td>
         <td class="px-5 py-3 text-gray-500">{{ $node->sort_order }}</td>
+        <td class="px-5 py-3">@if ($node->is_published)<span class="px-1.5 py-0.5 rounded bg-moss/10 text-moss text-xs">Published</span>@else<span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 text-xs">Draft</span>@endif</td>
         <td class="px-5 py-3 whitespace-nowrap text-right">
             <a href="{{ route('admin.'.$resource.'.edit', $node) }}" class="text-pine hover:underline text-sm font-medium">Edit</a>
             <form method="POST" action="{{ route('admin.'.$resource.'.destroy', $node) }}" class="inline" onsubmit="return confirm('Delete this {{ $resource }}?');">

@@ -61,7 +61,7 @@ Route::middleware('canonical')->group(function () {
     Route::get('/contact/managing-director', [PageController::class, 'managingDirector'])->name('contact.managing-director');
 });
 
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:6,1');
 
 /*
 |--------------------------------------------------------------------------
@@ -69,9 +69,9 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 |--------------------------------------------------------------------------
 */
 
-Route::get('/about', fn () => redirect()->away(Page::where('slug', 'about')->firstOrFail()->getPath(), 301));
+Route::get('/about', fn () => redirect()->away(Page::published()->where('slug', 'about')->firstOrFail()->getPath(), 301));
 Route::get('/about/{slug}', function (string $slug) {
-    $page = Page::where('slug', $slug)->firstOrFail();
+    $page = Page::published()->where('slug', $slug)->firstOrFail();
 
     return redirect()->away($page->getPath(), 301);
 });
@@ -80,7 +80,7 @@ Route::get('/services', fn () => redirect()->away('/ast-services/', 301));
 Route::get('/services/{path}', function (string $path) {
     $segments = explode('/', $path);
     $service = Service::resolvePath($segments)
-        ?? Service::where('slug', last($segments))->first();
+        ?? Service::published()->where('slug', last($segments))->first();
 
     abort_unless($service, 404);
 
@@ -91,7 +91,7 @@ Route::get('/destinations', fn () => redirect()->away('/destination/', 301));
 Route::get('/destinations/{path}', function (string $path) {
     $segments = explode('/', $path);
     $destination = Destination::resolvePath($segments)
-        ?? Destination::where('slug', last($segments))->first();
+        ?? Destination::published()->where('slug', last($segments))->first();
 
     abort_unless($destination, 404);
 
@@ -100,7 +100,7 @@ Route::get('/destinations/{path}', function (string $path) {
 
 Route::get('/packages', fn () => redirect()->away('/special-package/', 301));
 Route::get('/packages/{slug}', function (string $slug) {
-    $package = Package::where('slug', $slug)->firstOrFail();
+    $package = Package::published()->where('slug', $slug)->firstOrFail();
 
     return redirect()->away($package->getPath(), 301);
 });
@@ -143,5 +143,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
     Route::get('inquiries/{inquiry}', [InquiryController::class, 'show'])->name('inquiries.show');
+    Route::patch('inquiries/{inquiry}/toggle-read', [InquiryController::class, 'toggleRead'])->name('inquiries.toggle-read');
+    Route::patch('inquiries/{inquiry}/status', [InquiryController::class, 'updateStatus'])->name('inquiries.status');
+    Route::post('inquiries/bulk', [InquiryController::class, 'bulk'])->name('inquiries.bulk');
     Route::delete('inquiries/{inquiry}', [InquiryController::class, 'destroy'])->name('inquiries.destroy');
 });

@@ -59,6 +59,14 @@
                 <x-input-error :messages="$errors->get('sort_order')" class="mt-2" />
             </div>
 
+            <div>
+                <label class="flex items-center gap-2 text-sm text-gray-700">
+                    <input type="checkbox" name="is_published" value="1" @checked(old('is_published', $page->is_published)) class="rounded border-gray-300 text-pine focus:ring-pine">
+                    Published
+                </label>
+                <p class="mt-1 text-xs text-gray-500">Unpublished items are hidden from the public site and navigation.</p>
+            </div>
+
             <div class="flex items-center gap-3">
                 <x-primary-button>Save Changes</x-primary-button>
                 <a href="{{ route('admin.pages.index') }}" class="text-sm text-gray-500 hover:text-gray-700">Cancel</a>

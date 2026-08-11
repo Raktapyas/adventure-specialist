@@ -19,7 +19,7 @@ class PackageController extends Controller
     public function index(): View
     {
         return view('admin.packages.index', [
-            'packages' => Package::orderBy('sort_order')->get(),
+            'packages' => Package::orderBy('sort_order')->orderBy('title')->get(),
         ]);
     }
 

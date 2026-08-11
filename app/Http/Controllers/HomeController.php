@@ -12,15 +12,17 @@ class HomeController extends Controller
     public function __invoke()
     {
         return view('pages.home', [
-            'services' => Service::whereNull('parent_id')->orderBy('sort_order')->get(),
-            'destinations' => Destination::whereNull('parent_id')->orderBy('sort_order')->get(),
-            'packages' => Package::orderBy('sort_order')->limit(4)->get(),
-            'galleryImages' => GalleryImage::orderBy('sort_order')->limit(6)->get(),
+            'services' => Service::published()->whereNull('parent_id')->orderBy('sort_order')->orderBy('title')->get(),
+            'destinations' => Destination::published()->whereNull('parent_id')
+                ->with(['children' => fn ($q) => $q->published()])
+                ->orderBy('sort_order')->orderBy('title')->get(),
+            'packages' => Package::published()->orderBy('sort_order')->orderBy('title')->limit(4)->get(),
+            'galleryImages' => GalleryImage::orderBy('sort_order')->orderBy('id')->limit(6)->get(),
             'stats' => [
                 ['value' => 5, 'suffix' => '', 'label' => 'Countries served'],
-                ['value' => Service::count(), 'suffix' => '+', 'label' => 'Adventure services'],
-                ['value' => Destination::count(), 'suffix' => '+', 'label' => 'Destinations & programs'],
-                ['value' => Package::count(), 'suffix' => '', 'label' => 'Signature packages'],
+                ['value' => Service::published()->count(), 'suffix' => '+', 'label' => 'Adventure services'],
+                ['value' => Destination::published()->count(), 'suffix' => '+', 'label' => 'Destinations & programs'],
+                ['value' => Package::published()->count(), 'suffix' => '', 'label' => 'Signature packages'],
             ],
         ]);
     }

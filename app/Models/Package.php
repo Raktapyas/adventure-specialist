@@ -18,7 +18,20 @@ class Package extends Model
         'duration_days',
         'cover_image',
         'sort_order',
+        'is_published',
     ];
+
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', true);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_published' => 'boolean',
+        ];
+    }
 
     public function mediaUsages(): MorphMany
     {

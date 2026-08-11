@@ -20,7 +20,7 @@ class DestinationController extends Controller
     public function index(): View
     {
         return view('admin.destinations.index', [
-            'destinations' => Destination::with('children')->orderBy('sort_order')->get(),
+            'destinations' => Destination::with('children')->orderBy('sort_order')->orderBy('title')->get(),
         ]);
     }
 
@@ -30,7 +30,7 @@ class DestinationController extends Controller
     public function create(): View
     {
         return view('admin.destinations.create', [
-            'destinations' => Destination::orderBy('sort_order')->get(),
+            'destinations' => Destination::orderBy('sort_order')->orderBy('title')->get(),
         ]);
     }
 
@@ -97,6 +97,6 @@ class DestinationController extends Controller
     {
         $excluded = array_merge([$destination->id], $destination->descendantIds());
 
-        return Destination::whereNotIn('id', $excluded)->orderBy('sort_order')->get();
+        return Destination::whereNotIn('id', $excluded)->orderBy('sort_order')->orderBy('title')->get();
     }
 }

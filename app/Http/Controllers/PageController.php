@@ -11,7 +11,13 @@ class PageController extends Controller
 
     public function show(string $slug)
     {
-        $page = Page::where('slug', $slug)->with('children')->first();
+        $page = Page::published()
+            ->where('slug', $slug)
+            ->with([
+                'children' => fn ($q) => $q->published(),
+                'parent.children' => fn ($q) => $q->published(),
+            ])
+            ->first();
 
         if (! $page) {
             return $this->redirectFromHistory();
@@ -31,7 +37,7 @@ class PageController extends Controller
 
     public function managingDirector()
     {
-        $page = Page::where('slug', 'managing-director')->first();
+        $page = Page::published()->where('slug', 'managing-director')->first();
 
         if (! $page) {
             return $this->redirectFromHistory();

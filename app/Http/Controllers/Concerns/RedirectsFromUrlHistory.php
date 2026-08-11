@@ -16,7 +16,9 @@ trait RedirectsFromUrlHistory
     {
         $target = app(UrlHistoryService::class)->targetFor(request()->getPathInfo());
 
-        if (! $target || ! method_exists($target, 'getPath')) {
+        if (! $target
+            || ! method_exists($target, 'getPath')
+            || ! (bool) $target->is_published) {
             abort(404);
         }
 

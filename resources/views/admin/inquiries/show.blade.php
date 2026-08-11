@@ -10,11 +10,37 @@
                     <h2 class="text-xl font-semibold text-gray-900">{{ $inquiry->subject ?? 'General Inquiry' }}</h2>
                     <p class="mt-1 text-sm text-gray-500">Received {{ $inquiry->created_at->format('M j, Y g:i A') }}</p>
                 </div>
-                <form method="POST" action="{{ route('admin.inquiries.destroy', $inquiry) }}" onsubmit="return confirm('Delete this inquiry?');">
+                <div class="flex items-center gap-2">
+                    <form method="POST" action="{{ route('admin.inquiries.toggle-read', $inquiry) }}">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="px-3 py-1.5 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            Mark as {{ $inquiry->is_read ? 'Unread' : 'Read' }}
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.inquiries.destroy', $inquiry) }}" onsubmit="return confirm('Delete this inquiry?');">
+                        @csrf
+                        @method('DELETE')
+                        <x-danger-button>Delete</x-danger-button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-wrap items-center gap-3">
+                <span class="text-sm text-gray-500 font-medium">Status:</span>
+                <form method="POST" action="{{ route('admin.inquiries.status', $inquiry) }}" class="flex items-center gap-2">
                     @csrf
-                    @method('DELETE')
-                    <x-danger-button>Delete</x-danger-button>
+                    @method('PATCH')
+                    <select name="status" class="rounded-md border-gray-300 text-sm">
+                        @foreach ($statuses as $status)
+                            <option value="{{ $status }}" @selected($inquiry->status === $status)>{{ ucfirst($status) }}</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="px-3 py-1.5 rounded-md bg-pine text-white text-sm font-medium">Update</button>
                 </form>
+                @if (! $inquiry->is_read)
+                    <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-xs">Unread</span>
+                @endif
             </div>
 
             <dl class="divide-y divide-gray-200 text-sm">

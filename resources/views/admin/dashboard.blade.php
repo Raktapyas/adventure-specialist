@@ -13,6 +13,7 @@
                     ['label' => 'Packages', 'value' => $counts['packages'], 'accent' => 'bg-bronze'],
                     ['label' => 'Gallery Images', 'value' => $counts['gallery'], 'accent' => 'bg-clay'],
                     ['label' => 'Inquiries', 'value' => $counts['inquiries'], 'accent' => 'bg-ink'],
+                    ['label' => 'Unread Inquiries', 'value' => $unreadInquiries, 'accent' => 'bg-amber-500'],
                 ];
             @endphp
 

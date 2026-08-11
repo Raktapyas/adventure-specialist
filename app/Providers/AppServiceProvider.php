@@ -13,7 +13,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // One NavComposer instance per request so the nav queries run once
+        // even when the composer fires for several of the registered views.
+        $this->app->singleton(NavComposer::class);
     }
 
     /**
@@ -21,6 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer('*', NavComposer::class);
+        View::composer(NavComposer::VIEWS, NavComposer::class);
     }
 }

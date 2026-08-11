@@ -19,7 +19,7 @@ class PageController extends Controller
     public function index(): View
     {
         return view('admin.pages.index', [
-            'pages' => Page::with('children')->orderBy('sort_order')->get(),
+            'pages' => Page::with('children')->orderBy('sort_order')->orderBy('title')->get(),
         ]);
     }
 
@@ -29,7 +29,7 @@ class PageController extends Controller
     public function create(): View
     {
         return view('admin.pages.create', [
-            'pages' => Page::orderBy('sort_order')->get(),
+            'pages' => Page::orderBy('sort_order')->orderBy('title')->get(),
         ]);
     }
 
@@ -55,7 +55,7 @@ class PageController extends Controller
     {
         return view('admin.pages.edit', [
             'page' => $page,
-            'pages' => Page::orderBy('sort_order')->get(),
+            'pages' => Page::orderBy('sort_order')->orderBy('title')->get(),
         ]);
     }
 

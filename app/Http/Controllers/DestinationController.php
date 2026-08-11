@@ -12,13 +12,21 @@ class DestinationController extends Controller
     public function index()
     {
         return view('destinations.index', [
-            'destinations' => Destination::whereNull('parent_id')->orderBy('sort_order')->with('children.parent')->get(),
+            'destinations' => Destination::published()
+                ->whereNull('parent_id')
+                ->orderBy('sort_order')
+                ->orderBy('title')
+                ->with(['children' => fn ($q) => $q->published()])
+                ->get(),
         ]);
     }
 
     public function show(string $slug)
     {
-        $destination = Destination::where('slug', $slug)->with('children.parent')->first();
+        $destination = Destination::published()
+            ->where('slug', $slug)
+            ->with(['children' => fn ($q) => $q->published()])
+            ->first();
 
         if (! $destination) {
             return $this->redirectFromHistory();
@@ -59,6 +67,7 @@ class DestinationController extends Controller
         }
 
         $destination->load('parent.parent');
+        $destination->parent?->load(['children' => fn ($q) => $q->published()]);
 
         return view('destinations.show', [
             'destination' => $destination,

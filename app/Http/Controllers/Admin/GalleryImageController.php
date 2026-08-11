@@ -18,7 +18,7 @@ class GalleryImageController extends Controller
     public function index(): View
     {
         return view('admin.gallery.index', [
-            'images' => GalleryImage::orderBy('sort_order')->get(),
+            'images' => GalleryImage::orderBy('sort_order')->orderBy('id')->get(),
         ]);
     }
 

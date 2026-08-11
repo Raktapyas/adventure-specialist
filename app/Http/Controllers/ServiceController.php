@@ -12,13 +12,21 @@ class ServiceController extends Controller
     public function index()
     {
         return view('services.index', [
-            'services' => Service::whereNull('parent_id')->orderBy('sort_order')->with('children.parent')->get(),
+            'services' => Service::published()
+                ->whereNull('parent_id')
+                ->orderBy('sort_order')
+                ->orderBy('title')
+                ->with(['children' => fn ($q) => $q->published()])
+                ->get(),
         ]);
     }
 
     public function show(string $slug)
     {
-        $service = Service::where('slug', $slug)->with('children.parent')->first();
+        $service = Service::published()
+            ->where('slug', $slug)
+            ->with(['children' => fn ($q) => $q->published()])
+            ->first();
 
         if (! $service) {
             return $this->redirectFromHistory();
@@ -47,6 +55,7 @@ class ServiceController extends Controller
         }
 
         $service->load('parent.parent');
+        $service->parent?->load(['children' => fn ($q) => $q->published()]);
 
         return view('services.show', [
             'service' => $service,

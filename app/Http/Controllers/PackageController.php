@@ -12,13 +12,13 @@ class PackageController extends Controller
     public function index()
     {
         return view('packages.index', [
-            'packages' => Package::orderBy('sort_order')->get(),
+            'packages' => Package::published()->orderBy('sort_order')->orderBy('title')->get(),
         ]);
     }
 
     public function show(string $slug)
     {
-        $package = Package::where('slug', $slug)->first();
+        $package = Package::published()->where('slug', $slug)->first();
 
         if (! $package) {
             return $this->redirectFromHistory();

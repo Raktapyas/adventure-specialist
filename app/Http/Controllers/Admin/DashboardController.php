@@ -25,8 +25,10 @@ class DashboardController extends Controller
                 'packages' => Package::count(),
                 'gallery' => GalleryImage::count(),
                 'inquiries' => Inquiry::count(),
+                'unreadInquiries' => Inquiry::unread()->count(),
             ],
             'recentInquiries' => Inquiry::latest()->limit(5)->get(),
+            'unreadInquiries' => Inquiry::unread()->count(),
         ]);
     }
 }

@@ -25,6 +25,10 @@ class UpdatePageRequest extends FormRequest
         if ($this->boolean('remove_parent')) {
             $this->merge(['parent_id' => null]);
         }
+
+        if ($this->exists('is_published')) {
+            $this->merge(['is_published' => $this->boolean('is_published')]);
+        }
     }
 
     /**
@@ -42,6 +46,7 @@ class UpdatePageRequest extends FormRequest
             'content' => ['nullable', 'string'],
             'cover_image' => ['nullable', 'string', 'max:255'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
+            'is_published' => ['boolean'],
         ];
     }
 

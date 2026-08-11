@@ -20,7 +20,7 @@ class ServiceController extends Controller
     public function index(): View
     {
         return view('admin.services.index', [
-            'services' => Service::with('children')->orderBy('sort_order')->get(),
+            'services' => Service::with('children')->orderBy('sort_order')->orderBy('title')->get(),
         ]);
     }
 
@@ -30,7 +30,7 @@ class ServiceController extends Controller
     public function create(): View
     {
         return view('admin.services.create', [
-            'services' => Service::orderBy('sort_order')->get(),
+            'services' => Service::orderBy('sort_order')->orderBy('title')->get(),
         ]);
     }
 
@@ -97,6 +97,6 @@ class ServiceController extends Controller
     {
         $excluded = array_merge([$service->id], $service->descendantIds());
 
-        return Service::whereNotIn('id', $excluded)->orderBy('sort_order')->get();
+        return Service::whereNotIn('id', $excluded)->orderBy('sort_order')->orderBy('title')->get();
     }
 }

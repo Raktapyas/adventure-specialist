@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Destination;
 use App\Models\GalleryImage;
+use App\Models\Package;
 use App\Models\Page;
 use App\Models\Service;
 use App\Models\User;
@@ -45,5 +47,34 @@ class AdminSeederSafetyTest extends TestCase
             ]);
 
         $this->assertDatabaseHas('pages', ['slug' => 'html-page', 'content' => $html]);
+    }
+
+    public function test_seeders_are_idempotent_when_run_twice(): void
+    {
+        $this->seed();
+
+        $countsBefore = [
+            'pages' => Page::count(),
+            'services' => Service::count(),
+            'destinations' => Destination::count(),
+            'packages' => Package::count(),
+        ];
+
+        $this->seed();
+
+        $this->assertSame($countsBefore['pages'], Page::count());
+        $this->assertSame($countsBefore['services'], Service::count());
+        $this->assertSame($countsBefore['destinations'], Destination::count());
+        $this->assertSame($countsBefore['packages'], Package::count());
+    }
+
+    public function test_seeded_records_are_published_by_default(): void
+    {
+        $this->seed();
+
+        $this->assertSame(Page::count(), Page::published()->count());
+        $this->assertSame(Service::count(), Service::published()->count());
+        $this->assertSame(Destination::count(), Destination::published()->count());
+        $this->assertSame(Package::count(), Package::published()->count());
     }
 }

@@ -9,6 +9,16 @@ use Illuminate\Validation\Rule;
 class UpdatePackageRequest extends FormRequest
 {
     /**
+     * Normalize the publishing checkbox (absent when unchecked).
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->exists('is_published')) {
+            $this->merge(['is_published' => $this->boolean('is_published')]);
+        }
+    }
+
+    /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
@@ -31,6 +41,7 @@ class UpdatePackageRequest extends FormRequest
             'duration_days' => ['nullable', 'integer', 'min:1', 'max:365'],
             'cover_image' => ['nullable', 'string', 'max:255'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
+            'is_published' => ['boolean'],
         ];
     }
 }
