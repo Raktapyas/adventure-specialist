@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreServiceRequest;
 use App\Http\Requests\Admin\UpdateServiceRequest;
 use App\Models\Service;
+use App\Services\MediaUsageService;
 use App\Services\UrlHistoryService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -38,7 +39,11 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request): RedirectResponse
     {
-        Service::create($request->validated());
+        $service = Service::create($request->validated());
+
+        $usage = app(MediaUsageService::class);
+        $usage->sync($service, 'cover_image', $request->validated('cover_image'));
+        $usage->syncContent($service, $request->validated('content'));
 
         return redirect()->route('admin.services.index')
             ->with('status', 'Service created.');
@@ -62,6 +67,10 @@ class ServiceController extends Controller
     {
         app(UrlHistoryService::class)->update($service, $request->validated());
 
+        $usage = app(MediaUsageService::class);
+        $usage->sync($service, 'cover_image', $request->validated('cover_image'));
+        $usage->syncContent($service, $request->validated('content'));
+
         return redirect()->route('admin.services.edit', $service)
             ->with('status', 'Service updated.');
     }
@@ -78,6 +87,7 @@ class ServiceController extends Controller
 
         $service->delete();
         app(UrlHistoryService::class)->purge($service);
+        app(MediaUsageService::class)->purgeModel($service);
 
         return redirect()->route('admin.services.index')
             ->with('status', 'Service deleted.');

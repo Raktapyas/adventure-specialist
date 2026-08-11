@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DestinationController as AdminDestinationController;
 use App\Http\Controllers\Admin\GalleryImageController;
 use App\Http\Controllers\Admin\InquiryController;
+use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PackageController as AdminPackageController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
@@ -136,6 +137,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('destinations', AdminDestinationController::class)->except(['show']);
     Route::resource('packages', AdminPackageController::class)->except(['show']);
     Route::resource('gallery', GalleryImageController::class)->except(['show']);
+    Route::resource('media', MediaController::class)->except(['show', 'edit', 'update']);
+
+    Route::get('media/picker-data', [MediaController::class, 'pickerData'])->name('media.picker-data');
 
     Route::get('inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
     Route::get('inquiries/{inquiry}', [InquiryController::class, 'show'])->name('inquiries.show');

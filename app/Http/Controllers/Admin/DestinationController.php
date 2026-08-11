@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreDestinationRequest;
 use App\Http\Requests\Admin\UpdateDestinationRequest;
 use App\Models\Destination;
+use App\Services\MediaUsageService;
 use App\Services\UrlHistoryService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -38,7 +39,11 @@ class DestinationController extends Controller
      */
     public function store(StoreDestinationRequest $request): RedirectResponse
     {
-        Destination::create($request->validated());
+        $destination = Destination::create($request->validated());
+
+        $usage = app(MediaUsageService::class);
+        $usage->sync($destination, 'cover_image', $request->validated('cover_image'));
+        $usage->syncContent($destination, $request->validated('content'));
 
         return redirect()->route('admin.destinations.index')
             ->with('status', 'Destination created.');
@@ -62,6 +67,10 @@ class DestinationController extends Controller
     {
         app(UrlHistoryService::class)->update($destination, $request->validated());
 
+        $usage = app(MediaUsageService::class);
+        $usage->sync($destination, 'cover_image', $request->validated('cover_image'));
+        $usage->syncContent($destination, $request->validated('content'));
+
         return redirect()->route('admin.destinations.edit', $destination)
             ->with('status', 'Destination updated.');
     }
@@ -78,6 +87,7 @@ class DestinationController extends Controller
 
         $destination->delete();
         app(UrlHistoryService::class)->purge($destination);
+        app(MediaUsageService::class)->purgeModel($destination);
 
         return redirect()->route('admin.destinations.index')
             ->with('status', 'Destination deleted.');

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePageRequest;
 use App\Http\Requests\Admin\UpdatePageRequest;
 use App\Models\Page;
+use App\Services\MediaUsageService;
 use App\Services\UrlHistoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -37,7 +38,11 @@ class PageController extends Controller
      */
     public function store(StorePageRequest $request): RedirectResponse
     {
-        Page::create($request->validated());
+        $page = Page::create($request->validated());
+
+        $usage = app(MediaUsageService::class);
+        $usage->sync($page, 'cover_image', $request->validated('cover_image'));
+        $usage->syncContent($page, $request->validated('content'));
 
         return redirect()->route('admin.pages.index')
             ->with('status', 'Page created.');
@@ -61,6 +66,10 @@ class PageController extends Controller
     {
         app(UrlHistoryService::class)->update($page, $request->validated());
 
+        $usage = app(MediaUsageService::class);
+        $usage->sync($page, 'cover_image', $request->validated('cover_image'));
+        $usage->syncContent($page, $request->validated('content'));
+
         return redirect()->route('admin.pages.edit', $page)
             ->with('status', 'Page updated.');
     }
@@ -77,6 +86,7 @@ class PageController extends Controller
 
         $page->delete();
         app(UrlHistoryService::class)->purge($page);
+        app(MediaUsageService::class)->purgeModel($page);
 
         return redirect()->route('admin.pages.index')
             ->with('status', 'Page deleted.');

@@ -47,6 +47,10 @@
                        class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.gallery.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
                         Gallery
                     </a>
+                    <a href="{{ route('admin.media.index') }}"
+                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.media.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                        Media
+                    </a>
                     <a href="{{ route('admin.inquiries.index') }}"
                        class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.inquiries.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
                         Inquiries

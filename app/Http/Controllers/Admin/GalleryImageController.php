@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreGalleryImageRequest;
 use App\Http\Requests\Admin\UpdateGalleryImageRequest;
 use App\Models\GalleryImage;
+use App\Services\MediaUsageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -34,7 +35,9 @@ class GalleryImageController extends Controller
      */
     public function store(StoreGalleryImageRequest $request): RedirectResponse
     {
-        GalleryImage::create($request->validated());
+        $gallery = GalleryImage::create($request->validated());
+
+        app(MediaUsageService::class)->sync($gallery, 'image_url', $request->validated('image_url'));
 
         return redirect()->route('admin.gallery.index')
             ->with('status', 'Image added.');
@@ -57,6 +60,8 @@ class GalleryImageController extends Controller
     {
         $gallery->update($request->validated());
 
+        app(MediaUsageService::class)->sync($gallery, 'image_url', $request->validated('image_url'));
+
         return redirect()->route('admin.gallery.edit', $gallery)
             ->with('status', 'Image updated.');
     }
@@ -67,6 +72,7 @@ class GalleryImageController extends Controller
     public function destroy(GalleryImage $gallery): RedirectResponse
     {
         $gallery->delete();
+        app(MediaUsageService::class)->purgeModel($gallery);
 
         return redirect()->route('admin.gallery.index')
             ->with('status', 'Image removed.');

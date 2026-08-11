@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePackageRequest;
 use App\Http\Requests\Admin\UpdatePackageRequest;
 use App\Models\Package;
+use App\Services\MediaUsageService;
 use App\Services\UrlHistoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -35,7 +36,11 @@ class PackageController extends Controller
      */
     public function store(StorePackageRequest $request): RedirectResponse
     {
-        Package::create($request->validated());
+        $package = Package::create($request->validated());
+
+        $usage = app(MediaUsageService::class);
+        $usage->sync($package, 'cover_image', $request->validated('cover_image'));
+        $usage->syncContent($package, $request->validated('content'));
 
         return redirect()->route('admin.packages.index')
             ->with('status', 'Package created.');
@@ -58,6 +63,10 @@ class PackageController extends Controller
     {
         app(UrlHistoryService::class)->update($package, $request->validated());
 
+        $usage = app(MediaUsageService::class);
+        $usage->sync($package, 'cover_image', $request->validated('cover_image'));
+        $usage->syncContent($package, $request->validated('content'));
+
         return redirect()->route('admin.packages.edit', $package)
             ->with('status', 'Package updated.');
     }
@@ -69,6 +78,7 @@ class PackageController extends Controller
     {
         $package->delete();
         app(UrlHistoryService::class)->purge($package);
+        app(MediaUsageService::class)->purgeModel($package);
 
         return redirect()->route('admin.packages.index')
             ->with('status', 'Package deleted.');
