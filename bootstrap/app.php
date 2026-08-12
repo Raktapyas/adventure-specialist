@@ -18,6 +18,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'canonical' => EnsureTrailingSlash::class,
             'admin' => EnsureIsAdmin::class,
         ]);
+
+        // Authenticated visitors hitting guest-only pages (e.g. /login after
+        // signing in) must not be bounced into the admin area where a
+        // non-admin would hit a 403. Admins go to the dashboard; everyone
+        // else returns to the public site.
+        $middleware->redirectTo(
+            users: fn (Request $request) => $request->user()?->is_admin
+                ? route('dashboard')
+                : route('home'),
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

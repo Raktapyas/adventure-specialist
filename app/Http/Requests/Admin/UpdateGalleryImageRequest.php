@@ -2,11 +2,22 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\Concerns\NormalizesMediaPath;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateGalleryImageRequest extends FormRequest
 {
+    use NormalizesMediaPath;
+
+    /**
+     * Normalize the image reference to its host-relative form.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->normalizeMediaPath('image_url');
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -23,7 +34,7 @@ class UpdateGalleryImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image_url' => ['required', 'string', 'max:255'],
+            'image_url' => $this->mediaPathRules('image_url', nullable: false),
             'caption' => ['nullable', 'string', 'max:1000'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ];

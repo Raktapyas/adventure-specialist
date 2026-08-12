@@ -11,11 +11,18 @@ use RuntimeException;
 
 class MediaUploader
 {
-    private const MIME_TO_EXTENSION = [
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'image/webp' => 'webp',
-        'image/gif' => 'gif',
+    /**
+     * Extensions the server accepts for each sniffed MIME type. JPEG may use
+     * either ".jpg" or ".jpeg"; everything else has a single canonical
+     * extension. The stored extension is the client-declared one, so ".jpeg"
+     * uploads keep their ".jpeg" suffix while still matching the sniffed
+     * "image/jpeg" contents.
+     */
+    private const MIME_EXTENSIONS = [
+        'image/jpeg' => ['jpg', 'jpeg'],
+        'image/png' => ['png'],
+        'image/webp' => ['webp'],
+        'image/gif' => ['gif'],
     ];
 
     /**
@@ -35,18 +42,24 @@ class MediaUploader
             throw new RuntimeException('Failed to store the uploaded file.');
         }
 
-        return Media::create([
-            'name' => $this->sanitizeName($file->getClientOriginalName()),
-            'path' => $this->hostRelativeUrl($disk, $storagePath),
-            'disk' => $disk,
-            'storage_path' => $storagePath,
-            'mime_type' => $file->getMimeType(),
-            'extension' => $extension,
-            'size' => $file->getSize(),
-            'alt_text' => $altText,
-            'is_legacy' => false,
-            'created_by' => $userId,
-        ]);
+        try {
+            return Media::create([
+                'name' => $this->sanitizeName($file->getClientOriginalName()),
+                'path' => $this->hostRelativeUrl($disk, $storagePath),
+                'disk' => $disk,
+                'storage_path' => $storagePath,
+                'mime_type' => $file->getMimeType(),
+                'extension' => $extension,
+                'size' => $file->getSize(),
+                'alt_text' => $altText,
+                'is_legacy' => false,
+                'created_by' => $userId,
+            ]);
+        } catch (\Throwable $e) {
+            Storage::disk($disk)->delete($storagePath);
+
+            throw $e;
+        }
     }
 
     /**
@@ -103,9 +116,9 @@ class MediaUploader
             $this->fail('The file is not a valid image.');
         }
 
-        $expectedExtension = self::MIME_TO_EXTENSION[$sniffedMime] ?? null;
+        $allowedExtensions = self::MIME_EXTENSIONS[$sniffedMime] ?? null;
 
-        if ($expectedExtension === null || $extension !== $expectedExtension) {
+        if ($allowedExtensions === null || ! in_array($extension, $allowedExtensions, true)) {
             $this->fail('The file extension does not match its contents.');
         }
 

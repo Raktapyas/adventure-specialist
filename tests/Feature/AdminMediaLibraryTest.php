@@ -27,6 +27,13 @@ class AdminMediaLibraryTest extends TestCase
         return UploadedFile::fake()->createWithContent($name, $bytes);
     }
 
+    private function jpeg(string $name = 'image.jpg'): UploadedFile
+    {
+        $bytes = base64_decode('/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AVN//2Q==');
+
+        return UploadedFile::fake()->createWithContent($name, $bytes);
+    }
+
     public function test_guests_are_redirected_to_login(): void
     {
         $this->get('/admin/media')->assertRedirect('/login');
@@ -82,6 +89,47 @@ class AdminMediaLibraryTest extends TestCase
         $this->assertSame($admin->id, $media->created_by);
 
         Storage::disk('public')->assertExists($media->storage_path);
+    }
+
+    public function test_admin_can_upload_jpeg_extension_files_like_jpg(): void
+    {
+        Storage::fake('public');
+
+        $this->actingAs($this->admin())
+            ->post('/admin/media', ['media' => [$this->jpeg('photo.jpeg')]])
+            ->assertRedirect(route('admin.media.index'));
+
+        $media = Media::firstOrFail();
+
+        $this->assertFalse($media->is_legacy);
+        $this->assertSame('jpeg', $media->extension);
+        $this->assertSame('image/jpeg', $media->mime_type);
+
+        Storage::disk('public')->assertExists($media->storage_path);
+        $this->assertStringStartsWith('/storage/', $media->path);
+    }
+
+    public function test_jpg_and_jpeg_extensions_are_both_accepted_for_jpeg_contents(): void
+    {
+        Storage::fake('public');
+
+        $this->actingAs($this->admin())
+            ->post('/admin/media', ['media' => [$this->jpeg('photo.jpg'), $this->jpeg('photo.jpeg')]])
+            ->assertRedirect(route('admin.media.index'));
+
+        $this->assertSame(2, Media::count());
+        $this->assertSame(['jpg', 'jpeg'], Media::orderBy('id')->pluck('extension')->all());
+    }
+
+    public function test_jpeg_extension_with_non_jpeg_contents_is_rejected(): void
+    {
+        $png = $this->png('mismatch.jpeg');
+
+        $this->actingAs($this->admin())
+            ->post('/admin/media', ['media' => [$png]])
+            ->assertSessionHasErrors();
+
+        $this->assertDatabaseCount('media', 0);
     }
 
     public function test_upload_rejects_non_images(): void

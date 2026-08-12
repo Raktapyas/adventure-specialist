@@ -111,6 +111,54 @@ class AdminPageCrudTest extends TestCase
             ->assertSessionHasErrors('parent_id');
     }
 
+    public function test_page_can_be_created_directly_under_a_top_level_page(): void
+    {
+        $top = Page::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->post('/admin/pages', [
+                'title' => 'Child Page',
+                'slug' => 'child-page',
+                'parent_id' => $top->id,
+            ])
+            ->assertRedirect(route('admin.pages.index'));
+
+        $this->assertDatabaseHas('pages', ['slug' => 'child-page', 'parent_id' => $top->id]);
+    }
+
+    public function test_page_cannot_be_created_under_a_child_page(): void
+    {
+        $top = Page::factory()->create();
+        $child = Page::factory()->create(['parent_id' => $top->id]);
+
+        $this->actingAs($this->admin())
+            ->post('/admin/pages', [
+                'title' => 'Grandchild',
+                'slug' => 'grandchild',
+                'parent_id' => $child->id,
+            ])
+            ->assertSessionHasErrors('parent_id');
+
+        $this->assertDatabaseMissing('pages', ['slug' => 'grandchild']);
+    }
+
+    public function test_page_cannot_be_moved_under_a_child_page(): void
+    {
+        $top = Page::factory()->create();
+        $child = Page::factory()->create(['parent_id' => $top->id]);
+        $page = Page::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->put("/admin/pages/{$page->id}", [
+                'title' => $page->title,
+                'slug' => $page->slug,
+                'parent_id' => $child->id,
+            ])
+            ->assertSessionHasErrors('parent_id');
+
+        $this->assertDatabaseHas('pages', ['id' => $page->id, 'parent_id' => null]);
+    }
+
     public function test_page_cannot_be_moved_under_its_own_descendant(): void
     {
         $parent = Page::factory()->create();

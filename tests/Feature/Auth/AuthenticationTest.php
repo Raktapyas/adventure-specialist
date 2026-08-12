@@ -27,7 +27,56 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('home', absolute: false));
+    }
+
+    public function test_admin_users_are_redirected_to_the_dashboard_after_login(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->post('/login', [
+            'email' => $admin->email,
+            'password' => 'password',
+        ])->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_non_admin_login_ignores_an_admin_intended_url(): void
+    {
+        $user = User::factory()->create();
+
+        $this->withSession(['url.intended' => route('admin.dashboard')])
+            ->post('/login', [
+                'email' => $user->email,
+                'password' => 'password',
+            ])
+            ->assertRedirect(route('home', absolute: false));
+    }
+
+    public function test_non_admin_login_respects_a_public_intended_url(): void
+    {
+        $user = User::factory()->create();
+
+        $this->withSession(['url.intended' => route('gallery')])
+            ->post('/login', [
+                'email' => $user->email,
+                'password' => 'password',
+            ])
+            ->assertRedirect(route('gallery', absolute: false));
+    }
+
+    public function test_authenticated_non_admin_visiting_guest_pages_goes_home_not_dashboard(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get('/login')->assertRedirect(route('home', absolute: false));
+        $this->actingAs($user)->get('/register')->assertRedirect(route('home', absolute: false));
+    }
+
+    public function test_authenticated_admin_visiting_guest_pages_goes_to_the_dashboard(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)->get('/login')->assertRedirect(route('dashboard', absolute: false));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void

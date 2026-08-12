@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\Concerns\NormalizesMediaPath;
+use App\Models\Page;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -9,6 +11,8 @@ use Illuminate\Validation\Validator;
 
 class UpdatePageRequest extends FormRequest
 {
+    use NormalizesMediaPath;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,6 +26,8 @@ class UpdatePageRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        $this->normalizeMediaPath('cover_image');
+
         if ($this->boolean('remove_parent')) {
             $this->merge(['parent_id' => null]);
         }
@@ -44,7 +50,7 @@ class UpdatePageRequest extends FormRequest
             'slug' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('pages', 'slug')->ignore($this->route('page'))],
             'excerpt' => ['nullable', 'string', 'max:1000'],
             'content' => ['nullable', 'string'],
-            'cover_image' => ['nullable', 'string', 'max:255'],
+            'cover_image' => $this->mediaPathRules('cover_image'),
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_published' => ['boolean'],
         ];
@@ -69,6 +75,12 @@ class UpdatePageRequest extends FormRequest
 
             if (in_array((int) $parentId, $page->descendantIds(), true)) {
                 $validator->errors()->add('parent_id', 'A page cannot be a descendant of itself.');
+            }
+
+            $parentDepth = $page->id === (int) $parentId ? 0 : (Page::find($parentId)?->chainDepth() ?? 0);
+
+            if ($parentDepth >= 1) {
+                $validator->errors()->add('parent_id', 'A page can only be nested directly under a top-level page.');
             }
         });
     }

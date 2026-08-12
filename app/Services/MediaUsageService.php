@@ -16,10 +16,15 @@ class MediaUsageService
     /**
      * Point the "field" usage of a model at the media row owning the given
      * web path (when one exists), dropping any previous value for that field.
+     *
+     * The path is normalized to its host-relative form first, so an absolute
+     * URL and its host-relative path reference the same media row.
      */
     public function sync(Model $model, string $field, ?string $path): void
     {
         $this->clear($model, $field);
+
+        $path = Media::normalizePath($path);
 
         if ($path === null || $path === '') {
             return;
@@ -154,9 +159,16 @@ class MediaUsageService
     {
         preg_match_all('/src=["\']([^"\']+)["\']/i', $html, $matches);
 
-        return array_values(array_unique(array_map(
-            fn (string $src) => $src,
-            $matches[1] ?? []
-        )));
+        $paths = [];
+
+        foreach ($matches[1] ?? [] as $src) {
+            $path = Media::normalizePath($src);
+
+            if ($path !== null) {
+                $paths[] = $path;
+            }
+        }
+
+        return array_values(array_unique($paths));
     }
 }

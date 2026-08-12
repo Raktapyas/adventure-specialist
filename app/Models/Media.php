@@ -53,16 +53,60 @@ class Media extends Model
     }
 
     /**
+     * Canonical host-relative form of a stored image reference.
+     *
+     * Absolute http(s) URLs (e.g. pasted browser addresses or legacy data)
+     * are reduced to their path (plus any query), so they match the
+     * host-relative path convention used by uploads and legacy media. Any
+     * other value is returned unchanged.
+     */
+    public static function normalizePath(?string $path): ?string
+    {
+        if ($path === null || trim($path) === '') {
+            return null;
+        }
+
+        $value = trim($path);
+        $parts = parse_url($value);
+
+        if (isset($parts['scheme']) && in_array($parts['scheme'], ['http', 'https'], true)) {
+            $value = ($parts['path'] ?? '/').(isset($parts['query']) ? '?'.$parts['query'] : '');
+        }
+
+        return $value;
+    }
+
+    /**
      * True when the file physically exists for this row.
+     *
+     * The check is defensive: malformed rows (missing disk, tampered paths
+     * with traversal or absolute filesystem paths) report "missing" instead of
+     * probing arbitrary paths or throwing. Delete protection is unaffected —
+     * it is driven by usage rows, never by file existence.
      */
     public function fileExists(): bool
     {
         if ($this->is_legacy) {
+            if (! $this->isSafeWebPath($this->path)) {
+                return false;
+            }
+
             return is_file(public_path($this->path));
         }
 
-        return $this->storage_path !== null
-            && Storage::disk($this->disk)->exists($this->storage_path);
+        if ($this->storage_path === null || $this->disk === null || $this->disk === '') {
+            return false;
+        }
+
+        if (! $this->isSafeStoragePath($this->storage_path)) {
+            return false;
+        }
+
+        try {
+            return Storage::disk($this->disk)->exists($this->storage_path);
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     public function humanSize(): string
@@ -95,5 +139,30 @@ class Media extends Model
         return $this->usages->map(fn (MediaUsage $usage) => trim(
             str_replace('App\\Models\\', '', $usage->model_type).'#'.$usage->model_id.' · '.$usage->field
         ))->all();
+    }
+
+    /**
+     * A host-relative web path is safe when it starts with a single slash,
+     * has no scheme, no traversal, and no filesystem separators.
+     */
+    protected function isSafeWebPath(string $path): bool
+    {
+        return str_starts_with($path, '/')
+            && ! str_starts_with($path, '//')
+            && ! str_contains($path, '..')
+            && ! str_contains($path, '\\')
+            && ! str_contains($path, ':');
+    }
+
+    /**
+     * A stored (disk-relative) path is safe when it is relative, without
+     * traversal, filesystem separators, or a drive/colon prefix.
+     */
+    protected function isSafeStoragePath(string $path): bool
+    {
+        return ! str_starts_with($path, '/')
+            && ! str_contains($path, '..')
+            && ! str_contains($path, '\\')
+            && ! str_contains($path, ':');
     }
 }

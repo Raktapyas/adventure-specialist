@@ -24,6 +24,30 @@ class ContactThrottleTest extends TestCase
         ]);
     }
 
+    public function test_successful_submission_redirects_to_the_canonical_contact_route_with_flash(): void
+    {
+        $this->from('/contact')
+            ->post('/contact', [
+                'name' => 'Jane Traveller',
+                'email' => 'jane@example.com',
+                'message' => 'Please send me the trekking brochure.',
+            ])
+            ->assertRedirect(route('contact.index'))
+            ->assertSessionHas('success', 'Thank you for your message. We will get back to you as soon as possible.');
+    }
+
+    public function test_successful_submission_ignores_a_spoofed_referer(): void
+    {
+        $this->withHeader('Referer', 'https://evil.example.net/phish')
+            ->post('/contact', [
+                'name' => 'Jane Traveller',
+                'email' => 'jane@example.com',
+                'message' => 'Please send me the trekking brochure.',
+            ])
+            ->assertRedirect(route('contact.index'))
+            ->assertSessionHas('success');
+    }
+
     public function test_contact_form_throttles_after_six_attempts(): void
     {
         $payload = [
