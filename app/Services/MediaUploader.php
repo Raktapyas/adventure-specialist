@@ -37,7 +37,7 @@ class MediaUploader
 
         return Media::create([
             'name' => $this->sanitizeName($file->getClientOriginalName()),
-            'path' => Storage::disk($disk)->url($storagePath),
+            'path' => $this->hostRelativeUrl($disk, $storagePath),
             'disk' => $disk,
             'storage_path' => $storagePath,
             'mime_type' => $file->getMimeType(),
@@ -47,6 +47,19 @@ class MediaUploader
             'is_legacy' => false,
             'created_by' => $userId,
         ]);
+    }
+
+    /**
+     * The web path of a stored file, relative to the app host (e.g.
+     * "/storage/media/2026/08/..."). Storing a host-relative path keeps
+     * thumbnails working regardless of the host/port the browser uses,
+     * matching the convention used by legacy media and the media factory.
+     */
+    protected function hostRelativeUrl(string $disk, string $storagePath): string
+    {
+        $path = parse_url(Storage::disk($disk)->url($storagePath), PHP_URL_PATH);
+
+        return $path !== false && $path !== null ? $path : '/'.$storagePath;
     }
 
     /**

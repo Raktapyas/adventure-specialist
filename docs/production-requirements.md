@@ -35,6 +35,25 @@ Verify after configuring:
 php -i | grep -E "upload_max_filesize|post_max_size"
 ```
 
+### Local development (same contract)
+
+Some development machines ship a system `php.ini` whose `upload_max_filesize`
+is smaller than the app's 5 MB limit (e.g. Arch's default `2M`). A 2-5 MB file
+is then rejected by PHP with `UPLOAD_ERR_INI_SIZE` *before* application
+validation runs, surfacing as the generic `The media.0 failed to upload.` error
+instead of the app's friendly size message.
+
+The repo ships a project-local override in `.php-ini/upload-limits.ini`. Run the
+dev server with it so the built-in server honors the same 5 MB / 6 MB contract:
+
+```bash
+PHP_INI_SCAN_DIR="/etc/php/conf.d:$(pwd)/.php-ini" php artisan serve
+```
+
+(Prefix any other PHP command — `php artisan test`, `php -i` — the same way if
+you need the raised limits.) Do **not** lower the application validation to
+match the server; raise the server limit instead.
+
 ### Trailing-slash redirects on Apache (B1)
 
 `public/.htaccess` intentionally does **not** contain Laravel's default

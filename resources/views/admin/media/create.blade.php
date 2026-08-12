@@ -18,8 +18,15 @@
                     class="mt-1 block w-full text-sm text-gray-500 file:mr-3 file:rounded-md file:border-0 file:bg-pine file:py-2 file:px-4 file:text-paper file:hover:bg-pine-deep file:cursor-pointer"
                 >
                 <p class="mt-1 text-xs text-gray-500">JPEG, PNG, WebP or GIF · max 5 MB each · up to 10 at once.</p>
-                <x-input-error :messages="$errors->get('media')" class="mt-2" />
-                <x-input-error :messages="$errors->get('media.*')" class="mt-2" />
+                @php
+                    // Flatten nested media.* upload errors into individual string messages
+                    // (a multi-file input produces one nested bag entry per file).
+                    $mediaErrors = collect($errors->get('media'))
+                        ->concat(collect($errors->get('media.*'))->flatten())
+                        ->map(fn ($message) => (string) $message)
+                        ->all();
+                @endphp
+                <x-input-error :messages="$mediaErrors" class="mt-2" />
             </div>
 
             <div>

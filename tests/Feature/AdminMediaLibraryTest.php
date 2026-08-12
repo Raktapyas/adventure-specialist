@@ -175,6 +175,97 @@ class AdminMediaLibraryTest extends TestCase
         Storage::disk('public')->assertMissing($media->storage_path);
     }
 
+    public function test_upload_stores_host_relative_path(): void
+    {
+        Storage::fake('public');
+
+        $this->actingAs($this->admin())
+            ->post('/admin/media', ['media' => [$this->png()]])
+            ->assertRedirect(route('admin.media.index'));
+
+        $media = Media::firstOrFail();
+
+        $this->assertStringStartsWith('/storage/', $media->path);
+        $this->assertStringNotContainsString('://', $media->path);
+    }
+
+    public function test_uploaded_thumbnail_renders_host_relative_path(): void
+    {
+        Storage::fake('public');
+
+        $this->actingAs($this->admin())
+            ->post('/admin/media', ['media' => [$this->png()]])
+            ->assertRedirect(route('admin.media.index'));
+
+        $media = Media::firstOrFail();
+
+        $this->actingAs($this->admin())
+            ->get('/admin/media')
+            ->assertOk()
+            ->assertSee($media->path);
+    }
+
+    public function test_uploaded_media_in_use_cannot_be_deleted_and_shows_usage_label(): void
+    {
+        Storage::fake('public');
+        $media = Media::factory()->uploaded()->create();
+        Storage::disk('public')->put($media->storage_path, 'fake-image');
+        $page = Page::factory()->create();
+
+        MediaUsage::create([
+            'media_id' => $media->id,
+            'model_type' => $page->getMorphClass(),
+            'model_id' => $page->id,
+            'field' => 'cover_image',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->delete("/admin/media/{$media->id}")
+            ->assertRedirect(route('admin.media.index'))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseHas('media', ['id' => $media->id]);
+        Storage::disk('public')->assertExists($media->storage_path);
+
+        $label = str_replace('App\\Models\\', '', $page->getMorphClass()).'#'.$page->id.' · cover_image';
+        $this->assertStringContainsString($label, session('error'));
+    }
+
+    public function test_unused_uploaded_media_can_be_deleted(): void
+    {
+        Storage::fake('public');
+        $media = Media::factory()->uploaded()->create();
+
+        $this->actingAs($this->admin())
+            ->delete("/admin/media/{$media->id}")
+            ->assertRedirect(route('admin.media.index'))
+            ->assertSessionHas('status');
+
+        $this->assertDatabaseMissing('media', ['id' => $media->id]);
+        Storage::disk('public')->assertMissing($media->storage_path);
+    }
+
+    public function test_legacy_force_delete_never_touches_the_physical_file(): void
+    {
+        $file = public_path('assets/images/legacy-kept.jpg');
+        @mkdir(dirname($file), 0777, true);
+        file_put_contents($file, 'legacy');
+
+        try {
+            $media = Media::factory()->create(['path' => '/assets/images/legacy-kept.jpg']);
+
+            $this->actingAs($this->admin())
+                ->delete("/admin/media/{$media->id}?force=1")
+                ->assertRedirect(route('admin.media.index'))
+                ->assertSessionHas('status');
+
+            $this->assertDatabaseMissing('media', ['id' => $media->id]);
+            $this->assertFileExists($file);
+        } finally {
+            @unlink($file);
+        }
+    }
+
     public function test_page_update_tracks_media_usage(): void
     {
         $media = Media::factory()->uploaded()->create();

@@ -125,8 +125,13 @@ class MediaController extends Controller
         $isLegacy = $medium->is_legacy;
 
         if ($usageCount > 0 && ! $request->boolean('force')) {
-            return redirect()->route('admin.media.index')
-                ->with('error', 'This image is in use by '.$usageCount.' item(s). Reassign or remove those references first, or force-delete.');
+            $labels = $medium->usageLabels();
+
+            $message = 'This image is in use by '.$usageCount.' item(s)'
+                .($labels !== [] ? ': '.implode(', ', $labels) : '')
+                .'. Reassign or remove those references first, or force-delete.';
+
+            return redirect()->route('admin.media.index')->with('error', $message);
         }
 
         DB::transaction(function () use ($medium) {
