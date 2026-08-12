@@ -64,6 +64,10 @@ class MediaUsageService
 
     /**
      * Re-link the media rows referenced inside a model's raw HTML content.
+     *
+     * This is the destructive form used when content is actually replaced
+     * (admin store/update): existing content usages are cleared and rebuilt
+     * from the new HTML. It must not be used for maintenance scans.
      */
     public function syncContent(Model $model, ?string $html): void
     {
@@ -83,9 +87,31 @@ class MediaUsageService
     }
 
     /**
+     * Add usage rows for every media path referenced inside a model's raw
+     * HTML content. Strictly additive: existing content usages are never
+     * removed, even when the scanner cannot detect their reference (e.g. CSS
+     * background URLs, srcset, escaped or relative paths).
+     */
+    public function scanContentFor(Model $model, ?string $html): void
+    {
+        if ($html === null || $html === '') {
+            return;
+        }
+
+        foreach ($this->extractImagePaths($html) as $path) {
+            $media = Media::where('path', $path)->first();
+
+            if ($media !== null) {
+                $this->add($media, $model, 'content');
+            }
+        }
+    }
+
+    /**
      * Scan every model's raw HTML content for <img src> paths and link the
-     * matching media rows. Existing content usages are refreshed, never
-     * removed for references this scanner cannot see.
+     * matching media rows. Additive only: existing content usages are never
+     * removed, so references the scanner cannot see (CSS background URLs,
+     * srcset, escaped or relative paths) are preserved.
      */
     public function scanContent(): array
     {
@@ -106,7 +132,7 @@ class MediaUsageService
                         ->where('field', 'content')
                         ->count();
 
-                    $this->syncContent($model, $model->content);
+                    $this->scanContentFor($model, $model->content);
 
                     $after = MediaUsage::where('model_type', $model->getMorphClass())
                         ->where('model_id', $model->getKey())
