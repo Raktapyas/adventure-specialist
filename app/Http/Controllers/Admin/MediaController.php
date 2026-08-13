@@ -11,7 +11,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class MediaController extends Controller
@@ -25,33 +24,25 @@ class MediaController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Media::with('uploader')->withCount('usages');
+        $search = trim((string) $request->query('search'));
+        $type = $request->query('type');
+        $source = $request->query('source');
 
-        if ($search = trim((string) $request->query('search'))) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('path', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->has('type') && in_array($request->query('type'), ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
-            $query->where('extension', $request->query('type'));
-        }
-
-        if ($request->query('source') === 'uploaded') {
-            $query->where('is_legacy', false);
-        } elseif ($request->query('source') === 'legacy') {
-            $query->where('is_legacy', true);
-        }
-
-        $media = $query->orderByDesc('id')->paginate(24)->withQueryString();
+        $media = Media::with('uploader')->withCount('usages')
+            ->search($search)
+            ->when(in_array($type, config('media.allowed_extensions'), true), fn ($q) => $q->where('extension', $type))
+            ->when($source === 'uploaded', fn ($q) => $q->where('is_legacy', false))
+            ->when($source === 'legacy', fn ($q) => $q->where('is_legacy', true))
+            ->orderByDesc('id')
+            ->paginate(24)
+            ->withQueryString();
 
         return view('admin.media.index', [
             'media' => $media,
             'filters' => [
                 'search' => $search,
-                'type' => $request->query('type'),
-                'source' => $request->query('source'),
+                'type' => $type,
+                'source' => $source,
             ],
         ]);
     }
@@ -72,12 +63,8 @@ class MediaController extends Controller
         $stored = 0;
 
         foreach ($request->file('media', []) as $file) {
-            try {
-                $this->uploader->store($file, $request->user()?->id, $request->validated('alt_text'));
-                $stored++;
-            } catch (ValidationException $e) {
-                throw $e;
-            }
+            $this->uploader->store($file, $request->user()?->id, $request->validated('alt_text'));
+            $stored++;
         }
 
         return redirect()->route('admin.media.index')
@@ -89,15 +76,10 @@ class MediaController extends Controller
      */
     public function pickerData(Request $request): JsonResponse
     {
-        $query = Media::withCount('usages');
-
-        if ($search = trim((string) $request->query('search'))) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")->orWhere('path', 'like', "%{$search}%");
-            });
-        }
-
-        $media = $query->orderByDesc('id')->paginate(48);
+        $media = Media::withCount('usages')
+            ->search($request->query('search'))
+            ->orderByDesc('id')
+            ->paginate(48);
 
         return response()->json([
             'items' => $media->map(fn (Media $m) => [
@@ -121,17 +103,20 @@ class MediaController extends Controller
      */
     public function destroy(Request $request, Media $medium): RedirectResponse
     {
-        $usageCount = $medium->usages()->count();
         $isLegacy = $medium->is_legacy;
 
-        if ($usageCount > 0 && ! $request->boolean('force')) {
-            $labels = $medium->usageLabels();
+        if (! $request->boolean('force')) {
+            $medium->load('usages');
 
-            $message = 'This image is in use by '.$usageCount.' item(s)'
-                .($labels !== [] ? ': '.implode(', ', $labels) : '')
-                .'. Reassign or remove those references first, or force-delete.';
+            if ($medium->usages->isNotEmpty()) {
+                $labels = $medium->usageLabels();
 
-            return redirect()->route('admin.media.index')->with('error', $message);
+                $message = 'This image is in use by '.$medium->usages->count().' item(s)'
+                    .($labels !== [] ? ': '.implode(', ', $labels) : '')
+                    .'. Reassign or remove those references first, or force-delete.';
+
+                return redirect()->route('admin.media.index')->with('error', $message);
+            }
         }
 
         DB::transaction(function () use ($medium) {

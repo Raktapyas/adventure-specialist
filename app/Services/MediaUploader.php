@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Media;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
@@ -25,6 +24,8 @@ class MediaUploader
         'image/gif' => ['gif'],
     ];
 
+    private static ?\finfo $finfo = null;
+
     /**
      * Validate and persist a single uploaded image.
      *
@@ -33,10 +34,10 @@ class MediaUploader
      */
     public function store(UploadedFile $file, ?int $userId, ?string $altText = null): Media
     {
-        $extension = $this->assertSafe($file);
+        $safe = $this->assertSafe($file);
 
         $disk = config('media.disk');
-        $storagePath = $file->store(Str::of(config('media.directory'))->append('/')->append(date('Y/m')), $disk);
+        $storagePath = $file->store(config('media.directory').'/'.date('Y/m'), $disk);
 
         if ($storagePath === false) {
             throw new RuntimeException('Failed to store the uploaded file.');
@@ -48,8 +49,8 @@ class MediaUploader
                 'path' => $this->hostRelativeUrl($disk, $storagePath),
                 'disk' => $disk,
                 'storage_path' => $storagePath,
-                'mime_type' => $file->getMimeType(),
-                'extension' => $extension,
+                'mime_type' => $safe['mime_type'],
+                'extension' => $safe['extension'],
                 'size' => $file->getSize(),
                 'alt_text' => $altText,
                 'is_legacy' => false,
@@ -79,23 +80,28 @@ class MediaUploader
      * Reject path traversal / control characters and verify that the uploaded
      * bytes really are an allowed image whose extension matches its contents.
      *
+     * @return array{extension: string, mime_type: string}
+     *
      * @throws ValidationException
      */
-    protected function assertSafe(UploadedFile $file): string
+    protected function assertSafe(UploadedFile $file): array
     {
         $name = $file->getClientOriginalName();
         $extension = strtolower($file->getClientOriginalExtension());
+        $allowedExtensions = config('media.allowed_extensions');
+        $allowedMimes = config('media.allowed_mimes');
+        $maxBytes = config('media.max_upload_bytes');
 
         if ($name === '' || str_contains($name, '/') || str_contains($name, '..') || str_contains($name, "\0")) {
             $this->fail('The filename is not allowed.');
         }
 
-        if (! in_array($extension, config('media.allowed_extensions'), true)) {
+        if (! in_array($extension, $allowedExtensions, true)) {
             $this->fail('The file extension is not allowed.');
         }
 
-        if ($file->getSize() > config('media.max_upload_bytes')) {
-            $this->fail('The file must not exceed '.round(config('media.max_upload_bytes') / 1048576).' MB.');
+        if ($file->getSize() > $maxBytes) {
+            $this->fail('The file must not exceed '.round($maxBytes / 1048576).' MB.');
         }
 
         $path = $file->getRealPath();
@@ -104,10 +110,10 @@ class MediaUploader
             $this->fail('The uploaded file could not be read.');
         }
 
-        $sniffedMime = (new \finfo(FILEINFO_MIME_TYPE))->buffer(file_get_contents($path));
+        $sniffedMime = (self::$finfo ??= new \finfo(FILEINFO_MIME_TYPE))->file($path);
 
-        if (! in_array($sniffedMime, config('media.allowed_mimes'), true)) {
-            $this->fail('The file must be an image ('.implode(', ', config('media.allowed_extensions')).').');
+        if (! in_array($sniffedMime, $allowedMimes, true)) {
+            $this->fail('The file must be an image ('.implode(', ', $allowedExtensions).').');
         }
 
         $size = @getimagesize($path);
@@ -116,13 +122,13 @@ class MediaUploader
             $this->fail('The file is not a valid image.');
         }
 
-        $allowedExtensions = self::MIME_EXTENSIONS[$sniffedMime] ?? null;
+        $mimeExtensions = self::MIME_EXTENSIONS[$sniffedMime] ?? null;
 
-        if ($allowedExtensions === null || ! in_array($extension, $allowedExtensions, true)) {
+        if ($mimeExtensions === null || ! in_array($extension, $mimeExtensions, true)) {
             $this->fail('The file extension does not match its contents.');
         }
 
-        return $extension;
+        return ['extension' => $extension, 'mime_type' => $sniffedMime];
     }
 
     /**

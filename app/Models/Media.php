@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,6 +42,23 @@ class Media extends Model
     public function usages(): HasMany
     {
         return $this->hasMany(MediaUsage::class);
+    }
+
+    /**
+     * Filter by name or stored path (used by the library index and picker).
+     */
+    public function scopeSearch(Builder $query, mixed $search): Builder
+    {
+        $search = trim((string) $search);
+
+        if ($search === '') {
+            return $query;
+        }
+
+        return $query->where(function (Builder $q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+                ->orWhere('path', 'like', "%{$search}%");
+        });
     }
 
     /**
@@ -122,11 +140,6 @@ class Media extends Model
         }
 
         return number_format($bytes, 1).' TB';
-    }
-
-    public function usageCount(): int
-    {
-        return $this->usages()->count();
     }
 
     /**

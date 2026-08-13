@@ -142,9 +142,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('media/picker-data', [MediaController::class, 'pickerData'])->name('media.picker-data');
 
     Route::get('inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
+    Route::post('inquiries/bulk', [InquiryController::class, 'bulk'])->name('inquiries.bulk');
     Route::get('inquiries/{inquiry}', [InquiryController::class, 'show'])->name('inquiries.show');
     Route::patch('inquiries/{inquiry}/toggle-read', [InquiryController::class, 'toggleRead'])->name('inquiries.toggle-read');
     Route::patch('inquiries/{inquiry}/status', [InquiryController::class, 'updateStatus'])->name('inquiries.status');
-    Route::post('inquiries/bulk', [InquiryController::class, 'bulk'])->name('inquiries.bulk');
     Route::delete('inquiries/{inquiry}', [InquiryController::class, 'destroy'])->name('inquiries.destroy');
 });
