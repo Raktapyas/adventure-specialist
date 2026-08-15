@@ -12,7 +12,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/admin')->assertRedirect('/login');
+        $this->get('/admin')->assertRedirect('/admin/login');
     }
 
     public function test_non_admin_users_are_forbidden(): void

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DestinationController as AdminDestinationController;
 use App\Http\Controllers\Admin\GalleryImageController;
 use App\Http\Controllers\Admin\InquiryController;
@@ -113,7 +112,7 @@ Route::get('/packages/{slug}', function (string $slug) {
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('filament.admin.pages.dashboard');
     })->name('dashboard');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -130,8 +129,6 @@ require __DIR__.'/auth.php';
 */
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', DashboardController::class)->name('dashboard');
-
     Route::resource('pages', AdminPageController::class)->except(['show']);
     Route::resource('services', AdminServiceController::class)->except(['show']);
     Route::resource('destinations', AdminDestinationController::class)->except(['show']);

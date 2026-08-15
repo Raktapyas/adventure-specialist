@@ -8,7 +8,7 @@
 
 <select
     name="{{ $name }}"
-    {{ $attributes->merge(['class' => 'border-gray-300 focus:border-pine focus:ring-pine rounded-md shadow-sm w-full']) }}
+    {{ $attributes->merge(['class' => 'border-gray-300 focus:border-amber-500 focus:ring-amber-500 rounded-md shadow-sm w-full']) }}
 >
     <option value="" {{ $selected === null || $selected === '' ? 'selected' : '' }}>{{ $placeholder }}</option>
     @foreach ($options as $key => $label)

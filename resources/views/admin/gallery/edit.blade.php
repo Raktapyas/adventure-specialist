@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <span>Edit Image</span>
+        <h1 class="text-xl font-semibold text-gray-950">Edit Image</h1>
     </x-slot>
 
     @if (session('status'))
-        <div class="mb-4 px-4 py-3 rounded-md bg-moss/10 text-moss border border-moss/30 text-sm">{{ session('status') }}</div>
+        <div class="mb-4 px-4 py-3 rounded-md bg-green-50 text-green-700 border border-green-200 text-sm">{{ session('status') }}</div>
     @endif
 
     <div class="max-w-3xl">

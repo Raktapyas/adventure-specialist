@@ -12,60 +12,53 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen flex bg-gray-100">
-            <aside class="w-64 shrink-0 bg-pine text-paper flex flex-col">
-                <div class="px-6 py-5 border-b border-paper/10">
-                    <a href="{{ route('admin.dashboard') }}" class="block font-serif text-lg leading-tight">
-                        Adventure Specialist
-                        <span class="block text-xs font-sans tracking-widest uppercase text-paper/60">Admin Panel</span>
-                    </a>
-                </div>
-
+    <body class="font-sans antialiased bg-gray-50 text-gray-950 dark:bg-gray-950 dark:text-gray-100">
+        <div class="min-h-screen flex bg-gray-50 dark:bg-gray-950">
+            <aside class="w-64 shrink-0 bg-white dark:bg-gray-900 flex flex-col border-r border-gray-200 dark:border-gray-800">
                 <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
-                    <a href="{{ route('admin.dashboard') }}"
-                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.dashboard') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                    <a href="{{ route('filament.admin.pages.dashboard') }}"
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('filament.admin.pages.dashboard') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Dashboard
                     </a>
                     <a href="{{ route('admin.pages.index') }}"
-                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.pages.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.pages.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Pages
                     </a>
                     <a href="{{ route('admin.services.index') }}"
-                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.services.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.services.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Services
                     </a>
                     <a href="{{ route('admin.destinations.index') }}"
-                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.destinations.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.destinations.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Destinations
                     </a>
                     <a href="{{ route('admin.packages.index') }}"
-                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.packages.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.packages.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Packages
                     </a>
                     <a href="{{ route('admin.gallery.index') }}"
-                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.gallery.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.gallery.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Gallery
                     </a>
                     <a href="{{ route('admin.media.index') }}"
-                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.media.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.media.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Media
                     </a>
                     <a href="{{ route('admin.inquiries.index') }}"
-                       class="block px-3 py-2 rounded-md {{ request()->routeIs('admin.inquiries.*') ? 'bg-paper/15 text-paper' : 'text-paper/70 hover:bg-paper/10 hover:text-paper' }}">
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.inquiries.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Inquiries
                     </a>
                     <a href="{{ route('home') }}"
-                       class="block px-3 py-2 rounded-md text-paper/70 hover:bg-paper/10 hover:text-paper">
+                       class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
                         View Site
                     </a>
                 </nav>
 
-                <div class="px-6 py-4 border-t border-paper/10 text-sm">
-                    <p class="text-paper/60 truncate">{{ auth()->user()->name }}</p>
+                <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-800 text-sm">
+                    <p class="text-gray-500 dark:text-gray-400 truncate">{{ auth()->user()->name }}</p>
                     <form method="POST" action="{{ route('logout') }}" class="mt-2">
                         @csrf
-                        <button type="submit" class="text-paper/70 hover:text-paper">
+                        <button type="submit" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                             Log Out
                         </button>
                     </form>
@@ -74,9 +67,9 @@
 
             <div class="flex-1 flex flex-col min-w-0">
                 @isset($header)
-                    <header class="bg-white shadow">
+                    <header class="bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10">
                         <div class="px-6 py-4">
-                            <h1 class="text-xl font-semibold text-gray-800">{{ $header }}</h1>
+                            {{ $header }}
                         </div>
                     </header>
                 @endisset

@@ -1,15 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <span>Gallery</span>
-            <a href="{{ route('admin.gallery.create') }}" class="inline-flex items-center px-3 py-2 bg-pine text-paper text-sm font-medium rounded-md hover:bg-pine-deep">
+        <div class="flex items-center justify-between gap-4 mb-6">
+            <h2 class="text-xl font-semibold text-gray-950">Gallery</h2>
+            <a href="{{ route('admin.gallery.create') }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500">
                 Add Image
             </a>
         </div>
     </x-slot>
 
     @if (session('status'))
-        <div class="mb-4 px-4 py-3 rounded-md bg-moss/10 text-moss border border-moss/30 text-sm">{{ session('status') }}</div>
+        <div class="mb-4 px-4 py-3 rounded-md bg-green-50 text-green-700 border border-green-200 text-sm">{{ session('status') }}</div>
     @endif
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -22,11 +22,11 @@
                     <div class="mt-3 flex items-center justify-between">
                         <span class="text-xs text-gray-500">Sort: {{ $image->sort_order }}</span>
                         <div class="space-x-3">
-                            <a href="{{ route('admin.gallery.edit', $image) }}" class="text-pine hover:underline text-sm font-medium">Edit</a>
+                            <a href="{{ route('admin.gallery.edit', $image) }}" class="text-amber-600 hover:underline text-sm font-medium">Edit</a>
                             <form method="POST" action="{{ route('admin.gallery.destroy', $image) }}" class="inline" onsubmit="return confirm('Remove this image?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-clay hover:underline text-sm font-medium">Delete</button>
+                                <button type="submit" class="text-red-600 hover:underline text-sm font-medium">Delete</button>
                             </form>
                         </div>
                     </div>

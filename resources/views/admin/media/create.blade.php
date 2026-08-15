@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <span>Upload Images</span>
+        <h1 class="text-xl font-semibold text-gray-950">Upload Images</h1>
     </x-slot>
 
     <div class="max-w-2xl">
@@ -15,7 +15,7 @@
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif"
                     multiple
-                    class="mt-1 block w-full text-sm text-gray-500 file:mr-3 file:rounded-md file:border-0 file:bg-pine file:py-2 file:px-4 file:text-paper file:hover:bg-pine-deep file:cursor-pointer"
+                    class="mt-1 block w-full text-sm text-gray-500 file:mr-3 file:rounded-md file:border-0 file:bg-amber-600 file:py-2 file:px-4 file:text-white file:hover:bg-amber-500 file:cursor-pointer"
                 >
                 <p class="mt-1 text-xs text-gray-500">JPEG, PNG, WebP or GIF · max 5 MB each · up to 10 at once.</p>
                 @php

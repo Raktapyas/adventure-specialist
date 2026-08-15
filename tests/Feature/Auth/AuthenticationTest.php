@@ -44,7 +44,7 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->withSession(['url.intended' => route('admin.dashboard')])
+        $this->withSession(['url.intended' => route('filament.admin.pages.dashboard')])
             ->post('/login', [
                 'email' => $user->email,
                 'password' => 'password',

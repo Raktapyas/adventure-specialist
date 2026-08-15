@@ -1,36 +1,36 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <span>Media Library</span>
-            <a href="{{ route('admin.media.create') }}" class="inline-flex items-center px-3 py-2 bg-pine text-paper text-sm font-medium rounded-md hover:bg-pine-deep">
+        <div class="flex items-center justify-between gap-4 mb-6">
+            <h2 class="text-xl font-semibold text-gray-950">Media Library</h2>
+            <a href="{{ route('admin.media.create') }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500">
                 Upload Images
             </a>
         </div>
     </x-slot>
 
     @if (session('status'))
-        <div class="mb-4 px-4 py-3 rounded-md bg-moss/10 text-moss border border-moss/30 text-sm">{{ session('status') }}</div>
+        <div class="mb-4 px-4 py-3 rounded-md bg-green-50 text-green-700 border border-green-200 text-sm">{{ session('status') }}</div>
     @endif
 
     @if (session('error'))
-        <div class="mb-4 px-4 py-3 rounded-md bg-clay/10 text-clay border border-clay/30 text-sm">{{ session('error') }}</div>
+        <div class="mb-4 px-4 py-3 rounded-md bg-red-50 text-red-700 border border-red-200 text-sm">{{ session('error') }}</div>
     @endif
 
     <form method="GET" action="{{ route('admin.media.index') }}" class="mb-5 flex flex-wrap items-center gap-3">
         <input type="text" name="search" value="{{ $filters['search'] }}" placeholder="Search by name or path…"
-               class="border-gray-300 focus:border-pine focus:ring-pine rounded-md shadow-sm w-72">
-        <select name="type" class="border-gray-300 focus:border-pine focus:ring-pine rounded-md shadow-sm">
+               class="border-gray-300 focus:border-amber-500 focus:ring-amber-500 rounded-md shadow-sm w-72">
+        <select name="type" class="border-gray-300 focus:border-amber-500 focus:ring-amber-500 rounded-md shadow-sm">
             <option value="">All types</option>
             @foreach (['jpg' => 'JPEG', 'png' => 'PNG', 'webp' => 'WebP', 'gif' => 'GIF'] as $value => $label)
                 <option value="{{ $value }}" @selected($filters['type'] === $value)>{{ $label }}</option>
             @endforeach
         </select>
-        <select name="source" class="border-gray-300 focus:border-pine focus:ring-pine rounded-md shadow-sm">
+        <select name="source" class="border-gray-300 focus:border-amber-500 focus:ring-amber-500 rounded-md shadow-sm">
             <option value="">All sources</option>
             <option value="uploaded" @selected($filters['source'] === 'uploaded')>Uploaded</option>
             <option value="legacy" @selected($filters['source'] === 'legacy')>Legacy</option>
         </select>
-        <button type="submit" class="inline-flex items-center px-3 py-2 bg-paper text-pine border border-gray-200 text-sm font-medium rounded-md hover:bg-gray-50">Filter</button>
+        <button type="submit" class="inline-flex items-center px-3 py-2 bg-white text-gray-700 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50">Filter</button>
         @if ($filters['search'] || $filters['type'] || $filters['source'])
             <a href="{{ route('admin.media.index') }}" class="text-sm text-gray-500 hover:underline">Clear</a>
         @endif
@@ -59,14 +59,14 @@
                               onsubmit="return confirm('Remove this media item?{{ $item->is_legacy ? ' The original file will be kept in place.' : '' }}');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-clay hover:underline text-sm font-medium">Delete</button>
+                            <button type="submit" class="text-red-600 hover:underline text-sm font-medium">Delete</button>
                         </form>
                     </div>
                 </div>
             </div>
         @empty
             <div class="col-span-full bg-white rounded-lg shadow-sm p-6 text-center text-gray-500">
-                No media found. @if (request('search') || request('type') || request('source'))<a href="{{ route('admin.media.index') }}" class="text-pine hover:underline">Clear filters</a>.@endif
+                No media found. @if (request('search') || request('type') || request('source'))<a href="{{ route('admin.media.index') }}" class="text-amber-600 hover:underline">Clear filters</a>.@endif
             </div>
         @endforelse
     </div>

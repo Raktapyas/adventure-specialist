@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <span>Add Image</span>
+        <h1 class="text-xl font-semibold text-gray-950">Add Image</h1>
     </x-slot>
 
     <div class="max-w-3xl">

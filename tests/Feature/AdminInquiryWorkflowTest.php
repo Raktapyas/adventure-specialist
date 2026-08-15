@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Widgets\StatsOverview;
 use App\Models\Inquiry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AdminInquiryWorkflowTest extends TestCase
@@ -168,10 +170,8 @@ class AdminInquiryWorkflowTest extends TestCase
         Inquiry::factory()->count(3)->create(['is_read' => false]);
         Inquiry::factory()->count(2)->create(['is_read' => true]);
 
-        $this->actingAs($this->admin())
-            ->get('/admin')
-            ->assertOk()
-            ->assertSee('3', false)
-            ->assertSee('Unread Inquiries');
+        Livewire::test(StatsOverview::class)
+            ->assertSee('Unread Inquiries')
+            ->assertSee('3');
     }
 }

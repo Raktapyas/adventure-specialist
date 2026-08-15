@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <span>Add Destination</span>
+        <h1 class="text-xl font-semibold text-gray-950">Add Destination</h1>
     </x-slot>
 
     <div class="max-w-3xl">
@@ -54,7 +54,7 @@
 
             <div>
                 <label class="flex items-center gap-2 text-sm text-gray-700">
-                    <input type="checkbox" name="is_published" value="1" @checked(old('is_published', true)) class="rounded border-gray-300 text-pine focus:ring-pine">
+                    <input type="checkbox" name="is_published" value="1" @checked(old('is_published', true)) class="rounded border-gray-300 text-amber-600 focus:ring-amber-500">
                     Published
                 </label>
                 <p class="mt-1 text-xs text-gray-500">Unpublished items are hidden from the public site and navigation.</p>

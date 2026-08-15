@@ -8,7 +8,7 @@
         name="{{ $name }}"
         type="text"
         value="{{ old($name, $value) }}"
-        {{ $attributes->merge(['class' => 'border-gray-300 focus:border-pine focus:ring-pine rounded-md shadow-sm w-full']) }}
+        {{ $attributes->merge(['class' => 'border-gray-300 focus:border-amber-500 focus:ring-amber-500 rounded-md shadow-sm w-full']) }}
         x-data="{}"
         x-on:input="$el.closest('div').querySelector('img').src = $el.value"
     >

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <span>Inquiry Detail</span>
+        <h1 class="text-xl font-semibold text-gray-950">Inquiry Detail</h1>
     </x-slot>
 
     <div class="max-w-3xl">
@@ -36,7 +36,7 @@
                             <option value="{{ $status }}" @selected($inquiry->status === $status)>{{ ucfirst($status) }}</option>
                         @endforeach
                     </select>
-                    <button type="submit" class="px-3 py-1.5 rounded-md bg-pine text-white text-sm font-medium">Update</button>
+                    <button type="submit" class="px-3 py-1.5 rounded-md bg-amber-600 text-white text-sm font-medium">Update</button>
                 </form>
                 @if (! $inquiry->is_read)
                     <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-xs">Unread</span>
@@ -51,7 +51,7 @@
                 <div class="px-6 py-4 grid grid-cols-3 gap-4">
                     <dt class="text-gray-500 font-medium">Email</dt>
                     <dd class="col-span-2 text-gray-900">
-                        <a href="mailto:{{ $inquiry->email }}" class="text-pine hover:underline">{{ $inquiry->email }}</a>
+                        <a href="mailto:{{ $inquiry->email }}" class="text-amber-600 hover:underline">{{ $inquiry->email }}</a>
                     </dd>
                 </div>
                 <div class="px-6 py-4 grid grid-cols-3 gap-4">

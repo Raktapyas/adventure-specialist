@@ -14,7 +14,7 @@
     <button
         type="button"
         x-on:click="open()"
-        class="mt-2 inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pine focus:border-pine"
+        class="mt-2 inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
     >
         Browse Library
     </button>
@@ -35,7 +35,7 @@
                         x-model="search"
                         x-on:input.debounce.300ms="load(true)"
                         placeholder="Search library…"
-                        class="w-full border-gray-300 focus:border-pine focus:ring-pine rounded-md shadow-sm text-sm"
+                        class="w-full border-gray-300 focus:border-amber-500 focus:ring-amber-500 rounded-md shadow-sm text-sm"
                     >
                 </div>
 
@@ -45,7 +45,7 @@
                             type="button"
                             x-on:click="select(item)"
                             class="relative rounded-md overflow-hidden border-2 text-left transition"
-                            :class="selected && selected.id === item.id ? 'border-pine' : 'border-transparent hover:border-gray-300'"
+                            :class="selected && selected.id === item.id ? 'border-amber-600' : 'border-transparent hover:border-gray-300'"
                         >
                             <img :src="item.url" :alt="item.name" class="h-24 w-full object-cover bg-gray-100"
                                  x-on:error="$el.style.display = 'none'">
@@ -60,12 +60,12 @@
                 <div class="px-5 py-3 border-t flex items-center justify-between gap-3">
                     <span class="text-xs text-gray-500" x-text="items.length + ' result(s)'"></span>
                     <div class="flex items-center gap-3">
-                        <button x-show="hasMore" type="button" x-on:click="load(false)" class="text-sm text-pine hover:underline">Load more</button>
+                        <button x-show="hasMore" type="button" x-on:click="load(false)" class="text-sm text-amber-600 hover:underline">Load more</button>
                         <button
                             type="button"
                             x-on:click="insert()"
                             :disabled="!selected"
-                            class="inline-flex px-4 py-2 rounded-md text-sm font-medium bg-pine text-paper hover:bg-pine-deep disabled:opacity-40 disabled:cursor-not-allowed"
+                            class="inline-flex px-4 py-2 rounded-md text-sm font-medium bg-amber-600 text-white hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             Insert
                         </button>

@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <span>Inquiries</span>
+        <h1 class="text-xl font-semibold text-gray-950">Inquiries</h1>
     </x-slot>
 
     @if (session('status'))
-        <div class="mb-4 px-4 py-3 rounded-md bg-moss/10 text-moss border border-moss/30 text-sm">{{ session('status') }}</div>
+        <div class="mb-4 px-4 py-3 rounded-md bg-green-50 text-green-700 border border-green-200 text-sm">{{ session('status') }}</div>
     @endif
 
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -22,7 +22,7 @@
                     <option value="1" @selected($filters['read'] === '1')>Read only</option>
                 </select>
                 <input type="search" name="search" value="{{ $filters['search'] }}" placeholder="Search name, email, subject, message…" class="rounded-md border-gray-300 text-sm flex-1 min-w-[12rem]">
-                <button type="submit" class="px-4 py-2 rounded-md bg-pine text-white text-sm font-medium">Filter</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-amber-600 text-white text-sm font-medium">Filter</button>
                 <a href="{{ route('admin.inquiries.index') }}" class="px-4 py-2 rounded-md bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200">Reset</a>
             </form>
         </div>
@@ -63,11 +63,11 @@
                                 </td>
                                 <td class="px-5 py-3 text-gray-500 whitespace-nowrap">{{ $inquiry->created_at->format('M j, Y g:i A') }}</td>
                                 <td class="px-5 py-3 whitespace-nowrap text-right">
-                                    <a href="{{ route('admin.inquiries.show', $inquiry) }}" class="text-pine hover:underline text-sm font-medium">View</a>
+                                    <a href="{{ route('admin.inquiries.show', $inquiry) }}" class="text-amber-600 hover:underline text-sm font-medium">View</a>
                                     <form method="POST" action="{{ route('admin.inquiries.destroy', $inquiry) }}" class="inline" onsubmit="return confirm('Delete this inquiry?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="ml-3 text-clay hover:underline text-sm font-medium">Delete</button>
+                                        <button type="submit" class="ml-3 text-red-600 hover:underline text-sm font-medium">Delete</button>
                                     </form>
                                 </td>
                             </tr>
