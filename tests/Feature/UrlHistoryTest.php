@@ -2,6 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\DestinationResource\Pages\EditDestination;
+use App\Filament\Resources\PackageResource\Pages\EditPackage;
+use App\Filament\Resources\PageResource\Pages\EditPage;
+use App\Filament\Resources\ServiceResource\Pages\EditService;
 use App\Models\Destination;
 use App\Models\Package;
 use App\Models\Page;
@@ -9,6 +13,7 @@ use App\Models\Service;
 use App\Models\User;
 use App\Services\UrlHistoryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\Concerns\MakesKernelRequests;
 use Tests\TestCase;
 
@@ -19,7 +24,7 @@ class UrlHistoryTest extends TestCase
 
     private function admin(): User
     {
-        return User::factory()->create(['is_admin' => true]);
+        return User::factory()->create(['id' => 1, 'is_admin' => true]);
     }
 
     public function test_a_renaming_a_page_keeps_the_old_url_working(): void
@@ -28,12 +33,11 @@ class UrlHistoryTest extends TestCase
 
         $this->assertSame(200, $this->finalStatus('/about-us/history/'));
 
-        $this->actingAs($this->admin())
-            ->put("/admin/pages/{$page->id}", [
-                'title' => 'History',
-                'slug' => 'our-history',
-            ])
-            ->assertRedirect(route('admin.pages.edit', $page));
+        Livewire::actingAs($this->admin())
+            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->fillForm(['title' => 'History', 'slug' => 'our-history'])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('pages', ['id' => $page->id, 'slug' => 'our-history']);
         $this->assertDatabaseHas('redirects', [
@@ -53,12 +57,14 @@ class UrlHistoryTest extends TestCase
     {
         $service = Service::factory()->create(['slug' => 'rafting']);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$service->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $service->getKey()])
+            ->fillForm([
                 'title' => $service->title,
                 'slug' => 'rafting-expeditions',
             ])
-            ->assertRedirect(route('admin.services.edit', $service));
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $chain = $this->walk('/ast-services/rafting/');
 
@@ -71,12 +77,14 @@ class UrlHistoryTest extends TestCase
     {
         $destination = Destination::factory()->create(['slug' => 'tibet']);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/destinations/{$destination->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditDestination::class, ['record' => $destination->getKey()])
+            ->fillForm([
                 'title' => $destination->title,
                 'slug' => 'tibet-region',
             ])
-            ->assertRedirect(route('admin.destinations.edit', $destination));
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $chain = $this->walk('/destination/tibet/');
 
@@ -89,12 +97,14 @@ class UrlHistoryTest extends TestCase
     {
         $package = Package::factory()->create(['slug' => 'special-one']);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/packages/{$package->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditPackage::class, ['record' => $package->getKey()])
+            ->fillForm([
                 'title' => $package->title,
                 'slug' => 'special-one-plus',
             ])
-            ->assertRedirect(route('admin.packages.edit', $package));
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $chain = $this->walk('/special-package/special-one/');
 
@@ -106,14 +116,19 @@ class UrlHistoryTest extends TestCase
     public function test_b_multiple_renames_collapse_to_one_hop(): void
     {
         $page = Page::factory()->create(['slug' => 'stage-a']);
+        $admin = $this->admin();
 
-        $this->actingAs($this->admin())
-            ->put("/admin/pages/{$page->id}", ['title' => $page->title, 'slug' => 'stage-b'])
-            ->assertRedirect(route('admin.pages.edit', $page));
+        Livewire::actingAs($admin)
+            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->fillForm(['title' => $page->title, 'slug' => 'stage-b'])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
-        $this->actingAs($this->admin())
-            ->put("/admin/pages/{$page->id}", ['title' => $page->title, 'slug' => 'stage-c'])
-            ->assertRedirect(route('admin.pages.edit', $page));
+        Livewire::actingAs($admin)
+            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->fillForm(['title' => $page->title, 'slug' => 'stage-c'])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         foreach (['/about-us/stage-a/', '/about-us/stage-b/'] as $old) {
             $chain = $this->walk($old);
@@ -135,13 +150,15 @@ class UrlHistoryTest extends TestCase
 
         $this->assertSame(200, $this->finalStatus('/ast-services/alpha/bravo/'));
 
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$child->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $child->getKey()])
+            ->fillForm([
                 'title' => $child->title,
                 'slug' => $child->slug,
                 'parent_id' => $rootC->id,
             ])
-            ->assertRedirect(route('admin.services.edit', $child));
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('services', ['id' => $child->id, 'parent_id' => $rootC->id]);
         $this->assertDatabaseHas('redirects', [
@@ -167,12 +184,14 @@ class UrlHistoryTest extends TestCase
 
         $this->assertSame(200, $this->finalStatus('/ast-services/rafting/arun/'));
 
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$root->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $root->getKey()])
+            ->fillForm([
                 'title' => $root->title,
                 'slug' => 'rafting-expeditions',
             ])
-            ->assertRedirect(route('admin.services.edit', $root));
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $childChain = $this->walk('/ast-services/rafting/arun/');
         $this->assertSame([301, 200], array_column($childChain, 'status'));
@@ -192,13 +211,15 @@ class UrlHistoryTest extends TestCase
         $rootB = Destination::factory()->create(['slug' => 'transfers']);
         $child = Destination::factory()->create(['slug' => 'tibet-tour', 'parent_id' => $rootA->id]);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/destinations/{$rootA->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditDestination::class, ['record' => $rootA->getKey()])
+            ->fillForm([
                 'title' => $rootA->title,
                 'slug' => $rootA->slug,
                 'parent_id' => $rootB->id,
             ])
-            ->assertRedirect(route('admin.destinations.edit', $rootA));
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertSame(200, $this->finalStatus('/destination/transfers/tibet/'));
         $this->assertSame(200, $this->finalStatus('/destination/transfers/tibet/tibet-tour/'));
@@ -213,12 +234,14 @@ class UrlHistoryTest extends TestCase
         $service = Service::factory()->create(['slug' => 'alpha']);
         $other = Service::factory()->create(['slug' => 'bravo']);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$other->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $other->getKey()])
+            ->fillForm([
                 'title' => $other->title,
                 'slug' => 'alpha',
             ])
-            ->assertSessionHasErrors('slug');
+            ->call('save')
+            ->assertHasFormErrors(['slug']);
 
         $this->assertDatabaseHas('services', ['id' => $other->id, 'slug' => 'bravo']);
         $this->assertDatabaseCount('redirects', 0);
@@ -228,13 +251,15 @@ class UrlHistoryTest extends TestCase
     {
         $destination = Destination::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->put("/admin/destinations/{$destination->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditDestination::class, ['record' => $destination->getKey()])
+            ->fillForm([
                 'title' => $destination->title,
                 'slug' => $destination->slug,
                 'parent_id' => 999999,
             ])
-            ->assertSessionHasErrors('parent_id');
+            ->call('save')
+            ->assertHasFormErrors(['parent_id']);
 
         $this->assertDatabaseHas('destinations', ['id' => $destination->id, 'parent_id' => null]);
         $this->assertDatabaseCount('redirects', 0);
@@ -244,13 +269,15 @@ class UrlHistoryTest extends TestCase
     {
         $service = Service::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$service->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $service->getKey()])
+            ->fillForm([
                 'title' => $service->title,
                 'slug' => $service->slug,
                 'parent_id' => $service->id,
             ])
-            ->assertSessionHasErrors('parent_id');
+            ->call('save')
+            ->assertHasFormErrors(['parent_id']);
 
         $this->assertDatabaseHas('services', ['id' => $service->id, 'parent_id' => null]);
         $this->assertDatabaseCount('redirects', 0);
@@ -261,13 +288,15 @@ class UrlHistoryTest extends TestCase
         $parent = Service::factory()->create();
         $child = Service::factory()->create(['parent_id' => $parent->id]);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$parent->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $parent->getKey()])
+            ->fillForm([
                 'title' => $parent->title,
                 'slug' => $parent->slug,
                 'parent_id' => $child->id,
             ])
-            ->assertSessionHasErrors('parent_id');
+            ->call('save')
+            ->assertHasFormErrors(['parent_id']);
 
         $this->assertDatabaseHas('services', ['id' => $parent->id, 'parent_id' => null]);
         $this->assertDatabaseCount('redirects', 0);
@@ -278,13 +307,15 @@ class UrlHistoryTest extends TestCase
         $parent = Destination::factory()->create();
         $child = Destination::factory()->create(['parent_id' => $parent->id]);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/destinations/{$parent->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditDestination::class, ['record' => $parent->getKey()])
+            ->fillForm([
                 'title' => $parent->title,
                 'slug' => $parent->slug,
                 'parent_id' => $child->id,
             ])
-            ->assertSessionHasErrors('parent_id');
+            ->call('save')
+            ->assertHasFormErrors(['parent_id']);
 
         $this->assertDatabaseHas('destinations', ['id' => $parent->id, 'parent_id' => null]);
         $this->assertDatabaseCount('redirects', 0);
@@ -296,13 +327,15 @@ class UrlHistoryTest extends TestCase
         $child = Service::factory()->create(['parent_id' => $root->id]);
         $sibling = Service::factory()->create(['parent_id' => $root->id]);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$child->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $child->getKey()])
+            ->fillForm([
                 'title' => $child->title,
                 'slug' => $child->slug,
                 'parent_id' => $sibling->id,
             ])
-            ->assertSessionHasErrors('parent_id');
+            ->call('save')
+            ->assertHasFormErrors(['parent_id']);
 
         $this->assertDatabaseHas('services', ['id' => $child->id, 'parent_id' => $root->id]);
         $this->assertDatabaseCount('redirects', 0);
@@ -316,13 +349,15 @@ class UrlHistoryTest extends TestCase
         $otherL2 = Destination::factory()->create();
         $otherL3 = Destination::factory()->create(['parent_id' => $otherL2->id]);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/destinations/{$otherL3->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditDestination::class, ['record' => $otherL3->getKey()])
+            ->fillForm([
                 'title' => $otherL3->title,
                 'slug' => $otherL3->slug,
                 'parent_id' => $l3->id,
             ])
-            ->assertSessionHasErrors('parent_id');
+            ->call('save')
+            ->assertHasFormErrors(['parent_id']);
 
         $this->assertDatabaseHas('destinations', ['id' => $otherL3->id, 'parent_id' => $otherL2->id]);
         $this->assertDatabaseCount('redirects', 0);
@@ -331,11 +366,15 @@ class UrlHistoryTest extends TestCase
     public function test_i_old_url_resolution_terminates_without_looping(): void
     {
         $service = Service::factory()->create(['slug' => 'paragliding']);
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$service->id}", [
+
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $service->getKey()])
+            ->fillForm([
                 'title' => $service->title,
                 'slug' => 'paragliding-himalaya',
-            ]);
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $chain = $this->walk('/ast-services/paragliding/');
         $statuses = array_column($chain, 'status');
@@ -363,8 +402,7 @@ class UrlHistoryTest extends TestCase
     {
         $page = Page::factory()->create(['slug' => 'original']);
 
-        $this->put("/admin/pages/{$page->id}", ['title' => $page->title, 'slug' => 'hijacked'])
-            ->assertRedirect('/login');
+        $this->get("/admin/pages/{$page->id}/edit")->assertRedirect('/admin/login');
     }
 
     public function test_m_non_admins_cannot_edit_slugs(): void
@@ -372,25 +410,29 @@ class UrlHistoryTest extends TestCase
         $page = Page::factory()->create(['slug' => 'original']);
 
         $this->actingAs(User::factory()->create())
-            ->put("/admin/pages/{$page->id}", ['title' => $page->title, 'slug' => 'hijacked'])
+            ->get("/admin/pages/{$page->id}/edit")
             ->assertForbidden();
     }
 
     public function test_n_deleting_a_resource_cleans_up_its_redirects(): void
     {
         $package = Package::factory()->create(['slug' => 'doomed']);
+        $admin = $this->admin();
 
-        $this->actingAs($this->admin())
-            ->put("/admin/packages/{$package->id}", [
+        Livewire::actingAs($admin)
+            ->test(EditPackage::class, ['record' => $package->getKey()])
+            ->fillForm([
                 'title' => $package->title,
                 'slug' => 'doomed-renamed',
-            ]);
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertSame(200, $this->finalStatus('/special-package/doomed/'));
 
-        $this->actingAs($this->admin())
-            ->delete("/admin/packages/{$package->id}")
-            ->assertRedirect(route('admin.packages.index'));
+        Livewire::actingAs($admin)
+            ->test(EditPackage::class, ['record' => $package->getKey()])
+            ->callAction('delete');
 
         $this->assertDatabaseMissing('packages', ['id' => $package->id]);
         $this->assertDatabaseMissing('redirects', ['old_path' => '/special-package/doomed/']);
@@ -402,9 +444,9 @@ class UrlHistoryTest extends TestCase
     {
         $service = Service::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->delete("/admin/services/{$service->id}")
-            ->assertRedirect(route('admin.services.index'));
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $service->getKey()])
+            ->callAction('delete');
 
         $this->assertDatabaseCount('redirects', 0);
     }
@@ -412,11 +454,15 @@ class UrlHistoryTest extends TestCase
     public function test_o_slashless_old_urls_terminate_via_trailing_slash_and_history(): void
     {
         $service = Service::factory()->create(['slug' => 'bungee']);
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$service->id}", [
+
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $service->getKey()])
+            ->fillForm([
                 'title' => $service->title,
                 'slug' => 'bungee-nepal',
-            ]);
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $chain = $this->walk('/ast-services/bungee');
         $statuses = array_column($chain, 'status');

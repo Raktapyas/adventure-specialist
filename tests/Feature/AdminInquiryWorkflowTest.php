@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\InquiryResource\Pages\ListInquiries;
+use App\Filament\Resources\InquiryResource\Pages\ViewInquiry;
 use App\Filament\Widgets\StatsOverview;
 use App\Models\Inquiry;
 use App\Models\User;
@@ -15,16 +17,15 @@ class AdminInquiryWorkflowTest extends TestCase
 
     private function admin(): User
     {
-        return User::factory()->create(['is_admin' => true]);
+        return User::factory()->create(['id' => 1, 'is_admin' => true]);
     }
 
     public function test_viewing_an_inquiry_marks_it_as_read(): void
     {
         $inquiry = Inquiry::factory()->create(['is_read' => false]);
 
-        $this->actingAs($this->admin())
-            ->get("/admin/inquiries/{$inquiry->id}")
-            ->assertOk();
+        Livewire::actingAs($this->admin())
+            ->test(ViewInquiry::class, ['record' => $inquiry->getKey()]);
 
         $this->assertDatabaseHas('inquiries', ['id' => $inquiry->id, 'is_read' => true]);
     }
@@ -32,16 +33,17 @@ class AdminInquiryWorkflowTest extends TestCase
     public function test_admin_can_toggle_read_state(): void
     {
         $inquiry = Inquiry::factory()->create(['is_read' => false]);
+        $admin = $this->admin();
 
-        $this->actingAs($this->admin())
-            ->patch("/admin/inquiries/{$inquiry->id}/toggle-read")
-            ->assertRedirect();
+        Livewire::actingAs($admin)
+            ->test(ListInquiries::class)
+            ->callTableAction('toggle_read', $inquiry);
 
         $this->assertDatabaseHas('inquiries', ['id' => $inquiry->id, 'is_read' => true]);
 
-        $this->actingAs($this->admin())
-            ->patch("/admin/inquiries/{$inquiry->id}/toggle-read")
-            ->assertRedirect();
+        Livewire::actingAs($admin)
+            ->test(ListInquiries::class)
+            ->callTableAction('toggle_read', $inquiry);
 
         $this->assertDatabaseHas('inquiries', ['id' => $inquiry->id, 'is_read' => false]);
     }
@@ -50,9 +52,9 @@ class AdminInquiryWorkflowTest extends TestCase
     {
         $inquiry = Inquiry::factory()->create(['status' => 'new']);
 
-        $this->actingAs($this->admin())
-            ->patch("/admin/inquiries/{$inquiry->id}/status", ['status' => 'resolved'])
-            ->assertRedirect();
+        Livewire::actingAs($this->admin())
+            ->test(ListInquiries::class)
+            ->callTableAction('update_status', $inquiry, data: ['status' => 'resolved']);
 
         $this->assertDatabaseHas('inquiries', ['id' => $inquiry->id, 'status' => 'resolved']);
     }
@@ -61,10 +63,10 @@ class AdminInquiryWorkflowTest extends TestCase
     {
         $inquiry = Inquiry::factory()->create(['status' => 'new']);
 
-        $this->actingAs($this->admin())
-            ->from("/admin/inquiries/{$inquiry->id}")
-            ->patch("/admin/inquiries/{$inquiry->id}/status", ['status' => 'banana'])
-            ->assertSessionHasErrors('status');
+        Livewire::actingAs($this->admin())
+            ->test(ListInquiries::class)
+            ->callTableAction('update_status', $inquiry, data: ['status' => 'banana'])
+            ->assertHasTableActionErrors(['status']);
 
         $this->assertDatabaseHas('inquiries', ['id' => $inquiry->id, 'status' => 'new']);
     }
@@ -74,9 +76,9 @@ class AdminInquiryWorkflowTest extends TestCase
         Inquiry::factory()->create(['name' => 'Resolved Person', 'status' => 'resolved']);
         Inquiry::factory()->create(['name' => 'New Person', 'status' => 'new']);
 
-        $this->actingAs($this->admin())
-            ->get('/admin/inquiries?status=resolved')
-            ->assertOk()
+        Livewire::actingAs($this->admin())
+            ->test(ListInquiries::class)
+            ->filterTable('status', 'resolved')
             ->assertSee('Resolved Person')
             ->assertDontSee('New Person');
     }
@@ -86,9 +88,9 @@ class AdminInquiryWorkflowTest extends TestCase
         Inquiry::factory()->create(['name' => 'Read Person', 'is_read' => true]);
         Inquiry::factory()->create(['name' => 'Unread Person', 'is_read' => false]);
 
-        $this->actingAs($this->admin())
-            ->get('/admin/inquiries?read=0')
-            ->assertOk()
+        Livewire::actingAs($this->admin())
+            ->test(ListInquiries::class)
+            ->filterTable('is_read', false)
             ->assertSee('Unread Person')
             ->assertDontSee('Read Person');
     }
@@ -98,9 +100,9 @@ class AdminInquiryWorkflowTest extends TestCase
         Inquiry::factory()->create(['name' => 'Alice Traveller', 'message' => 'Looking for a trek']);
         Inquiry::factory()->create(['name' => 'Bob', 'message' => 'Completely different']);
 
-        $this->actingAs($this->admin())
-            ->get('/admin/inquiries?search=trek')
-            ->assertOk()
+        Livewire::actingAs($this->admin())
+            ->test(ListInquiries::class)
+            ->searchTable('trek')
             ->assertSee('Alice Traveller')
             ->assertDontSee('Bob');
     }
@@ -110,12 +112,9 @@ class AdminInquiryWorkflowTest extends TestCase
         $first = Inquiry::factory()->create(['is_read' => false]);
         $second = Inquiry::factory()->create(['is_read' => false]);
 
-        $this->actingAs($this->admin())
-            ->post('/admin/inquiries/bulk', [
-                'ids' => [$first->id, $second->id],
-                'action' => 'mark_read',
-            ])
-            ->assertRedirect(route('admin.inquiries.index'));
+        Livewire::actingAs($this->admin())
+            ->test(ListInquiries::class)
+            ->callTableBulkAction('mark_read', [$first, $second]);
 
         $this->assertDatabaseHas('inquiries', ['id' => $first->id, 'is_read' => true]);
         $this->assertDatabaseHas('inquiries', ['id' => $second->id, 'is_read' => true]);
@@ -126,12 +125,9 @@ class AdminInquiryWorkflowTest extends TestCase
         $first = Inquiry::factory()->create(['status' => 'new']);
         $second = Inquiry::factory()->create(['status' => 'new']);
 
-        $this->actingAs($this->admin())
-            ->post('/admin/inquiries/bulk', [
-                'ids' => [$first->id, $second->id],
-                'action' => 'in_progress',
-            ])
-            ->assertRedirect(route('admin.inquiries.index'));
+        Livewire::actingAs($this->admin())
+            ->test(ListInquiries::class)
+            ->callTableBulkAction('set_status', [$first, $second], data: ['status' => 'in_progress']);
 
         $this->assertDatabaseHas('inquiries', ['id' => $first->id, 'status' => 'in_progress']);
         $this->assertDatabaseHas('inquiries', ['id' => $second->id, 'status' => 'in_progress']);
@@ -142,12 +138,9 @@ class AdminInquiryWorkflowTest extends TestCase
         $first = Inquiry::factory()->create();
         $second = Inquiry::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->post('/admin/inquiries/bulk', [
-                'ids' => [$first->id, $second->id],
-                'action' => 'delete',
-            ])
-            ->assertRedirect(route('admin.inquiries.index'));
+        Livewire::actingAs($this->admin())
+            ->test(ListInquiries::class)
+            ->callTableBulkAction('delete', [$first, $second]);
 
         $this->assertDatabaseMissing('inquiries', ['id' => $first->id]);
         $this->assertDatabaseMissing('inquiries', ['id' => $second->id]);
@@ -157,12 +150,10 @@ class AdminInquiryWorkflowTest extends TestCase
     {
         $inquiry = Inquiry::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->post('/admin/inquiries/bulk', [
-                'ids' => [$inquiry->id],
-                'action' => 'explode',
-            ])
-            ->assertSessionHasErrors('action');
+        Livewire::actingAs($this->admin())
+            ->test(ListInquiries::class)
+            ->callTableBulkAction('set_status', [$inquiry], data: ['status' => 'explode'])
+            ->assertHasTableBulkActionErrors(['status']);
     }
 
     public function test_dashboard_shows_unread_inquiry_count(): void

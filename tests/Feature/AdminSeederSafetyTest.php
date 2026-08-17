@@ -2,13 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\PageResource\Pages\CreatePage;
 use App\Models\Destination;
 use App\Models\GalleryImage;
 use App\Models\Package;
 use App\Models\Page;
 use App\Models\Service;
 use App\Models\User;
+use Database\Seeders\AdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AdminSeederSafetyTest extends TestCase
@@ -39,14 +42,27 @@ class AdminSeederSafetyTest extends TestCase
     {
         $html = '<h2>Title</h2><p>Hello <strong>world</strong> &amp; friends</p>';
 
-        $this->actingAs(User::factory()->create(['is_admin' => true]))
-            ->post('/admin/pages', [
+        Livewire::actingAs(User::factory()->create(['id' => 1, 'is_admin' => true]))
+            ->test(CreatePage::class)
+            ->fillForm([
                 'title' => 'HTML Page',
                 'slug' => 'html-page',
                 'content' => $html,
-            ]);
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('pages', ['slug' => 'html-page', 'content' => $html]);
+    }
+
+    public function test_admin_seeder_assigns_super_admin_role(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+
+        $admin = User::where('email', 'admin@example.com')->firstOrFail();
+
+        $this->assertTrue($admin->hasRole('super_admin'));
+        $this->assertSame('admin', $admin->role);
     }
 
     public function test_seeders_are_idempotent_when_run_twice(): void

@@ -20,32 +20,32 @@
                        class="block px-3 py-2 rounded-lg {{ request()->routeIs('filament.admin.pages.dashboard') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Dashboard
                     </a>
-                    <a href="{{ route('admin.pages.index') }}"
-                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.pages.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
+                    <a href="{{ route('filament.admin.resources.pages.index') }}"
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('filament.admin.resources.pages.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Pages
                     </a>
-                    <a href="{{ route('admin.services.index') }}"
-                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.services.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
+                    <a href="{{ route('filament.admin.resources.services.index') }}"
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('filament.admin.resources.services.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Services
                     </a>
-                    <a href="{{ route('admin.destinations.index') }}"
-                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.destinations.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
+                    <a href="{{ route('filament.admin.resources.destinations.index') }}"
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('filament.admin.resources.destinations.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Destinations
                     </a>
-                    <a href="{{ route('admin.packages.index') }}"
-                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.packages.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
+                    <a href="{{ route('filament.admin.resources.packages.index') }}"
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('filament.admin.resources.packages.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Packages
                     </a>
-                    <a href="{{ route('admin.gallery.index') }}"
-                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.gallery.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
+                    <a href="{{ route('filament.admin.resources.gallery-images.index') }}"
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('filament.admin.resources.gallery-images.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Gallery
                     </a>
-                    <a href="{{ route('admin.media.index') }}"
-                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.media.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
+                    <a href="{{ route('filament.admin.resources.media.index') }}"
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('filament.admin.resources.media.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Media
                     </a>
-                    <a href="{{ route('admin.inquiries.index') }}"
-                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.inquiries.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
+                    <a href="{{ route('filament.admin.resources.inquiries.index') }}"
+                       class="block px-3 py-2 rounded-lg {{ request()->routeIs('filament.admin.resources.inquiries.*') ? 'bg-gray-100 text-amber-600 dark:bg-gray-800 dark:text-amber-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800' }}">
                         Inquiries
                     </a>
                     <a href="{{ route('home') }}"

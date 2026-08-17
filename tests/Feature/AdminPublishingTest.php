@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\PageResource\Pages\EditPage;
 use App\Models\Destination;
 use App\Models\Package;
 use App\Models\Page;
@@ -9,6 +10,7 @@ use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Livewire\Livewire;
 use Tests\Concerns\MakesKernelRequests;
 use Tests\TestCase;
 
@@ -19,7 +21,7 @@ class AdminPublishingTest extends TestCase
 
     private function admin(): User
     {
-        return User::factory()->create(['is_admin' => true]);
+        return User::factory()->create(['id' => 1, 'is_admin' => true]);
     }
 
     public function test_unpublished_pages_return_404_publicly(): void
@@ -67,25 +69,22 @@ class AdminPublishingTest extends TestCase
     public function test_admin_can_unpublish_and_republish_a_page(): void
     {
         $page = Page::factory()->create(['slug' => 'about', 'title' => 'About', 'is_published' => true]);
+        $admin = $this->admin();
 
-        $this->actingAs($this->admin())
-            ->put("/admin/pages/{$page->id}", [
-                'title' => 'About',
-                'slug' => 'about',
-                'is_published' => false,
-            ])
-            ->assertRedirect(route('admin.pages.edit', $page));
+        Livewire::actingAs($admin)
+            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->fillForm(['title' => 'About', 'slug' => 'about', 'is_published' => false])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('pages', ['id' => $page->id, 'is_published' => false]);
         $this->assertSame(404, $this->finalStatus('/about-us/'));
 
-        $this->actingAs($this->admin())
-            ->put("/admin/pages/{$page->id}", [
-                'title' => 'About',
-                'slug' => 'about',
-                'is_published' => true,
-            ])
-            ->assertRedirect(route('admin.pages.edit', $page));
+        Livewire::actingAs($admin)
+            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->fillForm(['title' => 'About', 'slug' => 'about', 'is_published' => true])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('pages', ['id' => $page->id, 'is_published' => true]);
         $this->assertSame(200, $this->finalStatus('/about-us/'));
@@ -95,13 +94,11 @@ class AdminPublishingTest extends TestCase
     {
         $page = Page::factory()->create(['slug' => 'our-history', 'title' => 'History', 'is_published' => false]);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/pages/{$page->id}", [
-                'title' => 'History',
-                'slug' => 'history-renamed',
-                'is_published' => false,
-            ])
-            ->assertRedirect(route('admin.pages.edit', $page));
+        Livewire::actingAs($this->admin())
+            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->fillForm(['title' => 'History', 'slug' => 'history-renamed', 'is_published' => false])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         // The old path now resolves via history, but the owner is unpublished.
         $this->assertSame(404, $this->finalStatus('/about-us/our-history/'));

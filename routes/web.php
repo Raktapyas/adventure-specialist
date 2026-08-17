@@ -1,12 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\DestinationController as AdminDestinationController;
-use App\Http\Controllers\Admin\GalleryImageController;
-use App\Http\Controllers\Admin\InquiryController;
-use App\Http\Controllers\Admin\MediaController;
-use App\Http\Controllers\Admin\PackageController as AdminPackageController;
-use App\Http\Controllers\Admin\PageController as AdminPageController;
-use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\GalleryController;
@@ -121,27 +114,3 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-
-/*
-|--------------------------------------------------------------------------
-| Admin area (auth + is_admin, outside canonical group)
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('pages', AdminPageController::class)->except(['show']);
-    Route::resource('services', AdminServiceController::class)->except(['show']);
-    Route::resource('destinations', AdminDestinationController::class)->except(['show']);
-    Route::resource('packages', AdminPackageController::class)->except(['show']);
-    Route::resource('gallery', GalleryImageController::class)->except(['show']);
-    Route::resource('media', MediaController::class)->except(['show', 'edit', 'update']);
-
-    Route::get('media/picker-data', [MediaController::class, 'pickerData'])->name('media.picker-data');
-
-    Route::get('inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
-    Route::post('inquiries/bulk', [InquiryController::class, 'bulk'])->name('inquiries.bulk');
-    Route::get('inquiries/{inquiry}', [InquiryController::class, 'show'])->name('inquiries.show');
-    Route::patch('inquiries/{inquiry}/toggle-read', [InquiryController::class, 'toggleRead'])->name('inquiries.toggle-read');
-    Route::patch('inquiries/{inquiry}/status', [InquiryController::class, 'updateStatus'])->name('inquiries.status');
-    Route::delete('inquiries/{inquiry}', [InquiryController::class, 'destroy'])->name('inquiries.destroy');
-});

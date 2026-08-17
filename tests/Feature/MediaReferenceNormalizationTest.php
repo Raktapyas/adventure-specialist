@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\GalleryImageResource\Pages\CreateGalleryImage;
+use App\Filament\Resources\PageResource\Pages\CreatePage;
+use App\Filament\Resources\PageResource\Pages\EditPage;
 use App\Models\Media;
 use App\Models\Page;
 use App\Models\User;
 use App\Services\MediaUsageService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class MediaReferenceNormalizationTest extends TestCase
@@ -15,7 +19,7 @@ class MediaReferenceNormalizationTest extends TestCase
 
     private function admin(): User
     {
-        return User::factory()->create(['is_admin' => true]);
+        return User::factory()->create(['id' => 1, 'is_admin' => true]);
     }
 
     public function test_page_cover_image_absolute_url_is_normalized_and_usage_tracked(): void
@@ -23,13 +27,15 @@ class MediaReferenceNormalizationTest extends TestCase
         $media = Media::factory()->create(['path' => '/storage/media/2026/08/pic.jpg', 'is_legacy' => false]);
         $page = Page::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->put("/admin/pages/{$page->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->fillForm([
                 'title' => $page->title,
                 'slug' => $page->slug,
                 'cover_image' => 'http://localhost/storage/media/2026/08/pic.jpg',
             ])
-            ->assertRedirect(route('admin.pages.edit', $page));
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('pages', ['id' => $page->id, 'cover_image' => '/storage/media/2026/08/pic.jpg']);
 
@@ -43,12 +49,14 @@ class MediaReferenceNormalizationTest extends TestCase
 
     public function test_gallery_image_url_absolute_url_is_normalized(): void
     {
-        $this->actingAs($this->admin())
-            ->post('/admin/gallery', [
+        Livewire::actingAs($this->admin())
+            ->test(CreateGalleryImage::class)
+            ->fillForm([
                 'image_url' => 'https://localhost/assets/images/himalaya.jpg',
                 'caption' => 'Snow peaks',
             ])
-            ->assertRedirect(route('admin.gallery.index'));
+            ->call('create')
+            ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('gallery_images', ['image_url' => '/assets/images/himalaya.jpg']);
     }
@@ -87,37 +95,43 @@ class MediaReferenceNormalizationTest extends TestCase
 
     public function test_page_cover_image_with_path_traversal_is_rejected(): void
     {
-        $this->actingAs($this->admin())
-            ->post('/admin/pages', [
+        Livewire::actingAs($this->admin())
+            ->test(CreatePage::class)
+            ->fillForm([
                 'title' => 'Bad',
                 'slug' => 'bad-page',
                 'cover_image' => '/assets/../secret.jpg',
             ])
-            ->assertSessionHasErrors('cover_image');
+            ->call('create')
+            ->assertHasFormErrors(['cover_image']);
 
         $this->assertDatabaseMissing('pages', ['slug' => 'bad-page']);
     }
 
     public function test_page_cover_image_with_protocol_relative_url_is_rejected(): void
     {
-        $this->actingAs($this->admin())
-            ->post('/admin/pages', [
+        Livewire::actingAs($this->admin())
+            ->test(CreatePage::class)
+            ->fillForm([
                 'title' => 'Bad',
                 'slug' => 'bad-page',
                 'cover_image' => '//evil.example.com/pic.jpg',
             ])
-            ->assertSessionHasErrors('cover_image');
+            ->call('create')
+            ->assertHasFormErrors(['cover_image']);
 
         $this->assertDatabaseMissing('pages', ['slug' => 'bad-page']);
     }
 
     public function test_gallery_image_url_must_be_a_host_relative_path(): void
     {
-        $this->actingAs($this->admin())
-            ->post('/admin/gallery', [
+        Livewire::actingAs($this->admin())
+            ->test(CreateGalleryImage::class)
+            ->fillForm([
                 'image_url' => 'C:\\windows\\not-an-image.jpg',
             ])
-            ->assertSessionHasErrors('image_url');
+            ->call('create')
+            ->assertHasFormErrors(['image_url']);
 
         $this->assertDatabaseCount('gallery_images', 0);
     }
@@ -126,13 +140,15 @@ class MediaReferenceNormalizationTest extends TestCase
     {
         $page = Page::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->put("/admin/pages/{$page->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->fillForm([
                 'title' => $page->title,
                 'slug' => $page->slug,
                 'cover_image' => '/assets/images/pages/15.jpg',
             ])
-            ->assertRedirect(route('admin.pages.edit', $page));
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('pages', ['id' => $page->id, 'cover_image' => '/assets/images/pages/15.jpg']);
     }

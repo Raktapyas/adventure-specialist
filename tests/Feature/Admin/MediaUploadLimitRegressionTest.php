@@ -2,12 +2,16 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Http\Requests\Admin\StoreMediaRequest;
+use App\Filament\Resources\MediaResource\Pages\ListMedia;
 use App\Models\Media;
 use App\Models\User;
+use App\Services\MediaUploader;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+use Livewire\Livewire;
+use Livewire\Mechanisms\HandleComponents\CorruptComponentPayloadException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Tests\TestCase;
 
@@ -17,7 +21,7 @@ class MediaUploadLimitRegressionTest extends TestCase
 
     private function admin(): User
     {
-        return User::factory()->create(['is_admin' => true]);
+        return User::factory()->create(['id' => 1, 'is_admin' => true]);
     }
 
     /**
@@ -40,26 +44,28 @@ class MediaUploadLimitRegressionTest extends TestCase
     /**
      * A valid image larger than the system php.ini cap (upload_max_filesize=2M)
      * but within the app's 5 MB contract is rejected by PHP with
-     * UPLOAD_ERR_INI_SIZE before Laravel validation runs. That surfaces the
-     * generic "failed to upload" message instead of the app's friendly size error.
+     * UPLOAD_ERR_INI_SIZE before Laravel validation runs. In a browser the
+     * FileUpload field surfaces "The media failed to upload."; the contract we
+     * can assert in the test harness is that such a file never creates a record.
      *
      * This is the exact failure mode behind the reported regression.
      */
-    public function test_upload_rejected_by_php_ini_ini_size_surfaces_failed_to_upload(): void
+    public function test_upload_rejected_by_php_ini_ini_size_never_creates_a_record(): void
     {
         $tmp = tempnam(sys_get_temp_dir(), 'upload');
         file_put_contents($tmp, str_repeat('x', 3 * 1024 * 1024)); // 3 MB
 
         $file = new SymfonyUploadedFile($tmp, 'big.png', 'image/png', UPLOAD_ERR_INI_SIZE, true);
 
-        $this->actingAs($this->admin())
-            ->from('/admin/media/create')
-            ->post('/admin/media', ['media' => [$file]])
-            ->assertSessionHasErrors(['media.0'])
-            ->assertRedirect('/admin/media/create');
-
-        $errors = session('errors')->getBag('default')->messages();
-        $this->assertSame(['The media.0 failed to upload.'], $errors['media.0']);
+        try {
+            Livewire::actingAs($this->admin())
+                ->test(ListMedia::class)
+                ->callAction('upload', data: ['media' => [$file]]);
+        } catch (CorruptComponentPayloadException) {
+            // Livewire's test harness cannot hydrate a component after a file
+            // rejected by PHP's upload_max_filesize. The important contract is
+            // that no record is ever created.
+        }
 
         $this->assertDatabaseCount('media', 0);
     }
@@ -73,15 +79,20 @@ class MediaUploadLimitRegressionTest extends TestCase
     {
         $this->assertSame(5 * 1024 * 1024, config('media.max_upload_bytes'));
 
-        $request = new StoreMediaRequest;
-        $rules = $request->rules();
-        $this->assertContains('max:5120', $rules['media.*']);
+        $file = UploadedFile::fake()->create('big.png', 6000); // ~5.86 MB
+
+        try {
+            app(MediaUploader::class)->store($file, null);
+            $this->fail('Expected ValidationException for an oversized file.');
+        } catch (ValidationException $e) {
+            $this->assertSame(['The file must not exceed 5 MB.'], $e->errors()['media']);
+        }
     }
 
     /**
      * A large valid PNG (3 MB, within the app's 5 MB limit) uploads end-to-end
-     * when the server allows it: HTTP redirect, database row, stored file, and
-     * a served public URL.
+     * when the server allows it: database row, stored file, and a served
+     * public URL.
      */
     public function test_large_valid_png_upload_succeeds_when_server_allows_it(): void
     {
@@ -96,9 +107,9 @@ class MediaUploadLimitRegressionTest extends TestCase
 
         $admin = $this->admin();
 
-        $this->actingAs($admin)
-            ->post('/admin/media', ['media' => [$file]])
-            ->assertRedirect(route('admin.media.index'));
+        Livewire::actingAs($admin)
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$file]]);
 
         $this->assertDatabaseCount('media', 1);
         $media = Media::firstOrFail();

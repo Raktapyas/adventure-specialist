@@ -6,6 +6,7 @@ use App\Filament\Pages\Dashboard;
 use App\Filament\Widgets\DashboardChart;
 use App\Filament\Widgets\RecentInquiriesOverview;
 use App\Filament\Widgets\StatsOverview;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -30,6 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->authGuard('web')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -44,27 +46,6 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->navigationItems([
-                NavigationItem::make('Pages')
-                    ->url('/admin/pages')
-                    ->icon('heroicon-m-document-text'),
-                NavigationItem::make('Services')
-                    ->url('/admin/services')
-                    ->icon('heroicon-m-wrench-screwdriver'),
-                NavigationItem::make('Destinations')
-                    ->url('/admin/destinations')
-                    ->icon('heroicon-m-globe-alt'),
-                NavigationItem::make('Packages')
-                    ->url('/admin/packages')
-                    ->icon('heroicon-m-map'),
-                NavigationItem::make('Gallery')
-                    ->url('/admin/gallery')
-                    ->icon('heroicon-m-photo'),
-                NavigationItem::make('Media')
-                    ->url('/admin/media')
-                    ->icon('heroicon-m-folder-open'),
-                NavigationItem::make('Inquiries')
-                    ->url('/admin/inquiries')
-                    ->icon('heroicon-m-chat-bubble-left-right'),
                 NavigationItem::make('View Site')
                     ->url('/')
                     ->icon('heroicon-m-arrow-top-right-on-square')
@@ -80,6 +61,9 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+            ])
+            ->plugins([
+                FilamentShieldPlugin::make(),
             ])
             ->authMiddleware([
                 Authenticate::class,

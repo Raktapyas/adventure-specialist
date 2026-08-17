@@ -26,7 +26,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_admin_users_see_the_dashboard(): void
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = User::factory()->create(['id' => 1, 'is_admin' => true]);
 
         $this->actingAs($admin)
             ->get('/admin')
@@ -36,7 +36,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_admin_can_log_out(): void
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = User::factory()->create(['id' => 1, 'is_admin' => true]);
 
         $this->actingAs($admin)
             ->post('/logout')

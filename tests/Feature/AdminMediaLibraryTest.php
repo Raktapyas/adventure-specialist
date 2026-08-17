@@ -2,13 +2,18 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\MediaResource\Pages\ListMedia;
+use App\Filament\Resources\PageResource\Pages\EditPage;
 use App\Models\Media;
 use App\Models\MediaUsage;
 use App\Models\Page;
 use App\Models\User;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AdminMediaLibraryTest extends TestCase
@@ -17,7 +22,7 @@ class AdminMediaLibraryTest extends TestCase
 
     private function admin(): User
     {
-        return User::factory()->create(['is_admin' => true]);
+        return User::factory()->create(['id' => 1, 'is_admin' => true]);
     }
 
     private function png(string $name = 'image.png'): UploadedFile
@@ -36,8 +41,7 @@ class AdminMediaLibraryTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/admin/media')->assertRedirect('/login');
-        $this->get('/admin/media/create')->assertRedirect('/login');
+        $this->get('/admin/media')->assertRedirect('/admin/login');
     }
 
     public function test_non_admin_users_are_forbidden(): void
@@ -52,20 +56,54 @@ class AdminMediaLibraryTest extends TestCase
         Media::factory()->create(['name' => 'summit.jpg', 'path' => '/assets/images/summit.jpg']);
         Media::factory()->uploaded()->create(['name' => 'gallery.png']);
 
-        $this->actingAs($this->admin())
-            ->get('/admin/media')
-            ->assertOk()
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
             ->assertSee('summit.jpg')
             ->assertSee('gallery.png');
+    }
+
+    public function test_library_grid_shows_name_and_size_metadata(): void
+    {
+        $media = Media::factory()->create(['name' => 'summit.jpg', 'size' => 2048]);
+
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->assertSee('summit.jpg')
+            ->assertSee($media->humanSize());
+    }
+
+    public function test_historical_media_hidden_by_global_scopes_still_renders_in_library(): void
+    {
+        $globalScopes = Media::getAllGlobalScopes();
+
+        try {
+            Media::addGlobalScope(
+                'hide_historical_media_for_regression',
+                fn (Builder $query) => $query->where('is_legacy', false),
+            );
+
+            Media::factory()->create([
+                'name' => 'historical.jpg',
+                'path' => '/assets/images/historical.jpg',
+                'is_legacy' => true,
+            ]);
+
+            Livewire::actingAs($this->admin())
+                ->test(ListMedia::class)
+                ->assertSee('historical.jpg')
+                ->assertSee('/assets/images/historical.jpg');
+        } finally {
+            Media::setAllGlobalScopes($globalScopes);
+        }
     }
 
     public function test_admin_can_filter_by_source(): void
     {
         Media::factory()->uploaded()->create(['name' => 'fresh.png']);
 
-        $this->actingAs($this->admin())
-            ->get('/admin/media?source=legacy')
-            ->assertOk()
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->filterTable('is_legacy', true)
             ->assertDontSee('fresh.png');
     }
 
@@ -74,12 +112,12 @@ class AdminMediaLibraryTest extends TestCase
         Storage::fake('public');
         $admin = $this->admin();
 
-        $this->actingAs($admin)
-            ->post('/admin/media', [
+        Livewire::actingAs($admin)
+            ->test(ListMedia::class)
+            ->callAction('upload', data: [
                 'media' => [$this->png()],
                 'alt_text' => 'A test image',
-            ])
-            ->assertRedirect(route('admin.media.index'));
+            ]);
 
         $media = Media::firstOrFail();
 
@@ -95,9 +133,9 @@ class AdminMediaLibraryTest extends TestCase
     {
         Storage::fake('public');
 
-        $this->actingAs($this->admin())
-            ->post('/admin/media', ['media' => [$this->jpeg('photo.jpeg')]])
-            ->assertRedirect(route('admin.media.index'));
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$this->jpeg('photo.jpeg')]]);
 
         $media = Media::firstOrFail();
 
@@ -113,9 +151,9 @@ class AdminMediaLibraryTest extends TestCase
     {
         Storage::fake('public');
 
-        $this->actingAs($this->admin())
-            ->post('/admin/media', ['media' => [$this->jpeg('photo.jpg'), $this->jpeg('photo.jpeg')]])
-            ->assertRedirect(route('admin.media.index'));
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$this->jpeg('photo.jpg'), $this->jpeg('photo.jpeg')]]);
 
         $this->assertSame(2, Media::count());
         $this->assertSame(['jpg', 'jpeg'], Media::orderBy('id')->pluck('extension')->all());
@@ -125,9 +163,10 @@ class AdminMediaLibraryTest extends TestCase
     {
         $png = $this->png('mismatch.jpeg');
 
-        $this->actingAs($this->admin())
-            ->post('/admin/media', ['media' => [$png]])
-            ->assertSessionHasErrors();
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$png]])
+            ->assertHasErrors(['media']);
 
         $this->assertDatabaseCount('media', 0);
     }
@@ -136,9 +175,10 @@ class AdminMediaLibraryTest extends TestCase
     {
         $bad = UploadedFile::fake()->createWithContent('shell.png', '<?php echo "nope"; ?>');
 
-        $this->actingAs($this->admin())
-            ->post('/admin/media', ['media' => [$bad]])
-            ->assertSessionHasErrors();
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$bad]])
+            ->assertHasErrors(['media']);
 
         $this->assertDatabaseCount('media', 0);
     }
@@ -150,22 +190,12 @@ class AdminMediaLibraryTest extends TestCase
             '<svg xmlns="http://www.w3.org/2000/svg"></svg>'
         );
 
-        $this->actingAs($this->admin())
-            ->post('/admin/media', ['media' => [$svg]])
-            ->assertSessionHasErrors();
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$svg]])
+            ->assertHasErrors(['media']);
 
         $this->assertDatabaseCount('media', 0);
-    }
-
-    public function test_picker_data_returns_json(): void
-    {
-        Media::factory()->create(['name' => 'peak.jpg', 'path' => '/assets/images/peak.jpg']);
-
-        $this->actingAs($this->admin())
-            ->getJson(route('admin.media.picker-data'))
-            ->assertOk()
-            ->assertJsonPath('items.0.name', 'peak.jpg')
-            ->assertJsonStructure(['items' => [['id', 'name', 'url', 'is_legacy', 'usages']], 'has_more', 'next_page']);
     }
 
     public function test_legacy_media_in_use_cannot_be_deleted(): void
@@ -180,10 +210,10 @@ class AdminMediaLibraryTest extends TestCase
             'field' => 'cover_image',
         ]);
 
-        $this->actingAs($this->admin())
-            ->delete("/admin/media/{$media->id}")
-            ->assertRedirect(route('admin.media.index'))
-            ->assertSessionHas('error');
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callTableAction('delete', $media)
+            ->assertNotified();
 
         $this->assertDatabaseHas('media', ['id' => $media->id]);
     }
@@ -193,10 +223,9 @@ class AdminMediaLibraryTest extends TestCase
         Storage::fake('public');
         $media = Media::factory()->create(['path' => '/assets/images/kept.jpg']);
 
-        $this->actingAs($this->admin())
-            ->delete("/admin/media/{$media->id}?force=1")
-            ->assertRedirect(route('admin.media.index'))
-            ->assertSessionHas('status');
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callTableAction('delete', $media, data: ['force' => true]);
 
         $this->assertDatabaseMissing('media', ['id' => $media->id]);
     }
@@ -214,9 +243,9 @@ class AdminMediaLibraryTest extends TestCase
             'field' => 'cover_image',
         ]);
 
-        $this->actingAs($this->admin())
-            ->delete("/admin/media/{$media->id}?force=1")
-            ->assertRedirect(route('admin.media.index'));
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callTableAction('delete', $media, data: ['force' => true]);
 
         $this->assertDatabaseMissing('media', ['id' => $media->id]);
         $this->assertDatabaseMissing('media_usages', ['media_id' => $media->id]);
@@ -227,9 +256,9 @@ class AdminMediaLibraryTest extends TestCase
     {
         Storage::fake('public');
 
-        $this->actingAs($this->admin())
-            ->post('/admin/media', ['media' => [$this->png()]])
-            ->assertRedirect(route('admin.media.index'));
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$this->png()]]);
 
         $media = Media::firstOrFail();
 
@@ -240,16 +269,16 @@ class AdminMediaLibraryTest extends TestCase
     public function test_uploaded_thumbnail_renders_host_relative_path(): void
     {
         Storage::fake('public');
+        $admin = $this->admin();
 
-        $this->actingAs($this->admin())
-            ->post('/admin/media', ['media' => [$this->png()]])
-            ->assertRedirect(route('admin.media.index'));
+        Livewire::actingAs($admin)
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$this->png()]]);
 
         $media = Media::firstOrFail();
 
-        $this->actingAs($this->admin())
-            ->get('/admin/media')
-            ->assertOk()
+        Livewire::actingAs($admin)
+            ->test(ListMedia::class)
             ->assertSee($media->path);
     }
 
@@ -267,16 +296,20 @@ class AdminMediaLibraryTest extends TestCase
             'field' => 'cover_image',
         ]);
 
-        $this->actingAs($this->admin())
-            ->delete("/admin/media/{$media->id}")
-            ->assertRedirect(route('admin.media.index'))
-            ->assertSessionHas('error');
+        $label = str_replace('App\\Models\\', '', $page->getMorphClass()).'#'.$page->id.' · cover_image';
+
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callTableAction('delete', $media)
+            ->assertNotified(
+                Notification::make()
+                    ->danger()
+                    ->title('Cannot delete')
+                    ->body('This image is in use by 1 item(s): '.$label.'. Reassign or remove those references first, or force-delete.')
+            );
 
         $this->assertDatabaseHas('media', ['id' => $media->id]);
         Storage::disk('public')->assertExists($media->storage_path);
-
-        $label = str_replace('App\\Models\\', '', $page->getMorphClass()).'#'.$page->id.' · cover_image';
-        $this->assertStringContainsString($label, session('error'));
     }
 
     public function test_unused_uploaded_media_can_be_deleted(): void
@@ -284,10 +317,9 @@ class AdminMediaLibraryTest extends TestCase
         Storage::fake('public');
         $media = Media::factory()->uploaded()->create();
 
-        $this->actingAs($this->admin())
-            ->delete("/admin/media/{$media->id}")
-            ->assertRedirect(route('admin.media.index'))
-            ->assertSessionHas('status');
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callTableAction('delete', $media);
 
         $this->assertDatabaseMissing('media', ['id' => $media->id]);
         Storage::disk('public')->assertMissing($media->storage_path);
@@ -302,10 +334,9 @@ class AdminMediaLibraryTest extends TestCase
         try {
             $media = Media::factory()->create(['path' => '/assets/images/legacy-kept.jpg']);
 
-            $this->actingAs($this->admin())
-                ->delete("/admin/media/{$media->id}?force=1")
-                ->assertRedirect(route('admin.media.index'))
-                ->assertSessionHas('status');
+            Livewire::actingAs($this->admin())
+                ->test(ListMedia::class)
+                ->callTableAction('delete', $media, data: ['force' => true]);
 
             $this->assertDatabaseMissing('media', ['id' => $media->id]);
             $this->assertFileExists($file);
@@ -319,14 +350,16 @@ class AdminMediaLibraryTest extends TestCase
         $media = Media::factory()->uploaded()->create();
         $page = Page::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->put("/admin/pages/{$page->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->fillForm([
                 'title' => $page->title,
                 'slug' => $page->slug,
                 'cover_image' => $media->path,
                 'content' => null,
             ])
-            ->assertRedirect(route('admin.pages.edit', $page));
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('media_usages', [
             'media_id' => $media->id,

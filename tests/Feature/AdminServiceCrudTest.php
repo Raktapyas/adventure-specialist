@@ -2,9 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\ServiceResource;
+use App\Filament\Resources\ServiceResource\Pages\CreateService;
+use App\Filament\Resources\ServiceResource\Pages\EditService;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AdminServiceCrudTest extends TestCase
@@ -13,31 +17,36 @@ class AdminServiceCrudTest extends TestCase
 
     private function admin(): User
     {
-        return User::factory()->create(['is_admin' => true]);
+        return User::factory()->create(['id' => 1, 'is_admin' => true]);
     }
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/admin/services')->assertRedirect('/login');
+        $this->get('/admin/services')->assertRedirect('/admin/login');
+        $this->get('/admin/services/create')->assertRedirect('/admin/login');
     }
 
     public function test_non_admin_users_are_forbidden(): void
     {
-        $this->actingAs(User::factory()->create())
-            ->get('/admin/services')
-            ->assertForbidden();
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get('/admin/services')->assertForbidden();
+        $this->actingAs($user)->get('/admin/services/create')->assertForbidden();
     }
 
     public function test_admin_can_create_a_service(): void
     {
-        $this->actingAs($this->admin())
-            ->post('/admin/services', [
+        Livewire::actingAs($this->admin())
+            ->test(CreateService::class)
+            ->fillForm([
                 'title' => 'Trekking',
                 'slug' => 'trekking',
                 'content' => '<p>Body</p>',
                 'sort_order' => 2,
             ])
-            ->assertRedirect(route('admin.services.index'));
+            ->call('create')
+            ->assertHasNoFormErrors()
+            ->assertRedirect(ServiceResource::getUrl('index'));
 
         $this->assertDatabaseHas('services', ['slug' => 'trekking', 'parent_id' => null]);
     }
@@ -46,9 +55,31 @@ class AdminServiceCrudTest extends TestCase
     {
         Service::factory()->create(['slug' => 'taken']);
 
-        $this->actingAs($this->admin())
-            ->post('/admin/services', ['title' => 'Dup', 'slug' => 'taken'])
-            ->assertSessionHasErrors('slug');
+        Livewire::actingAs($this->admin())
+            ->test(CreateService::class)
+            ->fillForm(['title' => 'Dup', 'slug' => 'taken'])
+            ->call('create')
+            ->assertHasFormErrors(['slug']);
+
+        $this->assertDatabaseCount('services', 1);
+    }
+
+    public function test_slug_auto_generates_from_title(): void
+    {
+        Livewire::actingAs($this->admin())
+            ->test(CreateService::class)
+            ->set('data.title', 'Mountain Biking')
+            ->assertFormSet(['slug' => 'mountain-biking']);
+    }
+
+    public function test_manual_slug_is_preserved_when_title_changes(): void
+    {
+        Livewire::actingAs($this->admin())
+            ->test(CreateService::class)
+            ->set('data.title', 'Mountain Biking')
+            ->set('data.slug', 'mountain-biking-2026')
+            ->set('data.title', 'Trail Riding')
+            ->assertFormSet(['slug' => 'mountain-biking-2026']);
     }
 
     public function test_service_parent_can_be_changed_on_update(): void
@@ -56,13 +87,16 @@ class AdminServiceCrudTest extends TestCase
         $root = Service::factory()->create();
         $child = Service::factory()->create(['parent_id' => $root->id]);
 
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$child->id}", [
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $child->getKey()])
+            ->fillForm([
                 'title' => 'Renamed Child',
                 'slug' => $child->slug,
                 'parent_id' => null,
             ])
-            ->assertRedirect(route('admin.services.edit', $child));
+            ->call('save')
+            ->assertHasNoFormErrors()
+            ->assertRedirect(ServiceResource::getUrl('index'));
 
         $this->assertDatabaseHas('services', ['id' => $child->id, 'parent_id' => null]);
         $this->assertDatabaseHas('redirects', [
@@ -77,13 +111,15 @@ class AdminServiceCrudTest extends TestCase
         $root = Service::factory()->create();
         $child = Service::factory()->create(['parent_id' => $root->id]);
 
-        $this->actingAs($this->admin())
-            ->post('/admin/services', [
+        Livewire::actingAs($this->admin())
+            ->test(CreateService::class)
+            ->fillForm([
                 'title' => 'Too Deep',
                 'slug' => 'too-deep',
                 'parent_id' => $child->id,
             ])
-            ->assertSessionHasErrors('parent_id');
+            ->call('create')
+            ->assertHasFormErrors(['parent_id']);
 
         $this->assertDatabaseMissing('services', ['slug' => 'too-deep']);
     }
@@ -92,9 +128,11 @@ class AdminServiceCrudTest extends TestCase
     {
         $service = Service::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->put("/admin/services/{$service->id}", ['title' => 'Updated', 'slug' => $service->slug])
-            ->assertRedirect(route('admin.services.edit', $service));
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $service->getKey()])
+            ->fillForm(['title' => 'Updated', 'slug' => $service->slug])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('services', ['id' => $service->id, 'title' => 'Updated']);
     }
@@ -104,10 +142,9 @@ class AdminServiceCrudTest extends TestCase
         $root = Service::factory()->create();
         Service::factory()->create(['parent_id' => $root->id]);
 
-        $this->actingAs($this->admin())
-            ->delete("/admin/services/{$root->id}")
-            ->assertRedirect(route('admin.services.index'))
-            ->assertSessionHas('error');
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $root->getKey()])
+            ->callAction('delete');
 
         $this->assertDatabaseHas('services', ['id' => $root->id]);
     }
@@ -116,9 +153,9 @@ class AdminServiceCrudTest extends TestCase
     {
         $service = Service::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->delete("/admin/services/{$service->id}")
-            ->assertRedirect(route('admin.services.index'));
+        Livewire::actingAs($this->admin())
+            ->test(EditService::class, ['record' => $service->getKey()])
+            ->callAction('delete');
 
         $this->assertDatabaseMissing('services', ['id' => $service->id]);
     }

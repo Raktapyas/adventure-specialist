@@ -32,7 +32,7 @@ class AuthenticationTest extends TestCase
 
     public function test_admin_users_are_redirected_to_the_dashboard_after_login(): void
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = User::factory()->create(['id' => 1, 'is_admin' => true]);
 
         $this->post('/login', [
             'email' => $admin->email,
@@ -74,7 +74,7 @@ class AuthenticationTest extends TestCase
 
     public function test_authenticated_admin_visiting_guest_pages_goes_to_the_dashboard(): void
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = User::factory()->create(['id' => 1, 'is_admin' => true]);
 
         $this->actingAs($admin)->get('/login')->assertRedirect(route('dashboard', absolute: false));
     }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\InquiryResource\Pages\ListInquiries;
 use App\Models\Destination;
 use App\Models\Inquiry;
 use App\Models\Package;
@@ -56,7 +57,7 @@ class StatsOverview extends BaseWidget
                 ->description('Require your attention')
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->chart([8, 6, 9, 7, 11, 9, 12])
-                ->url(route('admin.inquiries.index'));
+                ->url(ListInquiries::getUrl());
         }
 
         return $stats;
