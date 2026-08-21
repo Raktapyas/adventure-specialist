@@ -21,6 +21,8 @@ class ListMedia extends ListRecords
             Actions\Action::make('upload')
                 ->label('Upload images')
                 ->icon('heroicon-m-arrow-up-tray')
+                ->visible(fn (): bool => auth()->user()->can('create', Media::class))
+                ->authorize('create', Media::class)
                 ->form([
                     FileUpload::make('media')
                         ->multiple()

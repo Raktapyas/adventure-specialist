@@ -55,7 +55,7 @@ class InquiryPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_inquiry');
+        return $user->can('delete_inquiry');
     }
 
     /**

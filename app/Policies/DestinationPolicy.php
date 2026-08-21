@@ -55,7 +55,7 @@ class DestinationPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_destination');
+        return $user->can('delete_destination');
     }
 
     /**

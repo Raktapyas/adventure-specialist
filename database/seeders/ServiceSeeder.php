@@ -22,6 +22,7 @@ class ServiceSeeder extends Seeder
                     'title' => $row['title'],
                     'excerpt' => $row['excerpt'],
                     'content' => $row['content'],
+                    'icon' => $row['icon'] ?? null,
                     'cover_image' => $row['cover_image'],
                     'sort_order' => $row['sort_order'],
                     'is_published' => true,

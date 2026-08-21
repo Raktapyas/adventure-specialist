@@ -2,17 +2,24 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\DestinationResource;
+use App\Filament\Resources\GalleryImageResource;
 use App\Filament\Resources\GalleryImageResource\Pages\ListGalleryImages;
 use App\Filament\Resources\InquiryResource;
 use App\Filament\Resources\InquiryResource\Pages\ListInquiries;
+use App\Filament\Resources\MediaResource;
 use App\Filament\Resources\MediaResource\Pages\ListMedia;
+use App\Filament\Resources\PackageResource;
 use App\Filament\Resources\PackageResource\Pages\ListPackages;
 use App\Filament\Resources\PageResource;
 use App\Filament\Resources\PageResource\Pages\ListPages;
 use App\Filament\Resources\RoleResource;
 use App\Filament\Resources\RoleResource\Pages\CreateRole;
 use App\Filament\Resources\RoleResource\Pages\EditRole;
+use App\Filament\Resources\ServiceResource;
 use App\Filament\Resources\ServiceResource\Pages\ListServices;
+use App\Filament\Resources\UserResource;
+use App\Models\Destination;
 use App\Models\GalleryImage;
 use App\Models\Inquiry;
 use App\Models\Media;
@@ -31,7 +38,7 @@ class AdminRoleAccessTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_sub_admin_cannot_access_inquiry_and_page_resources(): void
+    public function test_sub_admin_cannot_access_resources_without_view_permissions(): void
     {
         $subAdmin = User::factory()->create(['id' => 2, 'role' => 'sub-admin']);
 
@@ -39,25 +46,26 @@ class AdminRoleAccessTest extends TestCase
 
         $this->assertFalse(InquiryResource::canAccess());
         $this->assertFalse(PageResource::canAccess());
+        $this->assertFalse(UserResource::canAccess());
     }
 
-    public function test_admin_role_can_access_inquiries_but_pages_are_shield_gated(): void
+    public function test_role_labels_do_not_bypass_shield_permissions(): void
     {
         $admin = User::factory()->create(['id' => 2, 'role' => 'admin']);
 
         $this->actingAs($admin);
 
-        $this->assertTrue(InquiryResource::canAccess());
+        $this->assertFalse(InquiryResource::canAccess());
         $this->assertFalse(PageResource::canAccess());
     }
 
-    public function test_legacy_admin_with_sub_admin_role_keeps_inquiry_access_but_not_pages(): void
+    public function test_legacy_admin_status_does_not_bypass_shield_permissions(): void
     {
         $legacyAdmin = User::factory()->create(['id' => 2, 'is_admin' => true, 'role' => 'sub-admin']);
 
         $this->actingAs($legacyAdmin);
 
-        $this->assertTrue(InquiryResource::canAccess());
+        $this->assertFalse(InquiryResource::canAccess());
         $this->assertFalse(PageResource::canAccess());
     }
 
@@ -72,15 +80,19 @@ class AdminRoleAccessTest extends TestCase
         $this->actingAs($subAdmin)
             ->get('/admin/pages')
             ->assertForbidden();
+
+        $this->actingAs($subAdmin)
+            ->get('/admin/users')
+            ->assertForbidden();
     }
 
-    public function test_legacy_admin_can_access_inquiries_but_pages_are_shield_gated(): void
+    public function test_legacy_admin_without_view_permissions_is_forbidden_from_inquiries(): void
     {
         $legacyAdmin = User::factory()->create(['id' => 2, 'is_admin' => true, 'role' => 'sub-admin']);
 
         $this->actingAs($legacyAdmin)
             ->get('/admin/inquiries')
-            ->assertSuccessful();
+            ->assertForbidden();
 
         $this->actingAs($legacyAdmin)
             ->get('/admin/pages')
@@ -98,6 +110,59 @@ class AdminRoleAccessTest extends TestCase
         $this->actingAs($user)
             ->get('/admin/pages')
             ->assertOk();
+    }
+
+    public function test_view_user_permission_does_not_grant_user_management_permissions(): void
+    {
+        $role = Role::findOrCreate('sub-admin', 'web');
+        $user = User::factory()->create(['id' => 2]);
+        $managedUser = User::factory()->create();
+        $user->assignRole($role);
+        $user->givePermissionTo(Permission::findOrCreate('view_user', 'web'));
+
+        $this->actingAs($user)
+            ->get('/admin/users')
+            ->assertOk();
+
+        $this->actingAs($user)
+            ->get('/admin/users/create')
+            ->assertForbidden();
+
+        $this->actingAs($user)
+            ->get("/admin/users/{$managedUser->getKey()}/edit")
+            ->assertForbidden();
+
+        $this->assertFalse(UserResource::canDelete($managedUser));
+        $this->assertFalse(UserResource::canDeleteAny());
+    }
+
+    public function test_view_permissions_only_allow_viewing_the_corresponding_resources(): void
+    {
+        $role = Role::findOrCreate('sub-admin', 'web');
+        $user = User::factory()->create(['id' => 2]);
+        $user->assignRole($role);
+
+        $resources = [
+            ['view_destination', DestinationResource::class, Destination::factory()->create()],
+            ['view_gallery::image', GalleryImageResource::class, GalleryImage::factory()->create()],
+            ['view_inquiry', InquiryResource::class, Inquiry::factory()->create()],
+            ['view_media', MediaResource::class, Media::factory()->create()],
+            ['view_package', PackageResource::class, Package::factory()->create()],
+            ['view_page', PageResource::class, Page::factory()->create()],
+            ['view_service', ServiceResource::class, Service::factory()->create()],
+            ['view_user', UserResource::class, User::factory()->create()],
+        ];
+
+        $this->actingAs($user);
+
+        foreach ($resources as [$permissionName, $resource, $record]) {
+            $user->givePermissionTo(Permission::findOrCreate($permissionName, 'web'));
+
+            $this->assertTrue($resource::canAccess());
+            $this->assertFalse($resource::canCreate());
+            $this->assertFalse($resource::canEdit($record));
+            $this->assertFalse($resource::canDelete($record));
+        }
     }
 
     public function test_row_actions_are_hidden_without_the_matching_shield_permission(): void
@@ -272,6 +337,7 @@ class AdminRoleAccessTest extends TestCase
         $resources = FilamentShield::getResources();
 
         $this->assertArrayNotHasKey('role', $resources);
+        $this->assertArrayHasKey('user', $resources);
     }
 
     public function test_prune_role_permissions_command_deletes_role_permissions(): void

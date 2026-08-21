@@ -18,6 +18,7 @@ class Service extends Model
         'slug',
         'excerpt',
         'content',
+        'icon',
         'cover_image',
         'sort_order',
         'is_published',

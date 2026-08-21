@@ -22,6 +22,14 @@ class ServiceFactory extends Factory
             'slug' => fake()->unique()->slug(2),
             'excerpt' => fake()->sentence(),
             'content' => '<p>'.fake()->paragraph().'</p>',
+            'icon' => fake()->randomElement([
+                'heroicon-o-paper-airplane',
+                'heroicon-o-map',
+                'heroicon-o-sun',
+                'heroicon-o-fire',
+                'heroicon-o-rocket-launch',
+                'heroicon-o-photo',
+            ]),
             'cover_image' => '/assets/images/'.fake()->slug(2).'.jpg',
             'sort_order' => fake()->numberBetween(0, 100),
         ];

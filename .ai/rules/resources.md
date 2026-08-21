@@ -3,6 +3,7 @@ paths:
   - app/Filament/Resources/PageResource.php
   - 'app/Filament/Resources/**'
   - app/Filament/Resources/GalleryImageResource.php
+  - app/Filament/Resources/ServiceResource.php
 ---
 
 # Resources
@@ -30,3 +31,6 @@ All resources with a slug field (Destination, Package, Page, Service) auto-gener
 
 ## GalleryImage picker uses allowHtml thumbnails
 The image_url Select uses ->allowHtml() with a private static mediaOptionLabel() helper that renders a thumbnail <img> + escaped name. Always escape (e()) names/paths in the HTML labels — allowHtml() skips escaping. In tests, getFormSelectSearchResults returns options transformed to [['label'=>..., 'value'=>..., 'disabled'=>false]] (not a key=>label map).
+
+## Service icon is a curated heroicon name stored in services.icon
+services.icon stores a heroicon name (e.g. heroicon-o-paper-airplane) chosen from ServiceResource::iconOptions(), NOT an image path. Render it in the card with {{ svg($service->icon ?: 'heroicon-o-photo', 'h-5 w-5') }}. The BladeUI Svg object is Htmlable — never cast to string; use the svg() helper or @svg directive so e()/Blade renders toHtml(). Keep iconOptions() in sync with the card's default heroicon-o-photo fallback.

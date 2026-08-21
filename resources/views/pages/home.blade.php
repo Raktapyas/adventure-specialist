@@ -3,55 +3,147 @@
 @section('title', 'Home')
 
 @section('content')
-    {{-- Hero --}}
-    <x-hero
-        eyebrow="Adventure Specialist Travel Pvt. Ltd."
-        title="The Himalayas, thoughtfully arranged."
-        lede="Specialist in preparing your holiday programs in Nepal, Bhutan, Sikkim, Tibet and Myanmar."
-        image="/assets/images/banners/1.jpg">
-        <div class="flex flex-wrap gap-3">
-            <a href="/ast-services/" class="btn btn-royal">Explore Services</a>
-            <a href="/contact/#enquiry" class="btn btn-outline">Plan a Trip</a>
-        </div>
-    </x-hero>
+    {{-- Hero (cinematic slider) --}}
+    @php
+        $heroSlides = [
+            [
+                'image' => '/assets/images/banners/1.jpg',
+                'eyebrow' => 'Adventure Specialist Travel Pvt. Ltd.',
+                'title' => 'The Himalayas, thoughtfully arranged.',
+                'lede' => 'Specialist in preparing your holiday programs in Nepal, Bhutan, Sikkim, Tibet and Myanmar.',
+                'kenburns' => 'animate-hero-zoom-in',
+                'ctas' => [
+                    ['label' => 'Explore Services', 'href' => '/ast-services/', 'style' => 'royal'],
+                    ['label' => 'Plan a Trip', 'href' => '/contact/#enquiry', 'style' => 'outline'],
+                ],
+            ],
+            [
+                'image' => '/assets/images/banners/2.jpg',
+                'eyebrow' => 'Where we go',
+                'title' => 'Five countries, one standard of care.',
+                'lede' => 'From the Kathmandu Valley to the roof of the world — culture, adventure and wildlife.',
+                'kenburns' => 'animate-hero-pan-right',
+                'ctas' => [
+                    ['label' => 'Explore Destinations', 'href' => '/destination/', 'style' => 'royal'],
+                    ['label' => 'Plan a Trip', 'href' => '/contact/#enquiry', 'style' => 'outline'],
+                ],
+            ],
+            [
+                'image' => '/assets/images/banners/3.jpg',
+                'eyebrow' => 'Signature programs',
+                'title' => 'Treks and tours, arranged around you.',
+                'lede' => 'Curated special packages for groups and individuals across the Himalaya.',
+                'kenburns' => 'animate-hero-zoom-out',
+                'ctas' => [
+                    ['label' => 'View Packages', 'href' => '/special-package/', 'style' => 'royal'],
+                    ['label' => 'Plan a Trip', 'href' => '/contact/#enquiry', 'style' => 'outline'],
+                ],
+            ],
+        ];
+    @endphp
 
-    {{-- Welcome / intro --}}
+    <x-hero :slides="$heroSlides" />
+
+    {{-- Welcome / intro (premium asymmetric About) --}}
     <section class="mx-auto max-w-[1240px] px-6 py-24 lg:py-32">
-        <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
-            <div class="lg:col-span-4">
+        <div class="grid items-center gap-16 lg:grid-cols-12 lg:gap-20">
+            <div class="lg:col-span-5">
                 <x-section-heading
                     eyebrow="Namaste"
-                    title="Welcome to our Website"
-                    lede="Welcome to the Website of Adventure Specialist Travel. We hope it will become the home to your travel &amp; tour services, you need for Nepal, Tibet, Bhutan, Myanmar and Sikkim." />
-            </div>
-            <div class="lg:col-span-8">
-                <div class="prose-editorial reveal">
+                    title="Where Journeys Become Stories" />
+
+                <p class="reveal mt-5 max-w-xl text-base leading-relaxed text-ink-faint">
+                    <strong class="font-semibold text-ink">Bespoke journeys</strong> across
+                    <strong class="font-semibold text-ink">Nepal, Bhutan, Sikkim, Tibet and Myanmar</strong>
+                    — culture, adventure and wildlife, arranged with care.
+                </p>
+
+                <div class="prose-editorial reveal mt-8">
                     <p>Our services include:</p>
                     <ul>
                         <li>Culture, Adventure &amp; Jungle Safari Packages for Groups and Individuals</li>
                         <li>Sightseeing tours in &amp; around Kathmandu Valley</li>
                         <li>Arrangement for incentive tours</li>
                     </ul>
-                    <p>
-                        Adventure Specialist Travel is a dedicated travel and tour company committed to sharing the richness of the Himalayas — from the warm valleys of Nepal to the high plateaus of Tibet and Bhutan.
-                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7">
+                <div class="relative lg:ml-10 lg:translate-y-10">
+                    {{-- Gallery card: thumbnail transforms into a full-container promo on hover --}}
+                    <div class="group relative reveal reveal-img">
+                        {{-- Neutral gallery mat frame (visible by default, fades on hover) --}}
+                        <div class="absolute -inset-2 rounded-[calc(var(--radius-card)+8px)] border border-line/70 transition-opacity duration-500 group-hover:opacity-0" aria-hidden="true"></div>
+
+                        {{-- Orange/blue animated border (on hover) --}}
+                        <div class="theme-border absolute -inset-[2px] rounded-card opacity-0 transition-opacity duration-500 group-hover:opacity-100" aria-hidden="true"></div>
+
+                        <div class="relative overflow-hidden rounded-card bg-pine-deep/10 shadow-card transition-shadow duration-500 group-hover:shadow-[0_24px_50px_-12px_rgba(13,18,14,0.45)]">
+                            {{-- Thumbnail image: slightly inset, expands to fill the container on hover --}}
+                            <img
+                                src="/assets/images/destinations/Boating_at_Rara.jpg"
+                                alt="Boating on Rara Lake, Nepal"
+                                class="aspect-[4/3] h-full w-full scale-[0.95] rounded-card object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                loading="lazy"
+                            >
+
+                            {{-- Promo overlay: fades in on hover --}}
+                            <div class="absolute inset-0 bg-gradient-to-t from-pine-deep/90 via-pine-deep/35 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                                <div class="absolute bottom-5 right-5 max-w-[16rem] translate-y-4 text-right transition-transform duration-500 group-hover:translate-y-0">
+                                    <p class="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-royal-bright">The Himalaya Awaits</p>
+                                    <p class="mt-1 text-xl font-extrabold leading-tight tracking-tight text-paper">Your Journey Starts Here</p>
+                                    <a href="#services" class="mt-3 inline-flex items-center gap-2 rounded-full bg-royal px-5 py-2.5 text-sm font-bold text-paper shadow-[0_8px_20px_-6px_rgba(12,90,219,0.6)] transition-colors duration-300 hover:bg-royal-bright">
+                                        Discover Journeys
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12l-7.5 7.5M21 12H3" /></svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Exploration badge: compass + mountain detail, integrated with the image --}}
+                        <div class="group/badge absolute bottom-5 left-5">
+                            <div class="relative overflow-hidden rounded-2xl border border-paper/15 bg-gradient-to-br from-pine-deep/95 via-pine-deep/75 to-pine-deep/55 px-5 py-4 shadow-[0_18px_40px_-12px_rgba(13,18,14,0.6)] backdrop-blur-md transition-all duration-500 group-hover/badge:-translate-y-1 group-hover/badge:shadow-[0_24px_50px_-12px_rgba(13,18,14,0.75)]">
+                                {{-- Mountain silhouette detail --}}
+                                <svg class="pointer-events-none absolute inset-x-0 bottom-0 h-8 w-full text-royal/20" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+                                    <path d="M0 40 L28 16 L52 30 L80 6 L108 26 L138 14 L168 32 L200 20 L200 40 Z" fill="currentColor" />
+                                </svg>
+
+                                <div class="relative flex items-center gap-4">
+                                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-royal to-royal-dark text-paper shadow-[0_8px_20px_-6px_rgba(12,90,219,0.65)] transition-transform duration-700 group-hover/badge:rotate-[135deg]" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-5 w-5">
+                                            <circle cx="12" cy="12" r="9" />
+                                            <path d="m16.5 7.5-3 6-6 3 3-6 6-3Z" fill="currentColor" stroke="none" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <p class="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-royal-bright">Explore</p>
+                                        <p class="mt-0.5 text-lg font-extrabold leading-tight tracking-tight text-paper">Beyond Borders</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     {{-- AST Services grid (flip cards) --}}
-    <section class="border-y border-line bg-paper-soft/60">
-        <div class="mx-auto max-w-[1240px] px-6 py-24 lg:py-28">
-            <div class="flex flex-wrap items-end justify-between gap-6">
+    <section id="services" class="flex min-h-svh flex-col items-center justify-center border-y border-line bg-paper-soft/60">
+        <div class="w-full max-w-[1240px] px-6 py-24 lg:py-28">
+            <div class="grid items-end gap-6 lg:grid-cols-[1fr_auto_1fr]">
+                <div class="hidden lg:block" aria-hidden="true"></div>
                 <x-section-heading
                     eyebrow="What we do"
                     title="AST Services"
-                    lede="Culture, adventure and wildlife — arranged for groups and individuals across the Himalaya." />
-                <a href="/ast-services/" class="btn btn-royal px-5! py-3! text-xs uppercase tracking-wider reveal">
-                    View all services
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" /></svg>
-                </a>
+                    lede="Culture, adventure and wildlife — arranged for groups and individuals across the Himalaya."
+                    align="center" />
+                <div class="flex justify-start lg:justify-end">
+                    <a href="/ast-services/" class="btn btn-royal px-5! py-3! text-xs uppercase tracking-wider reveal">
+                        View all services
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" /></svg>
+                    </a>
+                </div>
             </div>
 
             @if ($services->isNotEmpty())
@@ -64,10 +156,18 @@
         </div>
     </section>
 
-    {{-- Counters band (real, data-derived statistics) --}}
+    {{-- Counters band (premium scroll-parallax) --}}
     <section class="relative overflow-hidden bg-pine-deep text-paper">
+        {{-- Parallax background layer --}}
+        <div class="parallax-bg" aria-hidden="true">
+            <div class="parallax-bg__inner" data-parallax>
+                <img src="/assets/images/banners/1.jpg" alt="" class="h-full w-full object-cover" loading="lazy">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-b from-pine-deep/70 via-pine-deep/40 to-pine-deep/70"></div>
+        </div>
+
         <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-royal/10 blur-3xl"></div>
-        <div class="mx-auto max-w-[1240px] px-6 py-16 lg:py-20">
+        <div class="relative mx-auto max-w-[1240px] px-6 py-16 lg:py-20">
             <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($stats as $stat)
                     <div class="text-center reveal">
@@ -89,23 +189,43 @@
                     eyebrow="About us"
                     title="Why Choose AST?"
                     lede="Adventure Specialist Travel is very concerned about your comfort, your safety and the quality of your time in the mountains." />
+
+                <img src="/assets/images/why-why.jpeg" alt="Why choose Adventure Specialist Travel" loading="lazy"
+                    class="mt-8 aspect-video w-full rounded-card object-cover shadow-card">
             </div>
             <div class="lg:col-span-7">
                 <div class="grid gap-6 sm:grid-cols-2">
-                    <div class="rounded-card border border-line bg-paper-soft p-8 reveal card-lift">
-                        <p class="eyebrow eyebrow-royal">01</p>
-                        <h3 class="mt-3 text-lg font-bold tracking-tight">Hygienic food &amp; water</h3>
-                        <p class="mt-3 text-sm leading-relaxed text-ink-faint">AST is very concerned about your fooding or eateries in Nepal, when you are traveling here. It tries to suggest you better &amp; hygienic places, where you can go and eat, however, most of the Restaurants, which are meant for tourists, are, of course.</p>
+                    {{-- 01 Hygienic food & water --}}
+                    <div class="group relative reveal">
+                        <div class="absolute -inset-2 rounded-[calc(var(--radius-card)+8px)] border border-line/70 transition-opacity duration-500 group-hover:opacity-0" aria-hidden="true"></div>
+                        <div class="theme-border absolute -inset-[2px] rounded-card opacity-0 transition-opacity duration-500 group-hover:opacity-100" aria-hidden="true"></div>
+                        <div class="relative rounded-card bg-paper-soft p-8 shadow-card transition-shadow duration-500 group-hover:shadow-[0_24px_50px_-12px_rgba(13,18,14,0.45)]">
+                            <p class="eyebrow eyebrow-royal">01</p>
+                            <h3 class="mt-3 text-lg font-bold tracking-tight">Hygienic food & water</h3>
+                            <p class="mt-3 text-sm leading-relaxed text-ink-faint">AST is very concerned about your fooding or eateries in Nepal, when you are traveling here. It tries to suggest you better & hygienic places, where you can go and eat, however, most of the Restaurants, which are meant for tourists, are, of course.</p>
+                        </div>
                     </div>
-                    <div class="rounded-card border border-line bg-paper-soft p-8 reveal card-lift">
-                        <p class="eyebrow eyebrow-royal">02</p>
-                        <h3 class="mt-3 text-lg font-bold tracking-tight">Friendly Staff</h3>
-                        <p class="mt-3 text-sm leading-relaxed text-ink-faint">Nepalese are traditionally friendly people and easygoing people. All staffs, either in the field or in office, are very friendly or care for better hospitality. AST Team consists of the staffs, which come from the northern part of the country, where all high mountains are located.</p>
+
+                    {{-- 02 Friendly Staff --}}
+                    <div class="group relative reveal">
+                        <div class="absolute -inset-2 rounded-[calc(var(--radius-card)+8px)] border border-line/70 transition-opacity duration-500 group-hover:opacity-0" aria-hidden="true"></div>
+                        <div class="theme-border absolute -inset-[2px] rounded-card opacity-0 transition-opacity duration-500 group-hover:opacity-100" aria-hidden="true"></div>
+                        <div class="relative rounded-card bg-paper-soft p-8 shadow-card transition-shadow duration-500 group-hover:shadow-[0_24px_50px_-12px_rgba(13,18,14,0.45)]">
+                            <p class="eyebrow eyebrow-royal">02</p>
+                            <h3 class="mt-3 text-lg font-bold tracking-tight">Friendly Staff</h3>
+                            <p class="mt-3 text-sm leading-relaxed text-ink-faint">Nepalese are traditionally friendly people and easygoing people. All staffs, either in the field or in office, are very friendly or care for better hospitality. AST Team consists of the staffs, which come from the northern part of the country, where all high mountains are located.</p>
+                        </div>
                     </div>
-                    <div class="rounded-card border border-line bg-paper-soft p-8 reveal card-lift sm:col-span-2">
-                        <p class="eyebrow eyebrow-royal">03</p>
-                        <h3 class="mt-3 text-lg font-bold tracking-tight">Environmental Concern</h3>
-                        <p class="mt-3 text-sm leading-relaxed text-ink-faint">AST briefs all the staffs to make them aware of environmental issues in the areas, they take clients and are very much conscious about it. It is more precisely done, especially, when AST has group to a trekking in the country.</p>
+
+                    {{-- 03 Environmental Concern --}}
+                    <div class="group relative reveal sm:col-span-2">
+                        <div class="absolute -inset-2 rounded-[calc(var(--radius-card)+8px)] border border-line/70 transition-opacity duration-500 group-hover:opacity-0" aria-hidden="true"></div>
+                        <div class="theme-border absolute -inset-[2px] rounded-card opacity-0 transition-opacity duration-500 group-hover:opacity-100" aria-hidden="true"></div>
+                        <div class="relative rounded-card bg-paper-soft p-8 shadow-card transition-shadow duration-500 group-hover:shadow-[0_24px_50px_-12px_rgba(13,18,14,0.45)]">
+                            <p class="eyebrow eyebrow-royal">03</p>
+                            <h3 class="mt-3 text-lg font-bold tracking-tight">Environmental Concern</h3>
+                            <p class="mt-3 text-sm leading-relaxed text-ink-faint">AST briefs all the staffs to make them aware of environmental issues in the areas, they take clients and are very much conscious about it. It is more precisely done, especially, when AST has group to a trekking in the country.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -113,8 +233,16 @@
     </section>
 
     {{-- Destinations --}}
-    <section class="border-y border-line bg-pine-deep text-paper">
-        <div class="mx-auto max-w-[1240px] px-6 py-24 lg:py-28">
+    <section class="relative overflow-hidden border-y border-line bg-pine-deep text-paper">
+        {{-- Parallax background layer --}}
+        <div class="parallax-bg" aria-hidden="true">
+            <div class="parallax-bg__inner" data-parallax>
+                <img src="/assets/images/banners/2.jpg" alt="" class="h-full w-full object-cover" loading="lazy">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-b from-pine-deep/70 via-pine-deep/40 to-pine-deep/70"></div>
+        </div>
+
+        <div class="relative mx-auto max-w-[1240px] px-6 py-24 lg:py-28">
             <x-section-heading
                 eyebrow="Where we go"
                 title="Destinations"
@@ -177,7 +305,15 @@
 
     {{-- CTA strip --}}
     <section class="mx-auto max-w-[1240px] px-6 py-20">
-        <div class="reveal flex flex-col items-start justify-between gap-6 overflow-hidden rounded-card bg-pine-deep p-10 text-paper sm:p-14 lg:flex-row lg:items-center">
+        <div class="reveal relative flex flex-col items-start justify-between gap-6 overflow-hidden rounded-card bg-pine-deep p-10 text-paper sm:p-14 lg:flex-row lg:items-center">
+            {{-- Fixed cinematic backdrop --}}
+            <div class="parallax-bg" aria-hidden="true">
+                <div class="parallax-bg__inner" data-parallax>
+                    <img src="/assets/images/banners/3.jpg" alt="" class="h-full w-full object-cover" loading="lazy">
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-b from-pine-deep/70 via-pine-deep/40 to-pine-deep/70"></div>
+            </div>
+
             <div class="relative">
                 <p class="eyebrow text-paper/60">Ready when you are</p>
                 <h2 class="display-serif mt-3 text-3xl text-paper sm:text-4xl">Let us arrange your Himalayan holiday.</h2>

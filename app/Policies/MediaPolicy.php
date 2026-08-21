@@ -55,7 +55,7 @@ class MediaPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_media');
+        return $user->can('delete_media');
     }
 
     /**

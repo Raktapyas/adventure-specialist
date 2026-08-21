@@ -19,13 +19,6 @@ class InquiryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function canAccess(): bool
-    {
-        $user = auth()->user();
-
-        return $user !== null && ($user->isAdmin() || (bool) $user->is_admin);
-    }
-
     public static function statusOptions(): array
     {
         return [
@@ -114,11 +107,13 @@ class InquiryResource extends Resource
                     ->label(fn (Inquiry $record): string => $record->is_read ? 'Mark unread' : 'Mark read')
                     ->icon(fn (Inquiry $record): string => $record->is_read ? 'heroicon-m-envelope-open' : 'heroicon-m-envelope')
                     ->visible(fn (Inquiry $record): bool => auth()->user()->can('update', $record))
+                    ->authorize(fn (Inquiry $record): bool => auth()->user()->can('update', $record))
                     ->action(fn (Inquiry $record) => $record->update(['is_read' => ! $record->is_read])),
                 Tables\Actions\Action::make('update_status')
                     ->label('Update status')
                     ->icon('heroicon-m-arrow-path')
                     ->visible(fn (Inquiry $record): bool => auth()->user()->can('update', $record))
+                    ->authorize(fn (Inquiry $record): bool => auth()->user()->can('update', $record))
                     ->form([
                         Forms\Components\Select::make('status')
                             ->options(self::statusOptions())
@@ -132,14 +127,20 @@ class InquiryResource extends Resource
                     Tables\Actions\BulkAction::make('mark_read')
                         ->label('Mark as read')
                         ->icon('heroicon-m-envelope-open')
+                        ->visible(fn (): bool => auth()->user()->can('update_inquiry'))
+                        ->authorize('update_inquiry')
                         ->action(fn (Collection $records) => $records->each->update(['is_read' => true])),
                     Tables\Actions\BulkAction::make('mark_unread')
                         ->label('Mark as unread')
                         ->icon('heroicon-m-envelope')
+                        ->visible(fn (): bool => auth()->user()->can('update_inquiry'))
+                        ->authorize('update_inquiry')
                         ->action(fn (Collection $records) => $records->each->update(['is_read' => false])),
                     Tables\Actions\BulkAction::make('set_status')
                         ->label('Set status')
                         ->icon('heroicon-m-arrow-path')
+                        ->visible(fn (): bool => auth()->user()->can('update_inquiry'))
+                        ->authorize('update_inquiry')
                         ->form([
                             Forms\Components\Select::make('status')
                                 ->options(self::statusOptions())

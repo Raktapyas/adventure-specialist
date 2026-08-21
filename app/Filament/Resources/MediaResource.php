@@ -49,6 +49,7 @@ class MediaResource extends Resource
                     ->icon('heroicon-m-trash')
                     ->color('danger')
                     ->visible(fn (Media $record): bool => auth()->user()->can('delete', $record))
+                    ->authorize(fn (Media $record): bool => auth()->user()->can('delete', $record))
                     ->requiresConfirmation()
                     ->form([
                         Forms\Components\Checkbox::make('force')

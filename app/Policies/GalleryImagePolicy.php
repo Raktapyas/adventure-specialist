@@ -55,7 +55,7 @@ class GalleryImagePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_gallery::image');
+        return $user->can('delete_gallery::image');
     }
 
     /**

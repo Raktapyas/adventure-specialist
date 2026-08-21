@@ -19,10 +19,10 @@ class HomeController extends Controller
             'packages' => Package::published()->orderBy('sort_order')->orderBy('title')->limit(4)->get(),
             'galleryImages' => GalleryImage::orderBy('sort_order')->orderBy('id')->limit(6)->get(),
             'stats' => [
-                ['value' => 5, 'suffix' => '', 'label' => 'Countries served'],
-                ['value' => Service::published()->count(), 'suffix' => '+', 'label' => 'Adventure services'],
-                ['value' => Destination::published()->count(), 'suffix' => '+', 'label' => 'Destinations & programs'],
-                ['value' => Package::published()->count(), 'suffix' => '', 'label' => 'Signature packages'],
+                ['value' => 8000, 'suffix' => 'm+', 'label' => "Reach the world's highest peaks"],
+                ['value' => 365, 'suffix' => ' DAYS', 'label' => 'Adventure in Nepal, all year round'],
+                ['value' => 100, 'suffix' => '% LOCAL', 'label' => 'Authentic Himalayan experiences'],
+                ['value' => 1, 'suffix' => ' LIFETIME', 'label' => "Memories you'll never forget"],
             ],
         ]);
     }

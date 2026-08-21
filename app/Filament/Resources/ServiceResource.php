@@ -94,6 +94,12 @@ class ServiceResource extends Resource
                 Forms\Components\RichEditor::make('content')
                     ->nullable()
                     ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
+                Forms\Components\Select::make('icon')
+                    ->label('Icon')
+                    ->options(static::iconOptions())
+                    ->searchable()
+                    ->nullable()
+                    ->helperText('Icon shown in the mini badge on the service card.'),
                 static::coverImageField(),
                 Forms\Components\TextInput::make('sort_order')
                     ->label('Sort order')
@@ -154,6 +160,33 @@ class ServiceResource extends Resource
     {
         return [
             //
+        ];
+    }
+
+    /**
+     * Curated heroicon names for the service card's mini badge.
+     *
+     * @return array<string, string>
+     */
+    private static function iconOptions(): array
+    {
+        return [
+            'heroicon-o-paper-airplane' => 'Flight',
+            'heroicon-o-map' => 'Hiking',
+            'heroicon-o-sun' => 'Day trip',
+            'heroicon-o-fire' => 'Safari',
+            'heroicon-o-rocket-launch' => 'Adventure sport',
+            'heroicon-o-arrow-down-circle' => 'Bungee / drop',
+            'heroicon-o-bolt' => 'Rafting / adrenaline',
+            'heroicon-o-globe-asia-australia' => 'Tours',
+            'heroicon-o-photo' => 'Sightseeing',
+            'heroicon-o-briefcase' => 'Business',
+            'heroicon-o-heart' => 'Honeymoon',
+            'heroicon-o-users' => 'Groups',
+            'heroicon-o-home-modern' => 'Accommodation',
+            'heroicon-o-truck' => 'Transfers',
+            'heroicon-o-academic-cap' => 'Culture',
+            'heroicon-o-sparkles' => 'Special',
         ];
     }
 

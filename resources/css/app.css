@@ -44,6 +44,11 @@
     --animate-slow-zoom: slow-zoom 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
     --animate-bar-dot: bar-dot 3s linear infinite;
 
+    --animate-hero-zoom-in: hero-zoom-in 12s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    --animate-hero-zoom-out: hero-zoom-out 14s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    --animate-hero-pan-right: hero-pan-right 13s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    --animate-hero-pan-left: hero-pan-left 13s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+
     @keyframes fade-up {
         from {
             opacity: 0;
@@ -70,6 +75,42 @@
         }
         100% {
             left: calc(100% - 10px);
+        }
+    }
+
+    @keyframes hero-zoom-in {
+        from {
+            transform: scale(1.16);
+        }
+        to {
+            transform: scale(1.03);
+        }
+    }
+
+    @keyframes hero-zoom-out {
+        from {
+            transform: scale(1.03);
+        }
+        to {
+            transform: scale(1.16);
+        }
+    }
+
+    @keyframes hero-pan-right {
+        from {
+            transform: scale(1.14) translate3d(-2%, 0, 0);
+        }
+        to {
+            transform: scale(1.08) translate3d(2%, 0, 0);
+        }
+    }
+
+    @keyframes hero-pan-left {
+        from {
+            transform: scale(1.14) translate3d(2%, 0, 0);
+        }
+        to {
+            transform: scale(1.08) translate3d(-2%, 0, 0);
         }
     }
 }
@@ -170,6 +211,41 @@
     .split-reveal.is-visible .ts-word {
         opacity: 1;
         transform: translateY(0);
+    }
+
+    /* Cinematic image reveal (fade + rise + settle) — same observer as .reveal */
+    .js .reveal-img {
+        opacity: 0;
+        transform: translateY(2rem) scale(1.04);
+        transition:
+            opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal-img.is-visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* Thin animated theme border — shown only on hover, photo stays untouched.
+       Brand palette: royal blue → warm orange. */
+    .theme-border {
+        background: linear-gradient(90deg, #0c5adb, #2475fc, #f59e0b, #e07b39, #0c5adb);
+        background-size: 300% 100%;
+        border-radius: var(--radius-card);
+    }
+
+    .group:hover .theme-border {
+        animation: theme-border-slide 4s linear infinite;
+    }
+
+    @keyframes theme-border-slide {
+        0% {
+            background-position: 0% 50%;
+        }
+        100% {
+            background-position: 300% 50%;
+        }
     }
 
     /* ---- Buttons (reference clip-path wipe) ---- */
@@ -398,5 +474,160 @@
 
     .nav-link-overline {
         color: var(--color-royal);
+    }
+
+    /* ---- Fixed cinematic backdrop (dark bands: stats, destinations) ----
+       The inner layer is at least viewport-height and pinned to the viewport by
+       JS (translate3d(0, -rect.top, 0)) while the section scrolls over it, so
+       the image stays visually stationary and the content moves in front. */
+
+    .parallax-bg {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+    }
+
+    .parallax-bg__inner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: max(100%, 100vh);
+        will-change: transform;
+    }
+
+    /* ---- Homepage hero slider (cinematic, Alpine-driven) ----
+       Layers: absolute slides crossfade with a gentle settle; each active slide
+       runs a Ken Burns variant on its image; text staggers in per slide change. */
+
+    .hero-slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transform: scale(1.04);
+        transition:
+            opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .hero-slide.is-active {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* Inactive slides are stacked above the active one in DOM order; without
+       this their invisible content would swallow hover/click on the visible
+       slide's buttons. */
+    .hero-slide:not(.is-active) {
+        pointer-events: none;
+    }
+
+    /* Ken Burns runs on every slide but pauses when not visible: no jump on
+       deactivate, no wasted GPU on hidden layers. */
+    .hero-slide:not(.is-active) .hero-img {
+        animation-play-state: paused;
+    }
+
+    /* Staggered word entrance (spans injected by the Alpine init) */
+    .js .hero-slide .hero-word {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(1rem);
+        transition:
+            opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        transition-delay: calc(0.12s + var(--i) * 0.05s);
+    }
+
+    .hero-slide .hero-text-in .hero-word {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Eyebrow / lede / CTA entrance */
+    .js .hero-slide .hero-eyebrow,
+    .js .hero-slide .hero-lede,
+    .js .hero-slide .hero-cta {
+        opacity: 0;
+        transform: translateY(1.25rem);
+        transition:
+            opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .hero-slide .hero-eyebrow {
+        transition-delay: 0.08s;
+    }
+
+    .hero-slide .hero-lede {
+        transition-delay: 0.4s;
+    }
+
+    .hero-slide .hero-cta {
+        transition-delay: 0.52s;
+    }
+
+    .hero-slide .hero-text-in .hero-eyebrow,
+    .hero-slide .hero-text-in .hero-lede,
+    .hero-slide .hero-text-in .hero-cta {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Progress fill: scaleX is GPU-composited, no width layout cost */
+    .hero-progress-fill {
+        transform-origin: left;
+    }
+
+    /* Side arrows (desktop only) */
+    .hero-arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 9999px;
+        color: color-mix(in srgb, var(--color-paper) 80%, transparent);
+        border: 1px solid color-mix(in srgb, var(--color-paper) 35%, transparent);
+        background: color-mix(in srgb, var(--color-pine-deep) 25%, transparent);
+        backdrop-filter: blur(4px);
+        transition:
+            color 0.3s ease,
+            border-color 0.3s ease,
+            background-color 0.3s ease,
+            transform 0.2s ease;
+    }
+
+    .hero-arrow:hover {
+        color: var(--color-paper);
+        border-color: var(--color-paper);
+        background: color-mix(in srgb, var(--color-paper) 10%, transparent);
+    }
+
+    .hero-arrow:active {
+        transform: scale(0.94);
+    }
+
+    /* Reduced motion: static hero, no stagger, no ken burns, no parallax.
+       Overrides the global 0.01ms rule so transition delays can't delay text. */
+    @media (prefers-reduced-motion: reduce) {
+        .hero-slide {
+            transform: none !important;
+            transition: none !important;
+        }
+
+        .hero-img {
+            animation: none !important;
+        }
+
+        .hero-slide .hero-word,
+        .hero-slide .hero-eyebrow,
+        .hero-slide .hero-lede,
+        .hero-slide .hero-cta {
+            opacity: 1 !important;
+            transform: none !important;
+            transition-delay: 0ms !important;
+            transition-duration: 0ms !important;
+        }
     }
 }

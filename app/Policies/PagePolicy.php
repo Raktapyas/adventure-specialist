@@ -55,7 +55,7 @@ class PagePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_page');
+        return $user->can('delete_page');
     }
 
     /**

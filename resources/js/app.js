@@ -41,11 +41,40 @@ function animateCount(el) {
     const tick = (now) => {
         const progress = Math.min((now - start) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = `${Math.floor(target * eased)}${suffix}`;
+        el.textContent = `${Math.floor(target * eased).toLocaleString('en-US')}${suffix}`;
         if (progress < 1) requestAnimationFrame(tick);
     };
 
     requestAnimationFrame(tick);
+}
+
+function initParallax() {
+    const layers = document.querySelectorAll('[data-parallax]');
+    if (!layers.length) return;
+
+    const apply = () => {
+        const vh = window.innerHeight;
+        layers.forEach((layer) => {
+            const rect = layer.parentElement.getBoundingClientRect();
+            if (rect.bottom < 0 || rect.top > vh) return;
+
+            // Pin the backdrop to the viewport while the section scrolls over it.
+            layer.style.transform = `translate3d(0, ${-rect.top.toFixed(1)}px, 0)`;
+        });
+    };
+
+    let rafId = null;
+    const onScroll = () => {
+        if (rafId !== null) return;
+        rafId = requestAnimationFrame(() => {
+            rafId = null;
+            apply();
+        });
+    };
+
+    apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
 }
 
 if (prefersReducedMotion) {
@@ -53,7 +82,7 @@ if (prefersReducedMotion) {
         el.classList.add('is-visible'),
     );
     document.querySelectorAll('[data-count]').forEach((el) => {
-        el.textContent = `${el.dataset.count}${el.dataset.suffix ?? ''}`;
+        el.textContent = `${parseFloat(el.dataset.count).toLocaleString('en-US')}${el.dataset.suffix ?? ''}`;
     });
 } else {
     const observer = new IntersectionObserver(
@@ -88,4 +117,6 @@ if (prefersReducedMotion) {
     );
 
     document.querySelectorAll('[data-count]').forEach((el) => counterObserver.observe(el));
+
+    initParallax();
 }

@@ -51,6 +51,22 @@ class AdminServiceCrudTest extends TestCase
         $this->assertDatabaseHas('services', ['slug' => 'trekking', 'parent_id' => null]);
     }
 
+    public function test_service_icon_can_be_saved(): void
+    {
+        Livewire::actingAs($this->admin())
+            ->test(CreateService::class)
+            ->fillForm([
+                'title' => 'Rafting',
+                'slug' => 'rafting',
+                'icon' => 'heroicon-o-bolt',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors()
+            ->assertRedirect(ServiceResource::getUrl('index'));
+
+        $this->assertDatabaseHas('services', ['slug' => 'rafting', 'icon' => 'heroicon-o-bolt']);
+    }
+
     public function test_duplicate_slug_is_rejected(): void
     {
         Service::factory()->create(['slug' => 'taken']);

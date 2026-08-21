@@ -55,7 +55,7 @@ class PackagePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_package');
+        return $user->can('delete_package');
     }
 
     /**
