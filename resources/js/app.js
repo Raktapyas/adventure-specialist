@@ -77,12 +77,93 @@ function initParallax() {
     window.addEventListener('resize', onScroll, { passive: true });
 }
 
+function initMagneticGallery() {
+    const galleries = document.querySelectorAll('[data-gallery-magnetic]');
+    if (!galleries.length) return;
+
+    galleries.forEach((gallery) => {
+        const img = gallery.querySelector('[data-gallery-img]');
+        if (!img) return;
+
+        let rafId = null;
+        let targetX = 0;
+        let targetY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let hovering = false;
+
+        const lerp = (a, b, n) => a + (b - a) * n;
+
+        const tick = () => {
+            rafId = null;
+            currentX = lerp(currentX, targetX, 0.08);
+            currentY = lerp(currentY, targetY, 0.08);
+
+            // Smooth magnetic shift + subtle scale on hover — only transform (60fps)
+            const scale = hovering ? 1.04 : 0.96;
+            img.style.transform = `translate3d(${currentX.toFixed(2)}px, ${currentY.toFixed(2)}px, 0) scale(${scale})`;
+
+            if (Math.abs(currentX - targetX) > 0.05 || Math.abs(currentY - targetY) > 0.05) {
+                rafId = requestAnimationFrame(tick);
+            }
+        };
+
+        const queueTick = () => {
+            if (rafId === null) rafId = requestAnimationFrame(tick);
+        };
+
+        gallery.addEventListener('mousemove', (e) => {
+            const rect = gallery.getBoundingClientRect();
+            const relX = (e.clientX - rect.left) / rect.width - 0.5;
+            const relY = (e.clientY - rect.top) / rect.height - 0.5;
+            // Magnetic range: ±18px X, ±12px Y — cinematic, not jittery
+            targetX = relX * 18;
+            targetY = relY * 12;
+            queueTick();
+        });
+
+        gallery.addEventListener('mouseenter', () => {
+            hovering = true;
+            img.style.transition = 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1)';
+            queueTick();
+        });
+
+        gallery.addEventListener('mouseleave', () => {
+            hovering = false;
+            targetX = 0;
+            targetY = 0;
+            img.style.transition = 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1)';
+            queueTick();
+        });
+
+        // Disable transform updates when gallery is off-screen (perf)
+        const io = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) {
+                        targetX = 0;
+                        targetY = 0;
+                        currentX = 0;
+                        currentY = 0;
+                    }
+                });
+            },
+            { threshold: 0 },
+        );
+        io.observe(gallery);
+    });
+}
+
 if (prefersReducedMotion) {
     document.querySelectorAll('.reveal, .split-reveal').forEach((el) =>
         el.classList.add('is-visible'),
     );
     document.querySelectorAll('[data-count]').forEach((el) => {
         el.textContent = `${parseFloat(el.dataset.count).toLocaleString('en-US')}${el.dataset.suffix ?? ''}`;
+    });
+    // Keep gallery at natural scale when reduced-motion is requested
+    document.querySelectorAll('[data-gallery-img]').forEach((el) => {
+        el.style.transform = 'none';
     });
 } else {
     const observer = new IntersectionObserver(
@@ -119,4 +200,5 @@ if (prefersReducedMotion) {
     document.querySelectorAll('[data-count]').forEach((el) => counterObserver.observe(el));
 
     initParallax();
+    initMagneticGallery();
 }

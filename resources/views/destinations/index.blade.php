@@ -18,7 +18,7 @@
         @if ($destinations->isNotEmpty())
             <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 @foreach ($destinations as $destination)
-                    <x-destination-card :destination="$destination" />
+                    <x-destination-card :destination="$destination" :delay="$loop->index * 60" />
                 @endforeach
             </div>
         @else
