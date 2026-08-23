@@ -7,6 +7,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Http/Controllers/Auth/** | .ai/rules/auth.md |
 | app/Console/Commands/** | .ai/rules/commands.md |
 | config/filament-shield.php | .ai/rules/config.md |
+| phpunit.xml | .ai/rules/general.md |
 | app/Filament/Resources/PageResource/** | .ai/rules/page-resource.md |
 | app/Filament/Resources/**/Pages/*.php | .ai/rules/pages.md |
 | app/Policies/*.php | .ai/rules/policies.md |

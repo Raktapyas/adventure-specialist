@@ -292,11 +292,12 @@
                 align="center"
                 dark />
 
-            @if ($destinations->isNotEmpty())
-                {{-- Premium 5-card horizontal row — tight spacing, equal vertical cards. Hover: selected enlarges, siblings dim --}}
-                <div class="group/row mt-14 flex gap-3 sm:gap-3 lg:gap-4 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 snap-x snap-mandatory scrollbar-none"
+            @php $homeDestinations = $destinations->reject(fn($d) => $d->slug === 'nepal')->take(4); @endphp
+            @if ($homeDestinations->isNotEmpty())
+                {{-- Premium 4-card row (Nepal hidden on home only) — larger, centered, hover enlarges --}}
+                <div class="group/row mx-auto mt-14 flex max-w-[1100px] gap-3 sm:gap-4 lg:gap-5 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 snap-x snap-mandatory scrollbar-none"
                      style="scrollbar-width: none; -ms-overflow-style: none;">
-                    @foreach ($destinations as $destination)
+                    @foreach ($homeDestinations as $destination)
                         <div class="flex-1 min-w-[62vw] sm:min-w-0 snap-center transition-all duration-700 ease-out
                                     sm:hover:flex-[1.65_1_0%] lg:hover:flex-[1.6_1_0%]
                                     group-hover/row:opacity-60 group-hover/row:brightness-[0.72] hover:!opacity-100 hover:!brightness-100
