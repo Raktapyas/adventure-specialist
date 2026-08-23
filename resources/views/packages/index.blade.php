@@ -21,7 +21,7 @@
                 @endforeach
             </div>
         @else
-            <p class="text-ink-faint">Packages coming soon.</p>
+            <p class="text-ink-faint">No packages available at the moment — our team is crafting new special journeys. Please contact us or check back soon.</p>
         @endif
     </section>
 @endsection

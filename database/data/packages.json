@@ -2,36 +2,36 @@
   {
     "slug": "special-package-one",
     "parent_slug": null,
-    "title": "Special Tour Package",
-    "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
-    "content": "<img src=\"/assets/images/packages/1.jpg\" class=\"page_image\" alt=\"Special Tour Package\"/>",
+    "title": "Everest Base Camp Heritage Trek — 14 Days",
+    "excerpt": "Classic EBC lodge trek with acclimatization, Sherpa culture, and sunrise from Kalapatthar — guided, well-paced, and fully supported.",
+    "content": "<p><strong>Everest Base Camp Heritage Trek — 14 Days</strong></p><p>Follow the legendary Khumbu trail from Lukla to Base Camp, with gradual acclimatization in Namche and Dingboche, monasteries in Tengboche, and a sunrise climb of Kalapatthar (5,545m) for Everest panorama. Adventure Specialist Travel provides experienced Sherpa guides, lodge bookings, permits, and daily briefings.</p><p><strong>Highlights</strong></p><ul><li>Scenic flight Kathmandu–Lukla and Sagarmatha National Park</li><li>Namche Bazaar, Khumjung, Tengboche Monastery</li><li>Gorakshep, Everest Base Camp, and Kalapatthar sunrise</li></ul><p><strong>Includes:</strong> Lodges, meals during trek, permits, guide & porter. <strong>Best:</strong> Mar–May & Sep–Nov. </p>",
     "cover_image": "/assets/images/packages/1.jpg",
     "sort_order": 1
   },
   {
     "slug": "special-package-two",
     "parent_slug": null,
-    "title": "Special Tour Package",
-    "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
-    "content": "<img src=\"/assets/images/packages/2-1.jpg\" class=\"page_image\" alt=\"Special Tour Package\"/>",
+    "title": "Annapurna Circuit & Tilicho Lake — 16 Days",
+    "excerpt": "Thorung La (5,416m), Braga monasteries, and the turquoise Tilicho Lake — Annapurna’s most varied circuit with our camp and lodge support.",
+    "content": "<p><strong>Annapurna Circuit & Tilicho Lake — 16 Days</strong></p><p>Circle the Annapurna massif through Manang, cross Thorung La, and descend to Muktinath and Tatopani hot springs. An optional Tilicho Lake side trip adds alpine grandeur. Expect Gurung villages, rhododendron forests, and daily views of Annapurna and Dhaulagiri.</p><p><strong>Highlights</strong></p><ul><li>Manang acclimatization, Tilicho Lake (4,920m), Thorung La pass</li><li>Kali Gandaki gorge, Marpha apple orchards, and Ghorepani Poon Hill</li><li>Comfortable lodges, experienced crew, and flexible pacing</li></ul>",
     "cover_image": "/assets/images/packages/2-1.jpg",
     "sort_order": 2
   },
   {
     "slug": "special-package-two-2",
     "parent_slug": null,
-    "title": "Special Package",
-    "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
-    "content": "<img src=\"/assets/images/packages/3-1-e1498198298716.jpg\" class=\"page_image\" alt=\"Special Package\"/>",
+    "title": "Bhutan Thunder Dragon Culture — 8 Days",
+    "excerpt": "Paro, Thimphu, Punakha and Phobjikha — dzongs, Tiger’s Nest, and warm Bhutanese hospitality with private guide and sustainable fee included.",
+    "content": "<p><strong>Bhutan Thunder Dragon Culture — 8 Days</strong></p><p>Discover Bhutan’s living Buddhism: hike to Tiger’s Nest, visit Punakha Dzong at the Mo Chhu confluence, and explore Phobjikha’s crane valley. Evenings in handpicked boutique lodges, farmhouse dinners, and festival timing on request.</p><p><strong>Highlights</strong></p><ul><li>Paro Tiger’s Nest, Dochula Pass, and Thimphu arts</li><li>Punakha Dzong and Gangtey valley nature</li><li>Private guide, transport, and sustainable development fee included</li></ul><p>Best Mar–May & Sep–Nov. Pair with Nepal for a Himalayan grand tour. </p>",
     "cover_image": "/assets/images/packages/3-1-e1498198298716.jpg",
     "sort_order": 3
   },
   {
     "slug": "special-package-two-3",
     "parent_slug": null,
-    "title": "Special Package Two",
-    "excerpt": "One of Adventure Specialist Travel’s special tour packages.",
-    "content": "<img src=\"/assets/images/packages/4.jpg\" class=\"page_image\" alt=\"Special Package Two\"/>",
+    "title": "Myanmar Golden Heritage — 11 Days",
+    "excerpt": "Yangon, Bagan, Mandalay and Inle Lake — pagodas, river cruises, and lake villages with seamless flights and licensed guides.",
+    "content": "<p><strong>Myanmar Golden Heritage — 11 Days</strong></p><p>From Shwedagon’s golden spire to Bagan’s 2,000 temples, Mandalay’s royal history, and Inle’s floating gardens, this journey connects Myanmar’s cultural heartlands. Includes sunset Irrawaddy cruise, U Bein teak bridge, and Intha leg-rower villages.</p><p><strong>Highlights</strong></p><ul><li>Bagan sunrise, Ananda Temple, and lacquer workshops</li><li>Mandalay Hill, Amarapura, and Ava by horse cart</li><li>Inle Lake floating markets and boutique lake resorts</li></ul><p>Best Nov–Feb. Customizable with Yangon–Bago short stay or beach extension. </p>",
     "cover_image": "/assets/images/packages/4.jpg",
     "sort_order": 4
   }

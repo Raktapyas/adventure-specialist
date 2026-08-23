@@ -26,7 +26,7 @@
                 @endforeach
             </div>
         @else
-            <p class="text-ink-faint">Gallery images coming soon.</p>
+            <p class="text-ink-faint">Gallery is being updated — new Himalayan moments arriving soon. Please check back shortly or contact us for recent trip photos.</p>
         @endif
     </section>
 @endsection

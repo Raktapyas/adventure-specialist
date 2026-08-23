@@ -23,7 +23,7 @@ function splitReveal(el) {
             const span = document.createElement('span');
             span.className = 'ts-word';
             span.textContent = word;
-            span.style.transitionDelay = `${index * 45}ms`;
+            span.style.transitionDelay = `${index * 25}ms`;
             fragment.appendChild(span);
             if (index < words.length - 1) fragment.appendChild(document.createTextNode(' '));
         });

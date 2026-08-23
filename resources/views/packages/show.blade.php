@@ -28,7 +28,7 @@
                         {!! $package->content !!}
                     </div>
                 @else
-                    <p class="text-ink-faint">Content coming soon.</p>
+                    <p class="text-ink-faint">Detailed information is being finalized — please contact our team for a tailored itinerary and latest updates.</p>
                 @endif
 
                 <div class="mt-14 border-t border-line pt-10">

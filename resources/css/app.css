@@ -187,10 +187,10 @@
 
     .js .reveal {
         opacity: 0;
-        transform: translateY(1.5rem);
+        transform: translateY(1.2rem);
         transition:
-            opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .reveal.is-visible {
@@ -202,10 +202,10 @@
     .js .split-reveal .ts-word {
         display: inline-block;
         opacity: 0;
-        transform: translateY(0.9rem);
+        transform: translateY(0.6rem);
         transition:
-            opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .split-reveal.is-visible .ts-word {
@@ -216,10 +216,10 @@
     /* Cinematic image reveal (fade + rise + settle) — same observer as .reveal */
     .js .reveal-img {
         opacity: 0;
-        transform: translateY(2rem) scale(1.04);
+        transform: translateY(1.4rem) scale(1.02);
         transition:
-            opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .reveal-img.is-visible {
@@ -401,8 +401,8 @@
     /* ---- Prose (editorial body copy) ---- */
 
     .prose-editorial {
-        @apply prose prose-slate max-w-none text-ink-soft;
-        --tw-prose-body: var(--color-ink-soft);
+        @apply prose prose-slate max-w-none text-ink leading-relaxed;
+        --tw-prose-body: var(--color-ink);
         --tw-prose-headings: var(--color-ink);
         --tw-prose-links: var(--color-royal-dark);
         --tw-prose-bold: var(--color-ink);
@@ -411,13 +411,54 @@
         --tw-prose-hr: var(--color-line);
         --tw-prose-th-borders: var(--color-line-strong);
         --tw-prose-td-borders: var(--color-line);
+        --tw-prose-captions: var(--color-ink-faint);
         font-family: var(--font-sans);
+        font-size: 1rem;
+        line-height: 1.75;
     }
 
     .prose-editorial :where(h1, h2, h3, h4) {
         font-family: var(--font-sans);
         font-weight: 700;
         letter-spacing: -0.01em;
+    }
+
+    .prose-editorial :where(p) {
+        margin-top: 1em;
+        margin-bottom: 1em;
+        line-height: 1.8;
+        color: var(--color-ink-soft);
+        text-wrap: pretty;
+    }
+
+    .prose-editorial :where(ul, ol) {
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding-left: 1.5em;
+    }
+
+    .prose-editorial :where(li) {
+        margin-top: 0.4em;
+        margin-bottom: 0.4em;
+        padding-left: 0.25em;
+    }
+
+    .prose-editorial :where(li)::marker {
+        color: var(--color-bronze);
+    }
+
+    .prose-editorial :where(strong) {
+        font-weight: 700;
+        color: var(--color-ink);
+    }
+
+    .prose-editorial :where(a) {
+        text-decoration-thickness: 1.5px;
+        text-underline-offset: 3px;
+    }
+
+    .prose-editorial :where(p, li, blockquote) {
+        max-width: 65ch;
     }
 
     /* Legacy content carries fixed inline widths; make it fluid */
@@ -450,8 +491,9 @@
     /* ---- Navigation links ---- */
 
     .nav-link {
-        @apply relative text-sm font-semibold transition-colors;
+        @apply relative text-[16px] font-semibold transition-all duration-300 ease-out lg:text-[17px];
         color: currentColor;
+        letter-spacing: -0.01em;
     }
 
     .nav-link::after {
@@ -464,7 +506,12 @@
         background: var(--color-royal);
         transform: scaleX(0);
         transform-origin: left;
-        transition: transform 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .nav-link:hover {
+        color: var(--color-royal);
+        transform: translateY(-1px);
     }
 
     .nav-link-active::after,
