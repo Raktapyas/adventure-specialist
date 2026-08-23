@@ -95,7 +95,7 @@
         {{-- Thin subtle divider above copyright — bigger muted text --}}
         <div class="mt-12 flex flex-col gap-3 border-t border-white/15 pt-6 text-sm font-semibold tracking-wide text-white/60 sm:flex-row sm:items-center sm:justify-between">
             <p>© Adventure Specialist Travel Pvt. Ltd. 2017–2025. All rights reserved.</p>
-            <p>Made with <a href="https://megasoft.com.np" target="_blank" rel="noopener" class="font-black text-white/80 transition-colors hover:text-white">Megasoft</a></p>
+            <p>Made with <a href="https://megasoft.net.np/" target="_blank" rel="noopener" class="font-black text-white/80 transition-colors hover:text-white">Megasoft</a></p>
         </div>
     </div>
 </footer>
