@@ -168,7 +168,7 @@
 
         <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-royal/10 blur-3xl"></div>
         <div class="relative mx-auto max-w-[1240px] px-6 py-16 lg:py-20">
-            <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid gap-10 sm:grid-cols-3">
                 @foreach ($stats as $stat)
                     <div class="text-center reveal">
                         <p class="text-4xl font-extrabold tracking-tight text-paper lg:text-5xl">
@@ -339,7 +339,7 @@
     @if ($galleryImages->isNotEmpty())
         <section class="border-t border-line bg-paper-soft/60">
             <div class="mx-auto max-w-[1240px] px-6 py-24 lg:py-28">
-                <div class="mx-auto grid w-full max-w-[880px] items-end gap-6 sm:grid-cols-[1fr_auto_1fr] lg:max-w-[940px]">
+                <div class="grid w-full items-end gap-6 sm:grid-cols-[1fr_auto_1fr]">
                     <div class="hidden sm:block" aria-hidden="true"></div>
                     <x-section-heading eyebrow="Moments" title="AST Photo Gallery" align="center" />
                     <div class="flex justify-center sm:justify-end">
@@ -356,10 +356,10 @@
                     $fluidCols = $fluidImages->chunk(2);
                     while ($fluidCols->count() < 3) { $fluidCols->push(collect([$galleryImages->first(), $galleryImages->first()])); }
                 @endphp
-                <div class="mx-auto mt-14 w-full max-w-[880px] lg:max-w-[940px] [container-type:inline-size]">
-                    <div class="group/gallery relative grid h-[78vmin] max-h-[560px] min-h-[380px] w-full gap-3 transition-all duration-500 ease-in-out md:grid-cols-[30cqmin_30cqmin_30cqmin] has-[>div:nth-child(1):hover]:md:grid-cols-[60cqmin_15cqmin_15cqmin] has-[>div:nth-child(2):hover]:md:grid-cols-[15cqmin_60cqmin_15cqmin] has-[>div:nth-child(3):hover]:md:grid-cols-[15cqmin_15cqmin_60cqmin] before:pointer-events-none before:absolute before:inset-0 before:rounded-card before:bg-white/0 before:blur-[60px] hover:before:bg-white/[0.04] before:transition-all before:duration-500 before:ease-in-out lg:gap-4">
+                <div class="mt-14 w-full [container-type:inline-size]">
+                    <div class="group/gallery relative grid h-[78vmin] max-h-[560px] min-h-[380px] w-full gap-3 transition-all duration-500 ease-in-out md:grid-cols-[1fr_1fr_1fr] has-[>div:nth-child(1):hover]:md:grid-cols-[4fr_1fr_1fr] has-[>div:nth-child(2):hover]:md:grid-cols-[1fr_4fr_1fr] has-[>div:nth-child(3):hover]:md:grid-cols-[1fr_1fr_4fr] before:pointer-events-none before:absolute before:inset-0 before:rounded-card before:bg-white/0 before:blur-[60px] hover:before:bg-white/[0.04] before:transition-all before:duration-500 before:ease-in-out lg:gap-4">
                         @foreach ($fluidCols->take(3) as $col)
-                            <div class="grid gap-3 transition-all duration-500 ease-in-out grid-rows-[36cqmin_36cqmin] has-[article:nth-child(1):hover]:grid-rows-[56cqmin_18cqmin] has-[article:nth-child(2):hover]:grid-rows-[18cqmin_56cqmin] lg:gap-4">
+                            <div class="grid gap-3 transition-all duration-500 ease-in-out grid-rows-[1fr_1fr] has-[article:nth-child(1):hover]:grid-rows-[56fr_18fr] has-[article:nth-child(2):hover]:grid-rows-[18fr_56fr] lg:gap-4">
                                 @foreach ($col->take(2) as $image)
                                     <article class="group/item relative overflow-hidden rounded-card cursor-pointer shadow-card reveal" style="transition-delay: {{ $loop->parent->index * 80 + $loop->index * 40 }}ms">
                                         <a href="/gallery/" class="absolute inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-royal focus-visible:ring-offset-2" aria-label="View gallery">

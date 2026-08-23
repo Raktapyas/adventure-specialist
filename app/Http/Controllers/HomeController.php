@@ -19,10 +19,9 @@ class HomeController extends Controller
             'packages' => Package::published()->orderBy('sort_order')->orderBy('title')->limit(4)->get(),
             'galleryImages' => GalleryImage::orderBy('sort_order')->orderBy('id')->limit(6)->get(),
             'stats' => [
-                ['value' => 8000, 'suffix' => 'm+', 'label' => "Reach the world's highest peaks"],
-                ['value' => 365, 'suffix' => ' DAYS', 'label' => 'Adventure in Nepal, all year round'],
-                ['value' => 100, 'suffix' => '% LOCAL', 'label' => 'Authentic Himalayan experiences'],
-                ['value' => 1, 'suffix' => ' LIFETIME', 'label' => "Memories you'll never forget"],
+                ['value' => 2013, 'suffix' => '', 'label' => 'Established Year'],
+                ['value' => 1200, 'suffix' => '+', 'label' => 'Total Trekking'],
+                ['value' => 1600, 'suffix' => '+', 'label' => 'Happy Trekkers'],
             ],
         ]);
     }
