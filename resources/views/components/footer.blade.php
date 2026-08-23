@@ -1,3 +1,8 @@
+{{-- Decorative silhouette strip crowning the footer — blends into the page background above the dark footer --}}
+<div class="bg-paper" aria-hidden="true">
+    <img src="/assets/images/footer_bg.avif" alt="" class="h-auto w-full" loading="lazy">
+</div>
+
 <footer class="relative overflow-hidden bg-[#0a0a0a] text-[#F7F3EC]">
     {{-- Keep background footer.jpg — luxury near-black blend --}}
     <div class="absolute inset-0" aria-hidden="true">

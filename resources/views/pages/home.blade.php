@@ -338,7 +338,7 @@
     {{-- Gallery preview — centered header + living fluid grid --}}
     @if ($galleryImages->isNotEmpty())
         <section class="border-t border-line bg-paper-soft/60">
-            <div class="mx-auto max-w-[1240px] px-6 py-24 lg:py-28">
+            <div class="mx-auto max-w-[1240px] px-6 pt-24 pb-12 lg:pt-28 lg:pb-14">
                 <div class="grid w-full items-end gap-6 sm:grid-cols-[1fr_auto_1fr]">
                     <div class="hidden sm:block" aria-hidden="true"></div>
                     <x-section-heading eyebrow="Moments" title="AST Photo Gallery" align="center" />
@@ -377,7 +377,7 @@
     @endif
 
     {{-- CTA strip --}}
-    <section class="mx-auto max-w-[1240px] px-6 py-20">
+    <section class="mx-auto max-w-[1240px] px-6 pt-10 pb-20 lg:pt-12">
         <div class="reveal relative flex flex-col items-start justify-between gap-6 overflow-hidden rounded-card bg-pine-deep p-10 text-paper sm:p-14 lg:flex-row lg:items-center">
             {{-- Fixed cinematic backdrop --}}
             <div class="parallax-bg" aria-hidden="true">
