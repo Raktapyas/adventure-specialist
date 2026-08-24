@@ -5,6 +5,7 @@ namespace App\View\Composers;
 use App\Models\Destination;
 use App\Models\Page;
 use App\Models\Service;
+use App\Models\SiteSetting;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
@@ -39,10 +40,11 @@ class NavComposer
         $view->with('navServices', $this->cache['services']);
         $view->with('navDestinations', $this->cache['destinations']);
         $view->with('navNepal', $this->cache['nepal']);
+        $view->with('siteContact', $this->cache['siteContact']);
     }
 
     /**
-     * @return array{aboutPages: Collection, services: Collection, destinations: Collection, nepal: ?Destination}
+     * @return array{aboutPages: Collection, services: Collection, destinations: Collection, nepal: ?Destination, siteContact: array<string, ?string>}
      */
     protected function load(): array
     {
@@ -70,6 +72,7 @@ class NavComposer
                 ->where('slug', 'nepal')
                 ->with(['children' => fn ($q) => $q->published()])
                 ->first(),
+            'siteContact' => SiteSetting::current()->contactBlock(),
         ];
     }
 }

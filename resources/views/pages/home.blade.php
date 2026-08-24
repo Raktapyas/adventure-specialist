@@ -157,7 +157,8 @@
     </section>
 
     {{-- Counters band (premium scroll-parallax) --}}
-    <section class="relative overflow-hidden bg-pine-deep text-paper">
+    @if (! empty($stats))
+        <section class="relative overflow-hidden bg-pine-deep text-paper">
         {{-- Parallax background layer --}}
         <div class="parallax-bg" aria-hidden="true">
             <div class="parallax-bg__inner" data-parallax>
@@ -180,6 +181,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- About / Why choose us --}}
     <section class="mx-auto max-w-[1240px] px-6 py-24 lg:py-32">
@@ -377,23 +379,33 @@
     @endif
 
     {{-- CTA strip --}}
-    <section class="mx-auto max-w-[1240px] px-6 pt-10 pb-20 lg:pt-12">
-        <div class="reveal relative flex flex-col items-start justify-between gap-6 overflow-hidden rounded-card bg-pine-deep p-10 text-paper sm:p-14 lg:flex-row lg:items-center">
-            {{-- Fixed cinematic backdrop --}}
-            <div class="parallax-bg" aria-hidden="true">
-                <div class="parallax-bg__inner" data-parallax>
-                    <img src="/assets/images/banners/3.jpg" alt="" class="h-full w-full object-cover" loading="lazy">
-                </div>
-                <div class="absolute inset-0 bg-gradient-to-b from-pine-deep/70 via-pine-deep/40 to-pine-deep/70"></div>
-            </div>
+    @if (filled($cta['title']) || filled($cta['eyebrow']) || filled($cta['button_label']))
+        <section class="mx-auto max-w-[1240px] px-6 pt-10 pb-20 lg:pt-12">
+            <div class="reveal relative flex flex-col items-start justify-between gap-6 overflow-hidden rounded-card bg-pine-deep p-10 text-paper sm:p-14 lg:flex-row lg:items-center">
+                {{-- Fixed cinematic backdrop --}}
+                @if (filled($cta['image']))
+                    <div class="parallax-bg" aria-hidden="true">
+                        <div class="parallax-bg__inner" data-parallax>
+                            <img src="{{ $cta['image'] }}" alt="" class="h-full w-full object-cover" loading="lazy">
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-b from-pine-deep/70 via-pine-deep/40 to-pine-deep/70"></div>
+                    </div>
+                @endif
 
-            <div class="relative">
-                <p class="eyebrow text-paper/60">Ready when you are</p>
-                <h2 class="display-serif mt-3 text-3xl text-paper sm:text-4xl">Let us arrange your Himalayan holiday.</h2>
+                <div class="relative">
+                    @if (filled($cta['eyebrow']))
+                        <p class="eyebrow text-paper/60">{{ $cta['eyebrow'] }}</p>
+                    @endif
+                    @if (filled($cta['title']))
+                        <h2 class="display-serif mt-3 text-3xl text-paper sm:text-4xl">{{ $cta['title'] }}</h2>
+                    @endif
+                </div>
+                @if (filled($cta['button_label']) && filled($cta['button_url']))
+                    <a href="{{ $cta['button_url'] }}" class="btn btn-royal relative shrink-0">
+                        {{ $cta['button_label'] }}
+                    </a>
+                @endif
             </div>
-            <a href="/contact/#enquiry" class="btn btn-royal shrink-0">
-                Plan a Trip
-            </a>
-        </div>
-    </section>
+        </section>
+    @endif
 @endsection

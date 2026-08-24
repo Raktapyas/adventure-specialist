@@ -58,32 +58,55 @@
             <div>
                 <p class="text-sm font-black uppercase tracking-[0.2em] text-[#C9A86A]">Contact Us</p>
                 <address class="mt-5 space-y-3 text-base font-medium not-italic leading-relaxed [overflow-wrap:anywhere]">
-                    <p class="font-black tracking-tight text-white">ADVENTURE SPECIALIST TRAVEL</p>
-                    <p class="font-semibold text-white/80">Bungamati, Lalitpur, Nepal</p>
-                    <p class="font-bold text-white">
-                        <a href="tel:+97715173283" class="transition-colors hover:text-[#C9A86A]">+977 1 5173283</a><br>
-                        <a href="tel:+9779851024546" class="transition-colors hover:text-[#C9A86A]">+977 9851024546</a> <span class="font-semibold text-white/60">— Raj K. Shrestha</span>
-                    </p>
-                    <p><a href="mailto:adventurespecialisttravel@gmail.com" class="font-semibold text-white/80 transition-colors hover:text-white">adventurespecialisttravel@gmail.com</a></p>
-                    <p class="text-sm font-bold leading-relaxed text-white/50">Sun – Fri 9:00 – 16:00<br>Saturday – CLOSED</p>
+                    @if (filled($siteContact['company']))
+                        <p class="font-black tracking-tight text-white">{{ $siteContact['company'] }}</p>
+                    @endif
+                    @if (filled($siteContact['address']))
+                        <p class="font-semibold text-white/80">{{ $siteContact['address'] }}</p>
+                    @endif
+                    @if (filled($siteContact['phone_primary']) || filled($siteContact['phone_secondary']))
+                        <p class="font-bold text-white">
+                            @if (filled($siteContact['phone_primary']))
+                                <a href="tel:{{ preg_replace('/\s+/', '', $siteContact['phone_primary']) }}" class="transition-colors hover:text-[#C9A86A]">{{ $siteContact['phone_primary'] }}</a>@if (filled($siteContact['phone_secondary']))<br>@endif
+                            @endif
+                            @if (filled($siteContact['phone_secondary']))
+                                <a href="tel:{{ preg_replace('/\s+/', '', $siteContact['phone_secondary']) }}" class="transition-colors hover:text-[#C9A86A]">{{ $siteContact['phone_secondary'] }}</a>
+                                @if (filled($siteContact['phone_owner']))
+                                    <span class="font-semibold text-white/60">— {{ $siteContact['phone_owner'] }}</span>
+                                @endif
+                            @endif
+                        </p>
+                    @endif
+                    @if (filled($siteContact['email']))
+                        <p><a href="mailto:{{ $siteContact['email'] }}" class="font-semibold text-white/80 transition-colors hover:text-white">{{ $siteContact['email'] }}</a></p>
+                    @endif
+                    @if (filled($siteContact['hours']))
+                        <p class="text-sm font-bold leading-relaxed text-white/50">{!! nl2br(e($siteContact['hours'])) !!}</p>
+                    @endif
                 </address>
                 {{-- Minimal gold line-style icons — captions below at mouse point --}}
                 <div class="mt-6 flex items-center gap-3">
-                    <a href="https://www.facebook.com/Adventure-Specialist-Travel-PvtLtd-318003508387072" target="_blank" rel="noopener" aria-label="Facebook"
-                       class="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#C9A86A]/30 text-[#C9A86A] transition-colors hover:border-[#C9A86A] hover:bg-[#C9A86A] hover:text-[#0a0a0a]">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 8h2.5L14 12h2.2l.4 3H14v7h-3v-7H9v-3h2V9.5A3.5 3.5 0 0 1 14.5 6H17V9h-2a1 1 0 0 0-1 1V12h3l-.5 3H14v7h-.001V8H14Z"/></svg>
-                        <span class="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-bold tracking-wide text-[#0a0a0a] opacity-0 shadow-lg transition-all duration-200 group-hover:opacity-100">Facebook</span>
-                    </a>
-                    <a href="mailto:adventurespecialisttravel@gmail.com" aria-label="Email"
-                       class="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#C9A86A]/30 text-[#C9A86A] transition-colors hover:border-[#C9A86A] hover:bg-[#C9A86A] hover:text-[#0a0a0a]">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7.5 12 13l9-5.5"/></svg>
-                        <span class="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-bold tracking-wide text-[#0a0a0a] opacity-0 shadow-lg transition-all duration-200 group-hover:opacity-100">Email</span>
-                    </a>
-                    <a href="tel:+9779851024546" aria-label="Phone"
-                       class="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#C9A86A]/30 text-[#C9A86A] transition-colors hover:border-[#C9A86A] hover:bg-[#C9A86A] hover:text-[#0a0a0a]">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6.5 3.5a1 1 0 0 0-1 1.2C6.1 10.1 10.1 14.1 15.3 15.5a1 1 0 0 0 1.2-1l-1.1-3.2a1 1 0 0 0-.6-.6l-2.8-1a1 1 0 0 0-1 .2l-1.4 1.4a12.2 12.2 0 0 1-3.8-3.8l1.4-1.4a1 1 0 0 0 .2-1l-1-2.8a1 1 0 0 0-.6-.6L6.5 3.5Z"/></svg>
-                        <span class="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-bold tracking-wide text-[#0a0a0a] opacity-0 shadow-lg transition-all duration-200 group-hover:opacity-100">Phone</span>
-                    </a>
+                    @if (filled($siteContact['facebook_url']))
+                        <a href="{{ $siteContact['facebook_url'] }}" target="_blank" rel="noopener" aria-label="Facebook"
+                           class="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#C9A86A]/30 text-[#C9A86A] transition-colors hover:border-[#C9A86A] hover:bg-[#C9A86A] hover:text-[#0a0a0a]">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 8h2.5L14 12h2.2l.4 3H14v7h-3v-7H9v-3h2V9.5A3.5 3.5 0 0 1 14.5 6H17V9h-2a1 1 0 0 0-1 1V12h3l-.5 3H14v7h-.001V8H14Z"/></svg>
+                            <span class="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-bold tracking-wide text-[#0a0a0a] opacity-0 shadow-lg transition-all duration-200 group-hover:opacity-100">Facebook</span>
+                        </a>
+                    @endif
+                    @if (filled($siteContact['email']))
+                        <a href="mailto:{{ $siteContact['email'] }}" aria-label="Email"
+                           class="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#C9A86A]/30 text-[#C9A86A] transition-colors hover:border-[#C9A86A] hover:bg-[#C9A86A] hover:text-[#0a0a0a]">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7.5 12 13l9-5.5"/></svg>
+                            <span class="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-bold tracking-wide text-[#0a0a0a] opacity-0 shadow-lg transition-all duration-200 group-hover:opacity-100">Email</span>
+                        </a>
+                    @endif
+                    @if (filled($siteContact['phone_secondary']))
+                        <a href="tel:{{ preg_replace('/\s+/', '', $siteContact['phone_secondary']) }}" aria-label="Phone"
+                           class="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#C9A86A]/30 text-[#C9A86A] transition-colors hover:border-[#C9A86A] hover:bg-[#C9A86A] hover:text-[#0a0a0a]">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6.5 3.5a1 1 0 0 0-1 1.2C6.1 10.1 10.1 14.1 15.3 15.5a1 1 0 0 0 1.2-1l-1.1-3.2a1 1 0 0 0-.6-.6l-2.8-1a1 1 0 0 0-1 .2l-1.4 1.4a12.2 12.2 0 0 1-3.8-3.8l1.4-1.4a1 1 0 0 0 .2-1l-1-2.8a1 1 0 0 0-.6-.6L6.5 3.5Z"/></svg>
+                            <span class="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-bold tracking-wide text-[#0a0a0a] opacity-0 shadow-lg transition-all duration-200 group-hover:opacity-100">Phone</span>
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
