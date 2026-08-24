@@ -12,10 +12,10 @@
         <div class="grid gap-12 lg:grid-cols-12">
             {{-- Body --}}
             <div class="lg:col-span-9">
-                <div class="relative isolate flex flex-col sm:flex-row gap-6 lg:gap-8 items-start">
+                <div class="relative isolate flex flex-col gap-6 lg:gap-8">
                     @if ($page->cover_image)
-                        <figure class="group relative z-10 shrink-0 w-52 sm:w-60 md:w-64 lg:w-72 xl:w-80 reveal">
-                            <img src="{{ $page->cover_image }}" alt="{{ $page->title }}" class="block h-auto w-full origin-top-left cursor-zoom-in rounded-card border border-line/60 object-cover aspect-[4/3] shadow-card transition-all duration-500 ease-out will-change-transform hover:z-30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.22)] group-hover:z-30 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.22)] md:group-hover:scale-150 md:hover:scale-150 active:scale-110" loading="lazy" referrerpolicy="no-referrer">
+                        <figure class="group relative z-10 w-full reveal">
+                            <img src="{{ $page->cover_image }}" alt="{{ $page->title }}" class="block h-auto w-full rounded-card border border-line/60 object-cover aspect-[16/9] shadow-card transition-shadow duration-500 ease-out hover:shadow-[0_20px_50px_rgba(0,0,0,0.22)]" loading="lazy" referrerpolicy="no-referrer">
                         </figure>
                     @endif
                     <div class="min-w-0 flex-1 prose-editorial prose-p:leading-8 prose-p:text-[15.5px] sm:prose-p:text-[16px] lg:prose-p:text-[17px] prose-p:tracking-[-0.01em] prose-li:leading-7 prose-headings:leading-tight reveal">
