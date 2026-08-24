@@ -230,7 +230,7 @@
         </div>
     </section>
 @else
-    <section class="relative flex min-h-[78vh] items-end overflow-hidden bg-pine-deep pt-32 pb-20 text-paper sm:items-center lg:min-h-[82vh]">
+    <section class="relative flex h-[360px] items-center overflow-hidden bg-pine-deep pt-24 pb-10 text-paper sm:h-[420px] lg:h-[480px]">
         @if ($image)
             <div class="absolute inset-0">
                 <img src="{{ $image }}" alt="" class="h-full w-full animate-slow-zoom object-cover object-center brightness-[1.15] saturate-[0.95]" loading="eager" referrerpolicy="no-referrer">

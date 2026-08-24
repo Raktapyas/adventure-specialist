@@ -45,14 +45,14 @@ class PublicServicesIndexTest extends TestCase
         $this->assertStringContainsString('mx-auto text-center', $content);
         $this->assertStringContainsString('Mountain Flight', $content);
         $this->assertStringContainsString('A breath-taking panorama of the Himalaya.', $content);
-        $this->assertStringContainsString('3.269 3.125', $content);
+        $this->assertStringContainsString('/ast-services/mountain-flight/', $content);
     }
 
     public function test_index_shows_empty_state_without_hardcoded_fallback_cards(): void
     {
         $content = $this->indexContent();
 
-        $this->assertStringContainsString('Services coming soon.', $content);
+        $this->assertStringContainsString('Our services are being updated', $content);
         $this->assertStringNotContainsString('flip-inner', $content);
     }
 }
