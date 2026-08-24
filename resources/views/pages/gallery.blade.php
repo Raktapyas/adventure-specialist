@@ -4,7 +4,6 @@
 
 @section('content')
     <x-hero
-        eyebrow="Adventure Specialist Travel"
         title="AST Photo Gallery"
         lede="Moments from the mountains, the jungles and the valleys we call home."
         image="/assets/images/cover-all.png" />
