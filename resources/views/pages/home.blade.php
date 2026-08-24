@@ -3,45 +3,7 @@
 @section('title', 'Home')
 
 @section('content')
-    {{-- Hero (cinematic slider) --}}
-    @php
-        $heroSlides = [
-            [
-                'image' => '/assets/images/banners/1.jpg',
-                'eyebrow' => 'Adventure Specialist Travel Pvt. Ltd.',
-                'title' => 'The Himalayas, thoughtfully arranged.',
-                'lede' => 'Specialist in preparing your holiday programs in Nepal, Bhutan, Sikkim, Tibet and Myanmar.',
-                'kenburns' => 'animate-hero-zoom-in',
-                'ctas' => [
-                    ['label' => 'Explore Services', 'href' => '/ast-services/', 'style' => 'royal'],
-                    ['label' => 'Plan a Trip', 'href' => '/contact/#enquiry', 'style' => 'outline'],
-                ],
-            ],
-            [
-                'image' => '/assets/images/banners/2.jpg',
-                'eyebrow' => 'Where we go',
-                'title' => 'Five countries, one standard of care.',
-                'lede' => 'From the Kathmandu Valley to the roof of the world — culture, adventure and wildlife.',
-                'kenburns' => 'animate-hero-pan-right',
-                'ctas' => [
-                    ['label' => 'Explore Destinations', 'href' => '/destination/', 'style' => 'royal'],
-                    ['label' => 'Plan a Trip', 'href' => '/contact/#enquiry', 'style' => 'outline'],
-                ],
-            ],
-            [
-                'image' => '/assets/images/banners/3.jpg',
-                'eyebrow' => 'Signature programs',
-                'title' => 'Treks and tours, arranged around you.',
-                'lede' => 'Curated special packages for groups and individuals across the Himalaya.',
-                'kenburns' => 'animate-hero-zoom-out',
-                'ctas' => [
-                    ['label' => 'View Packages', 'href' => '/special-package/', 'style' => 'royal'],
-                    ['label' => 'Plan a Trip', 'href' => '/contact/#enquiry', 'style' => 'outline'],
-                ],
-            ],
-        ];
-    @endphp
-
+    {{-- Hero (cinematic slider) — slides managed in Filament: Hero Slides --}}
     <x-hero :slides="$heroSlides" />
 
     {{-- Welcome / intro (premium asymmetric About) --}}
