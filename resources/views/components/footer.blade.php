@@ -11,19 +11,10 @@
         <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/35 to-transparent"></div>
     </div>
     <div class="relative mx-auto max-w-[1240px] px-6 py-16 lg:py-20">
-        {{-- Centered brand — logo on home, text elsewhere (same spacing) --}}
+        {{-- Centered brand — logo on every page (identical to homepage) --}}
         <div class="text-center">
-            @if (request()->routeIs('home'))
-                <img src="{{ asset('images/logo-white.png') }}" alt="Adventure Specialist Travel" class="mx-auto h-[3.2rem] w-auto object-contain opacity-95 [filter:drop-shadow(0_0_20px_rgba(255,255,255,0.12))] sm:h-[4rem] lg:h-[4.75rem]">
-                <p class="sr-only">Adventure Specialist — Himalayan Journeys · Culture · Adventure · Wilderness</p>
-            @else
-                <h2 class="font-serif text-[clamp(2.4rem,6.5vw,4.75rem)] font-black uppercase tracking-[0.18em] text-[#C9A86A] [text-shadow:0_0_40px_rgba(201,168,106,0.22)]">
-                    Adventure Specialist
-                </h2>
-                <p class="mx-auto mt-4 max-w-2xl text-sm font-bold uppercase tracking-[0.24em] text-white/80 sm:text-[13px]">
-                    Himalayan Journeys &nbsp;·&nbsp; Culture &nbsp;·&nbsp; Adventure &nbsp;·&nbsp; Wilderness
-                </p>
-            @endif
+            <img src="{{ asset('images/logo-white.png') }}" alt="Adventure Specialist Travel" class="mx-auto h-[3.2rem] w-auto object-contain opacity-95 [filter:drop-shadow(0_0_20px_rgba(255,255,255,0.12))] sm:h-[4rem] lg:h-[4.75rem]">
+            <p class="sr-only">Adventure Specialist — Himalayan Journeys · Culture · Adventure · Wilderness</p>
         </div>
 
         {{-- Clean 3-column layout — gold headings bigger, white links bigger bold --}}
