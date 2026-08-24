@@ -17,6 +17,10 @@ class GalleryImageResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
+    protected static ?string $navigationGroup = 'Content';
+
+    protected static ?int $navigationSort = 60;
+
     public static function form(Form $form): Form
     {
         return $form

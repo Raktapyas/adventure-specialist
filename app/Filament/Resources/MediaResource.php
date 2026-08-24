@@ -16,7 +16,11 @@ class MediaResource extends Resource
 {
     protected static ?string $model = Media::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-folder-open';
+    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
+
+    protected static ?string $navigationGroup = 'Media';
+
+    protected static ?int $navigationSort = 10;
 
     public static function table(Table $table): Table
     {
