@@ -40,14 +40,25 @@ class PublicAboutNavigationTest extends TestCase
             ->assertDontSee('Draft Page');
     }
 
-    public function test_top_level_page_is_not_listed_under_about_us(): void
+    public function test_top_level_page_gets_its_own_navigation_section(): void
     {
         Page::factory()->create(['slug' => 'about', 'title' => 'About Us']);
         Page::factory()->create(['slug' => 'standalone', 'title' => 'Standalone']);
 
         $this->get('/')
             ->assertOk()
-            ->assertDontSee('Standalone');
+            ->assertSee('Standalone')
+            ->assertSee('/about-us/standalone/');
+    }
+
+    public function test_unpublished_top_level_page_is_hidden_from_navigation(): void
+    {
+        Page::factory()->create(['slug' => 'about', 'title' => 'About Us']);
+        Page::factory()->create(['slug' => 'hidden-section', 'title' => 'Hidden Section', 'is_published' => false]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertDontSee('Hidden Section');
     }
 
     public function test_migration_links_alo_under_about_us(): void

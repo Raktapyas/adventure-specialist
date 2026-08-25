@@ -6,6 +6,7 @@
         about: false,
         services: false,
         destination: false,
+        topOpen: null,
         activeHome: @js(request()->routeIs('home')),
         activePages: @js(request()->routeIs('pages.*')),
         activeServices: @js(request()->routeIs('services.*')),
@@ -51,6 +52,30 @@
                         @endforeach
                     </div>
                 </div>
+
+                {{-- Standalone top-level pages (managed in Filament > Pages) --}}
+                @foreach ($navTopLevelPages as $section)
+                    <div class="relative" @mouseenter="topOpen = {{ $section->id }}" @mouseleave="topOpen = null">
+                        <a href="{{ $section->getPath() }}" class="nav-link flex items-center gap-1" :class="activePages ? (scrolled ? 'text-royal' : 'text-royal-bright') : ''">
+                            {{ $section->title }}
+                            @if ($section->children->isNotEmpty())
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 transition-transform" :class="topOpen === {{ $section->id }} ? 'rotate-180' : ''"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" /></svg>
+                            @endif
+                        </a>
+                        @if ($section->children->isNotEmpty())
+                            <div x-show="topOpen === {{ $section->id }}" x-cloak x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
+                                x-transition:leave-end="opacity-0 translate-y-2"
+                                class="absolute left-0 top-full w-72 rounded-card border border-line bg-paper-soft/95 p-2 text-ink-soft shadow-card backdrop-blur-sm">
+                                <a href="{{ $section->getPath() }}" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-royal">{{ $section->title }}</a>
+                                @foreach ($section->children as $child)
+                                    <a href="{{ $child->getPath() }}" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-royal">{{ $child->title }}</a>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
 
                 {{-- AST Services --}}
                 <div class="relative" @mouseenter="services = true" @mouseleave="services = false">
@@ -115,6 +140,12 @@
         <nav class="mx-auto max-w-[1240px] space-y-1 px-6 py-6" aria-label="Mobile">
             <a href="/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">Home</a>
             <a href="/about-us/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">About Us</a>
+            @foreach ($navTopLevelPages as $section)
+                <a href="{{ $section->getPath() }}" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">{{ $section->title }}</a>
+                @foreach ($section->children as $child)
+                    <a href="{{ $child->getPath() }}" class="block rounded py-2 pl-7 pr-3 text-sm text-ink-soft hover:bg-paper-soft hover:text-royal">{{ $child->title }}</a>
+                @endforeach
+            @endforeach
             <a href="/ast-services/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">AST Services</a>
             <a href="/destination/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">Destination</a>
             <a href="/gallery/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">Gallery</a>

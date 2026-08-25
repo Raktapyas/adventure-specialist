@@ -6,6 +6,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | --- | --- |
 | app/Http/Controllers/Auth/** | .ai/rules/auth.md |
 | app/Console/Commands/** | .ai/rules/commands.md |
+| app/View/Composers/NavComposer.php | .ai/rules/composers.md |
 | config/filament-shield.php | .ai/rules/config.md |
 | phpunit.xml, docker-compose.yml | .ai/rules/general.md |
 | app/Filament/Resources/PageResource/** | .ai/rules/page-resource.md |

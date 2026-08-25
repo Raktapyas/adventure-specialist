@@ -37,6 +37,7 @@ class NavComposer
         }
 
         $view->with('navAboutPages', $this->cache['aboutPages']);
+        $view->with('navTopLevelPages', $this->cache['topLevelPages']);
         $view->with('navServices', $this->cache['services']);
         $view->with('navDestinations', $this->cache['destinations']);
         $view->with('navNepal', $this->cache['nepal']);
@@ -44,7 +45,7 @@ class NavComposer
     }
 
     /**
-     * @return array{aboutPages: Collection, services: Collection, destinations: Collection, nepal: ?Destination, siteContact: array<string, ?string>}
+     * @return array{aboutPages: Collection, topLevelPages: Collection, services: Collection, destinations: Collection, nepal: ?Destination, siteContact: array<string, ?string>}
      */
     protected function load(): array
     {
@@ -54,6 +55,16 @@ class NavComposer
                 ->with('parent')
                 ->orderBy('sort_order')
                 ->orderBy('title')
+                ->get(),
+            // Standalone sections: every other published top-level page gets its
+            // own navbar dropdown. "about" already renders as About Us and
+            // "managing-director" lives under /contact/, so both are excluded.
+            'topLevelPages' => Page::published()
+                ->whereNull('parent_id')
+                ->whereNotIn('slug', ['about', 'managing-director'])
+                ->orderBy('sort_order')
+                ->orderBy('title')
+                ->with(['children' => fn ($q) => $q->published()])
                 ->get(),
             'services' => Service::published()
                 ->whereNull('parent_id')
