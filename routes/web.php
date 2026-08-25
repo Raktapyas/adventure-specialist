@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\GalleryController;
@@ -54,6 +55,7 @@ Route::middleware('canonical')->group(function () {
 });
 
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:6,1');
+Route::post('/booking', [BookingController::class, 'store'])->name('booking.store')->middleware('throttle:6,1');
 
 /*
 |--------------------------------------------------------------------------

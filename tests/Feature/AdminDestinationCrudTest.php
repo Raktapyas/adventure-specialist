@@ -50,6 +50,55 @@ class AdminDestinationCrudTest extends TestCase
         $this->assertDatabaseHas('destinations', ['slug' => 'tibet', 'parent_id' => null]);
     }
 
+    public function test_trip_tab_fields_persist_on_create(): void
+    {
+        Livewire::actingAs($this->admin())
+            ->test(CreateDestination::class)
+            ->fillForm([
+                'title' => 'Gokyo Trek',
+                'slug' => 'gokyo-trek',
+                'content' => '<p>Overview</p>',
+                'itinerary' => '<p>Day 1</p>',
+                'includes' => '<p>Meals</p>',
+                'excludes' => '<p>Flights</p>',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('destinations', [
+            'slug' => 'gokyo-trek',
+            'itinerary' => '<p>Day 1</p>',
+            'includes' => '<p>Meals</p>',
+            'excludes' => '<p>Flights</p>',
+        ]);
+    }
+
+    public function test_trip_tab_fields_persist_on_update(): void
+    {
+        $destination = Destination::factory()->create([
+            'itinerary' => '<p>Day 1</p>',
+            'includes' => '<p>Meals</p>',
+            'excludes' => '<p>Flights</p>',
+        ]);
+
+        Livewire::actingAs($this->admin())
+            ->test(EditDestination::class, ['record' => $destination->getKey()])
+            ->fillForm([
+                'itinerary' => '<p>Day 1: Lukla</p>',
+                'includes' => '<p>Permits</p>',
+                'excludes' => '<p>Insurance</p>',
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('destinations', [
+            'id' => $destination->id,
+            'itinerary' => '<p>Day 1: Lukla</p>',
+            'includes' => '<p>Permits</p>',
+            'excludes' => '<p>Insurance</p>',
+        ]);
+    }
+
     public function test_duplicate_slug_is_rejected(): void
     {
         Destination::factory()->create(['slug' => 'taken']);

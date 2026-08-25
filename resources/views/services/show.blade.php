@@ -18,12 +18,8 @@
                             <img src="{{ $service->cover_image }}" alt="{{ $service->title }}" class="block h-auto w-full rounded-card border border-line/60 object-cover aspect-[16/9] shadow-card transition-shadow duration-500 ease-out hover:shadow-[0_20px_50px_rgba(0,0,0,0.22)]" loading="lazy" referrerpolicy="no-referrer">
                         </figure>
                     @endif
-                    <div class="min-w-0 flex-1 prose-editorial prose-p:leading-8 prose-p:text-[15.5px] sm:prose-p:text-[16px] lg:prose-p:text-[17px] prose-p:tracking-[-0.01em] prose-li:leading-7 prose-headings:leading-tight reveal">
-                        @if ($service->content)
-                                {!! $service->content !!}
-                            @else
-                                <p class="text-ink-faint">Detailed information is being finalized — please contact our team for a tailored itinerary and latest updates.</p>
-                            @endif
+                    <div class="min-w-0 flex-1 reveal">
+                        <x-trip-tabs :model="$service" />
                     </div>
                 </div>
 

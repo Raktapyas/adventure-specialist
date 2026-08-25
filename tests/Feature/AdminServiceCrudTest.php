@@ -67,6 +67,29 @@ class AdminServiceCrudTest extends TestCase
         $this->assertDatabaseHas('services', ['slug' => 'rafting', 'icon' => 'heroicon-o-bolt']);
     }
 
+    public function test_trip_tab_fields_persist_on_create(): void
+    {
+        Livewire::actingAs($this->admin())
+            ->test(CreateService::class)
+            ->fillForm([
+                'title' => 'Mountain Flight',
+                'slug' => 'mountain-flight',
+                'content' => '<p>Overview</p>',
+                'itinerary' => '<p>Day 1</p>',
+                'includes' => '<p>Guide</p>',
+                'excludes' => '<p>Tips</p>',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('services', [
+            'slug' => 'mountain-flight',
+            'itinerary' => '<p>Day 1</p>',
+            'includes' => '<p>Guide</p>',
+            'excludes' => '<p>Tips</p>',
+        ]);
+    }
+
     public function test_duplicate_slug_is_rejected(): void
     {
         Service::factory()->create(['slug' => 'taken']);

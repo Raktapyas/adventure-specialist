@@ -95,9 +95,34 @@ class ServiceResource extends Resource
                     ->maxLength(1000)
                     ->rows(3)
                     ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
-                Forms\Components\RichEditor::make('content')
-                    ->nullable()
-                    ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
+                Forms\Components\Tabs::make('Trip content')
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make('Trip Overview')
+                            ->schema([
+                                Forms\Components\RichEditor::make('content')
+                                    ->nullable()
+                                    ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
+                            ]),
+                        Forms\Components\Tabs\Tab::make('Detail Itinerary')
+                            ->schema([
+                                Forms\Components\RichEditor::make('itinerary')
+                                    ->nullable()
+                                    ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
+                            ]),
+                        Forms\Components\Tabs\Tab::make('Includes')
+                            ->schema([
+                                Forms\Components\RichEditor::make('includes')
+                                    ->nullable()
+                                    ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
+                            ]),
+                        Forms\Components\Tabs\Tab::make('Excludes')
+                            ->schema([
+                                Forms\Components\RichEditor::make('excludes')
+                                    ->nullable()
+                                    ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
+                            ]),
+                    ])
+                    ->contained(false),
                 Forms\Components\Select::make('icon')
                     ->label('Icon')
                     ->options(static::iconOptions())
