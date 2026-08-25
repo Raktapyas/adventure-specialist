@@ -104,21 +104,12 @@ gauntlet will find you.
 
 ---
 
-## 🚀 Deploying the War Machine
-
-Ships as a Docker image (`Dockerfile`) with a Render blueprint (`render.yaml`):
-
-1. Provision external MySQL (Render has none — Aiven free tier works)
-2. New Web Service on Render → connect this repo → fill the `sync: false` secrets
-3. First boot: migrations run → fresh DB auto-seeds → Filament assets publish → Apache rises
-
-Health check lives at `/up`. If it's green, the machine is alive.
-
----
 
 ## 📜 Final Words
 
 *Most travel agencies have a website.*
 *This one has a fortress.*
 
-— *Adventure Specialist Travel. The mountain always wins.*
+— *The mountain always wins.*
+
+ ...raktapyas...
