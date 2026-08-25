@@ -40,6 +40,12 @@ class UserResource extends Resource
                     ->dehydrated(fn (?string $state): bool => filled($state))
                     ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
                     ->maxLength(255),
+                Forms\Components\Select::make('roles')
+                    ->label('Panel role')
+                    ->relationship('roles', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->helperText('Grants access to the admin panel. sub-admin manages content only; super_admin has full access. Leave empty for no panel access.'),
             ]);
     }
 
@@ -53,6 +59,10 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\BadgeColumn::make('role'),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('Panel roles')
+                    ->badge()
+                    ->color('success'),
             ])
             ->filters([
                 //
