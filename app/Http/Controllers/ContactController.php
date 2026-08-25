@@ -24,6 +24,10 @@ class ContactController extends Controller
 
         Inquiry::create($validated);
 
-        return redirect()->route('contact.index')->with('success', 'Thank you for your message. We will get back to you as soon as possible.');
+        // Laravel strips trailing slashes from generated URLs, so the browser
+        // always bounces /contact -> /contact/ — which consumes a one-hop
+        // session flash before the page renders. A query flag survives every
+        // hop, so the pop-up triggers reliably.
+        return redirect()->to('/contact/?submitted=1');
     }
 }

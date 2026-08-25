@@ -74,10 +74,30 @@
             {{-- Form --}}
             <div class="lg:col-span-7" id="enquiry">
                 <div class="rounded-card border border-line bg-paper-soft p-8 shadow-card sm:p-12">
-                    @if (session('success'))
-                        <div role="alert" class="mb-8 rounded-card border border-royal/30 bg-royal/5 px-5 py-4 text-sm text-royal-ink">
-                            {{ session('success') }}
-                        </div>
+                    @if (session('success') || request()->boolean('submitted'))
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                var msg = @json(session('success') ?? 'Thank you for reaching out. Your message has been received and our team will respond to you shortly.');
+
+                                if (window.Swal) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Thank you!',
+                                        html: msg,
+                                        confirmButtonText: 'Close',
+                                        confirmButtonColor: '#0c5adb',
+                                        timer: 8000,
+                                        timerProgressBar: true,
+                                    }).then(function () {
+                                        history.replaceState(null, '', window.location.pathname);
+                                    });
+                                } else {
+                                    alert(msg);
+                                    history.replaceState(null, '', window.location.pathname);
+                                }
+                            });
+                        </script>
                     @endif
 
                     @if ($errors->any())
