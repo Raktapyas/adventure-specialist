@@ -348,14 +348,13 @@ class AdminMediaLibraryTest extends TestCase
     public function test_page_update_tracks_media_usage(): void
     {
         $media = Media::factory()->uploaded()->create();
-        $page = Page::factory()->create();
+        $page = Page::factory()->create(['cover_image' => $media->path]);
 
         Livewire::actingAs($this->admin())
             ->test(EditPage::class, ['record' => $page->getKey()])
             ->fillForm([
                 'title' => $page->title,
                 'slug' => $page->slug,
-                'cover_image' => $media->path,
                 'content' => null,
             ])
             ->call('save')

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\NormalizesCoverImage;
 use App\Filament\Resources\PageResource\Pages;
-use App\Models\Media;
 use App\Models\Page;
 use Closure;
 use Filament\Forms;
@@ -15,6 +15,8 @@ use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
+    use NormalizesCoverImage;
+
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
@@ -97,19 +99,7 @@ class PageResource extends Resource
                 Forms\Components\RichEditor::make('content')
                     ->nullable()
                     ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
-                Forms\Components\TextInput::make('cover_image')
-                    ->label('Cover image')
-                    ->nullable()
-                    ->maxLength(255)
-                    ->startsWith('/')
-                    ->notRegex('/\/\//')
-                    ->notRegex('/\.\./')
-                    ->helperText('Path relative to public root, e.g. /storage/media/2026/08/photo.jpg')
-                    // Normalize to a canonical host-relative path before validation so
-                    // absolute URLs pass the starts_with:/ rule (mirrors the legacy
-                    // prepareForValidation behaviour).
-                    ->mutateStateForValidationUsing(fn ($state): ?string => Media::normalizePath($state))
-                    ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
+                static::coverImageField(),
                 Forms\Components\TextInput::make('sort_order')
                     ->label('Sort order')
                     ->numeric()

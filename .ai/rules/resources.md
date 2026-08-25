@@ -34,3 +34,6 @@ The image_url Select uses ->allowHtml() with a private static mediaOptionLabel()
 
 ## Service icon is a curated heroicon name stored in services.icon
 services.icon stores a heroicon name (e.g. heroicon-o-paper-airplane) chosen from ServiceResource::iconOptions(), NOT an image path. Render it in the card with {{ svg($service->icon ?: 'heroicon-o-photo', 'h-5 w-5') }}. The BladeUI Svg object is Htmlable — never cast to string; use the svg() helper or @svg directive so e()/Blade renders toHtml(). Keep iconOptions() in sync with the card's default heroicon-o-photo fallback.
+
+## Don't test FileUpload fields via fillForm uploads
+Livewire test fillForm()/set() with UploadedFile does NOT work on FileUpload fields that override afterStateHydrated (NormalizesCoverImage pattern): the simulated upload's temp file is lost and state re-wraps the old value under a new UUID. Repo convention: only test uploads via table/grid Actions (callAction(data: ['media' => [...]])), as AdminMediaLibraryTest does. For cover_image fields, test normalization wiring + round-trip survival instead.

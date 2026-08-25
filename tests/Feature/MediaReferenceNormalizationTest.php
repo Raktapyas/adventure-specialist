@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\Concerns\NormalizesCoverImage;
 use App\Filament\Resources\GalleryImageResource\Pages\CreateGalleryImage;
 use App\Filament\Resources\PageResource\Pages\CreatePage;
 use App\Filament\Resources\PageResource\Pages\EditPage;
@@ -10,6 +11,8 @@ use App\Models\Page;
 use App\Models\User;
 use App\Services\MediaUsageService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -22,29 +25,43 @@ class MediaReferenceNormalizationTest extends TestCase
         return User::factory()->create(['id' => 1, 'is_admin' => true]);
     }
 
-    public function test_page_cover_image_absolute_url_is_normalized_and_usage_tracked(): void
+    public function test_page_cover_image_normalization_matches_service_wiring(): void
     {
-        $media = Media::factory()->create(['path' => '/storage/media/2026/08/pic.jpg', 'is_legacy' => false]);
-        $page = Page::factory()->create();
+        $page = new class extends Page
+        {
+            use NormalizesCoverImage;
 
+            public function expose(?string $path): ?string
+            {
+                return $this->normalizeCoverImage($path);
+            }
+        };
+
+        // Disk-relative upload paths get the /storage/ web prefix.
+        $this->assertSame('/storage/uploads/photo.jpg', $page->expose('uploads/photo.jpg'));
+
+        // Host-relative legacy paths pass through untouched.
+        $this->assertSame('/assets/images/pages/15.jpg', $page->expose('/assets/images/pages/15.jpg'));
+
+        // Absolute URLs are normalized to their host-relative form.
+        $this->assertSame('/storage/media/pic.jpg', $page->expose('https://cdn.example.com/storage/media/pic.jpg'));
+
+        // Empty values stay null.
+        $this->assertNull($page->expose(null));
+    }
+
+    public function test_page_can_be_created_without_cover_image(): void
+    {
         Livewire::actingAs($this->admin())
-            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->test(CreatePage::class)
             ->fillForm([
-                'title' => $page->title,
-                'slug' => $page->slug,
-                'cover_image' => 'http://localhost/storage/media/2026/08/pic.jpg',
+                'title' => 'No Cover',
+                'slug' => 'no-cover',
             ])
-            ->call('save')
+            ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('pages', ['id' => $page->id, 'cover_image' => '/storage/media/2026/08/pic.jpg']);
-
-        $this->assertDatabaseHas('media_usages', [
-            'media_id' => $media->id,
-            'model_type' => $page->getMorphClass(),
-            'model_id' => $page->id,
-            'field' => 'cover_image',
-        ]);
+        $this->assertDatabaseHas('pages', ['slug' => 'no-cover', 'cover_image' => null]);
     }
 
     public function test_gallery_image_url_absolute_url_is_normalized(): void
@@ -93,29 +110,32 @@ class MediaReferenceNormalizationTest extends TestCase
         ]);
     }
 
-    public function test_page_cover_image_with_path_traversal_is_rejected(): void
+    public function test_legacy_host_relative_cover_image_still_works(): void
     {
-        Livewire::actingAs($this->admin())
-            ->test(CreatePage::class)
-            ->fillForm([
-                'title' => 'Bad',
-                'slug' => 'bad-page',
-                'cover_image' => '/assets/../secret.jpg',
-            ])
-            ->call('create')
-            ->assertHasFormErrors(['cover_image']);
+        $page = Page::factory()->create(['cover_image' => '/assets/images/pages/15.jpg']);
 
-        $this->assertDatabaseMissing('pages', ['slug' => 'bad-page']);
+        Livewire::actingAs($this->admin())
+            ->test(EditPage::class, ['record' => $page->getKey()])
+            ->fillForm([
+                'title' => $page->title,
+                'slug' => $page->slug,
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('pages', ['id' => $page->id, 'cover_image' => '/assets/images/pages/15.jpg']);
     }
 
-    public function test_page_cover_image_with_protocol_relative_url_is_rejected(): void
+    public function test_page_cover_image_rejects_non_image_uploads(): void
     {
+        Storage::fake('public');
+
         Livewire::actingAs($this->admin())
             ->test(CreatePage::class)
             ->fillForm([
                 'title' => 'Bad',
                 'slug' => 'bad-page',
-                'cover_image' => '//evil.example.com/pic.jpg',
+                'cover_image' => UploadedFile::fake()->createWithContent('notes.txt', 'not an image'),
             ])
             ->call('create')
             ->assertHasFormErrors(['cover_image']);
@@ -136,20 +156,27 @@ class MediaReferenceNormalizationTest extends TestCase
         $this->assertDatabaseCount('gallery_images', 0);
     }
 
-    public function test_legacy_host_relative_cover_image_still_works(): void
+    public function test_page_cover_image_existing_storage_path_survives_save(): void
     {
-        $page = Page::factory()->create();
+        $media = Media::factory()->create(['path' => '/storage/media/2026/08/pic.jpg', 'is_legacy' => false]);
+        $page = Page::factory()->create(['cover_image' => '/storage/media/2026/08/pic.jpg']);
 
         Livewire::actingAs($this->admin())
             ->test(EditPage::class, ['record' => $page->getKey()])
             ->fillForm([
                 'title' => $page->title,
                 'slug' => $page->slug,
-                'cover_image' => '/assets/images/pages/15.jpg',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('pages', ['id' => $page->id, 'cover_image' => '/assets/images/pages/15.jpg']);
+        $this->assertDatabaseHas('pages', ['id' => $page->id, 'cover_image' => '/storage/media/2026/08/pic.jpg']);
+
+        $this->assertDatabaseHas('media_usages', [
+            'media_id' => $media->id,
+            'model_type' => $page->getMorphClass(),
+            'model_id' => $page->id,
+            'field' => 'cover_image',
+        ]);
     }
 }
