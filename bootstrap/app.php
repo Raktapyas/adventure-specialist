@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Render terminates TLS in front of the container; trusting its proxy
+        // keeps secure cookies, redirect targets and generated URLs on https.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'canonical' => EnsureTrailingSlash::class,
             'admin' => EnsureIsAdmin::class,
