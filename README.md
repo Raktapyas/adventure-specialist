@@ -1,58 +1,124 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏔️ ADVENTURE SPECIALIST TRAVEL
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> *"You climbed my mountains for the view. You stayed for the empire."*
 
-## About Laravel
+This is not a website. This is the **command center of a Himalayan travel dynasty** —
+every trail, every summit, every wide-eyed tourist who ever whispered *"take me there"*
+passes through systems built here.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Built to dominate. Tested 275 times before it's allowed to see daylight.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 💀 The Empire (What This Is)
 
-## Learning Laravel
+A full-stack **Laravel + Filament** operation with two faces:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**The Public Face** — what the tourists see:
+- Cinematic hero slider, driven by the database — swap the imagery without touching code
+- About Us dominion with nested sub-pages and auto-generated navigation
+- Services & Destinations hierarchies (Nepal gets its own subtree — obviously)
+- Special Packages with duration badges and inquiry funnels
+- A gallery with a full-screen lightbox (they came for photos; they stay for the rest)
+- Contact form → inquiries land in *my* dashboard, throttled against spam-rats
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**The War Room** (`/admin`) — what my lieutenants use:
+- Filament panel managing **everything**: pages, services, destinations, packages,
+  gallery, media library, hero slides, inquiries, site settings
+- **Role hierarchy**: `super_admin` (me — unlimited power) and `sub-admin`
+  (staff managers — content only, keys to nothing dangerous)
+- Media library with usage tracking — every image knows where it's deployed
+- URL history system — change a slug and old links get redirected automatically.
+  *Nothing escapes. Nothing breaks.*
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## ⚔️ The Arsenal
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+| Weapon | Purpose |
+|--------|---------|
+| PHP 8.5 / Laravel 13 | The skeleton |
+| Filament 3 | The war room UI |
+| MySQL 8.4 | The vault |
+| Tailwind CSS + Alpine.js | The public face's good looks |
+| Vite | Asset forge |
+| PHPUnit | 275 tests. Zero mercy. |
+
+---
+
+## 🔮 Summoning Ritual (Local Setup)
 
 ```bash
-composer require laravel/boost --dev
+# Acquire the repository
+git clone git@github.com:Raktapyas/adventure-specialist.git
+cd adventure-specialist
 
-php artisan boost:install
+# Install the dependencies (resistance is futile)
+composer install
+npm install
+
+# Forge your environment
+cp .env.example .env
+php artisan key:generate
+
+# Raise the local lair (PHP + MySQL via Sail)
+./vendor/bin/sail up -d
+./vendor/bin/sail artisan migrate --seed
+
+# Forge the assets
+npm run dev
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+The seeder imports the entire legacy empire: every page, service, destination,
+package, gallery image and media file — plus roles and an admin account from
+`ADMIN_EMAIL` / `ADMIN_PASSWORD`.
 
-## Contributing
+> ⚠️ Local artisan commands must run through Sail. `DB_HOST=mysql` only resolves
+> inside the container network. Outside it, you're shouting into the void.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🔐 The Secrets (Environment)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Every variable is documented in `.env.example`. The ones that matter most:
 
-## Security Vulnerabilities
+| Secret | Why you need it |
+|--------|-----------------|
+| `APP_KEY` | Encrypts everything worth encrypting |
+| `DB_*` | The vault connection |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Creates the first overlord on fresh soil |
+| `MAIL_*` | So password-reset ravens actually fly |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🥊 The Gauntlet (Testing)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+./vendor/bin/sail php artisan test --compact          # the full gauntlet
+./vendor/bin/sail php artisan test --compact --filter=AdminPageCrudTest
+```
+
+275 tests. 1200+ assertions. Content rules, permission matrices, URL redirects,
+media tracking, query-count regressions — all enforced. Break something and the
+gauntlet will find you.
+
+---
+
+## 🚀 Deploying the War Machine
+
+Ships as a Docker image (`Dockerfile`) with a Render blueprint (`render.yaml`):
+
+1. Provision external MySQL (Render has none — Aiven free tier works)
+2. New Web Service on Render → connect this repo → fill the `sync: false` secrets
+3. First boot: migrations run → fresh DB auto-seeds → Filament assets publish → Apache rises
+
+Health check lives at `/up`. If it's green, the machine is alive.
+
+---
+
+## 📜 Final Words
+
+*Most travel agencies have a website.*
+*This one has a fortress.*
+
+— *Adventure Specialist Travel. The mountain always wins.*
