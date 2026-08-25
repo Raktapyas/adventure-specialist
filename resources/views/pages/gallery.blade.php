@@ -6,7 +6,7 @@
     <x-hero
         title="AST Photo Gallery"
         lede="Moments from the mountains, the jungles and the valleys we call home."
-        image="/assets/images/cover-all.png" />
+        image="/assets/images/cover-all.jpg" />
 
     <section class="mx-auto max-w-[1240px] px-6 py-20 lg:py-28">
         @if ($images->isNotEmpty())

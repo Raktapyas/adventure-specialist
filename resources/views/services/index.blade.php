@@ -6,7 +6,7 @@
     <x-hero
         title="AST Services"
         lede="Culture, adventure and jungle safari packages for groups and individuals across Nepal and the Himalaya."
-        image="/assets/images/cover-all.png" />
+        image="/assets/images/cover-all.jpg" />
 
     <section class="mx-auto max-w-[1240px] px-6 py-20 lg:py-28">
         <x-section-heading
