@@ -48,6 +48,11 @@ fi
 echo ">>> Linking public storage..."
 php artisan storage:link || true
 
+# Filament v3 serves admin JS/CSS from physical files in public/ — there is
+# no fallback route. Regenerate on every boot so they always match vendor.
+echo ">>> Publishing Filament assets..."
+php artisan filament:assets
+
 # Fix ownership on the mounted persistent disk (Render mounts it as root).
 chown -R www-data:www-data storage bootstrap/cache || true
 

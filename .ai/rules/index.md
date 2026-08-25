@@ -9,6 +9,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/View/Composers/NavComposer.php | .ai/rules/composers.md |
 | config/filament-shield.php | .ai/rules/config.md |
 | phpunit.xml, docker-compose.yml | .ai/rules/general.md |
+| public/js/** | .ai/rules/js.md |
 | app/Filament/Resources/PageResource/** | .ai/rules/page-resource.md |
 | app/Filament/Resources/**/Pages/*.php | .ai/rules/pages.md |
 | app/Policies/*.php | .ai/rules/policies.md |
