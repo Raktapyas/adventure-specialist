@@ -47,38 +47,8 @@ A full-stack **Laravel + Filament** operation with two faces:
 ---
 
 
-## 🔐 The Secrets (Environment)
-
-Every variable is documented in `.env.example`. The ones that matter most:
-
-| Secret | Why you need it |
-|--------|-----------------|
-| `APP_KEY` | Encrypts everything worth encrypting |
-| `DB_*` | The vault connection |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Creates the first overlord on fresh soil |
-| `MAIL_*` | So password-reset ravens actually fly |
-
----
-
-## 🥊 The Gauntlet (Testing)
-
-```bash
-./vendor/bin/sail php artisan test --compact          # the full gauntlet
-./vendor/bin/sail php artisan test --compact --filter=AdminPageCrudTest
-```
-
-275 tests. 1200+ assertions. Content rules, permission matrices, URL redirects,
-media tracking, query-count regressions — all enforced. Break something and the
-gauntlet will find you.
-
----
 
 
-## 📜 Final Words
+## *The mountain always wins.*
 
-*Most travel agencies have a website.*
-*This one has a fortress.*
 
-— *The mountain always wins.*
-
- ...raktapyas...
