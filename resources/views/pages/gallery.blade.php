@@ -12,13 +12,28 @@
         @if ($images->isNotEmpty())
             <div class="columns-1 gap-5 sm:columns-2 lg:columns-3" data-gallery>
                 @foreach ($images as $image)
+                    @php $isVideo = $image->media?->isVideo() ?? false; @endphp
                     <figure class="group mb-5 break-inside-avoid reveal cursor-zoom-in"
                             data-lb-trigger
                             data-src="{{ $image->image_url }}"
+                            data-type="{{ $isVideo ? 'video' : 'image' }}"
                             data-caption="{{ $image->caption ?? '' }}">
                         <div class="block overflow-hidden rounded-card img-zoom">
-                            <img src="{{ $image->image_url }}" alt="{{ $image->caption ?? 'Gallery image' }}" loading="lazy"
-                                 class="w-full object-cover">
+                            @if ($isVideo)
+                                {{-- Thumbnail-style preview: silent looping clip with a play cue --}}
+                                <div class="relative">
+                                    <x-media-file :src="$image->image_url" type="video"
+                                                  class="w-full object-cover"/>
+                                    <span class="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-black/55 text-white ring-1 ring-white/40">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5" aria-hidden="true"><path d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"/></svg>
+                                        </span>
+                                    </span>
+                                </div>
+                            @else
+                                <x-media-file :src="$image->image_url" :alt="$image->caption ?? 'Gallery image'"
+                                              class="w-full object-cover"/>
+                            @endif
                         </div>
                         @if ($image->caption)
                             <figcaption class="mt-3 text-sm text-ink-faint">{{ $image->caption }}</figcaption>
@@ -39,6 +54,10 @@
         <img data-lb-frame src="" alt=""
              class="absolute rounded-lg shadow-[0_40px_120px_rgba(0,0,0,0.6)] will-change-transform"
              style="transition: none;" draggable="false">
+
+        {{-- Video viewer (fades in centered; controls + sound allowed on tap) --}}
+        <video data-lb-video src="" controls autoplay playsinline preload="metadata"
+               class="absolute hidden rounded-lg shadow-[0_40px_120px_rgba(0,0,0,0.6)] opacity-0 transition-opacity duration-300"></video>
 
         <p data-lb-caption class="absolute bottom-7 left-1/2 max-w-[80vw] -translate-x-1/2 truncate text-center text-sm text-white/75 opacity-0 transition-opacity duration-300"></p>
         <p data-lb-counter class="absolute left-1/2 top-6 -translate-x-1/2 text-xs font-semibold tracking-[0.3em] text-white/50 opacity-0 transition-opacity duration-300"></p>
@@ -68,6 +87,7 @@
         const triggers = [...grid.querySelectorAll('[data-lb-trigger]')];
         const backdrop = box.querySelector('[data-lb-backdrop]');
         const frame = box.querySelector('[data-lb-frame]');
+        const video = box.querySelector('[data-lb-video]');
         const captionEl = box.querySelector('[data-lb-caption]');
         const counterEl = box.querySelector('[data-lb-counter]');
         const uiFade = [backdrop, captionEl, counterEl, ...box.querySelectorAll('button')];
@@ -80,9 +100,10 @@
         const targetRect = () => {
             const vw = window.innerWidth * 0.92;
             const vh = window.innerHeight * 0.84;
-            const ratio = (frame.naturalWidth && frame.naturalHeight)
-                ? frame.naturalWidth / frame.naturalHeight
-                : 3 / 2;
+            const active = isVideo() ? video : frame;
+            const ratio = (active.tagName === 'VIDEO')
+                ? 16 / 9
+                : ((frame.naturalWidth && frame.naturalHeight) ? frame.naturalWidth / frame.naturalHeight : 3 / 2);
             let w = vw, h = vw / ratio;
             if (h > vh) { h = vh; w = vh * ratio; }
             return {
@@ -94,10 +115,11 @@
         };
 
         const syncFrame = (rect) => {
-            frame.style.left = rect.left + 'px';
-            frame.style.top = rect.top + 'px';
-            frame.style.width = rect.width + 'px';
-            frame.style.height = rect.height + 'px';
+            const el = isVideo() ? video : frame;
+            el.style.left = rect.left + 'px';
+            el.style.top = rect.top + 'px';
+            el.style.width = rect.width + 'px';
+            el.style.height = rect.height + 'px';
         };
 
         const fadeUi = (show) => {
@@ -107,13 +129,38 @@
             });
         };
 
+        const isVideo = () => triggers[index]?.dataset.type === 'video';
+
+        const showOnly = (el) => {
+            [frame, video].forEach((node) => {
+                const active = node === el;
+                node.classList.toggle('hidden', !active);
+                node.style.opacity = active ? '' : '0';
+            });
+        };
+
+        const stopVideo = () => {
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+        };
+
         const load = (i) => {
             index = (i + triggers.length) % triggers.length;
             const t = triggers[index];
-            frame.src = t.dataset.src;
-            frame.alt = t.dataset.caption || 'Gallery image';
             captionEl.textContent = t.dataset.caption || '';
             counterEl.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(triggers.length).padStart(2, '0');
+
+            if (t.dataset.type === 'video') {
+                frame.removeAttribute('src');
+                showOnly(video);
+                video.src = t.dataset.src;
+            } else {
+                stopVideo();
+                showOnly(frame);
+                frame.src = t.dataset.src;
+                frame.alt = t.dataset.caption || 'Gallery image';
+            }
         };
 
         const openAt = (i) => {
@@ -121,20 +168,30 @@
             load(i);
             open = true;
 
-            const thumb = triggers[index].querySelector('img');
-            const r = thumb.getBoundingClientRect();
             box.classList.remove('hidden');
+            const active = isVideo() ? video : frame;
 
-            // Start as the thumbnail…
-            frame.style.transition = 'none';
-            syncFrame({ left: r.left, top: r.top, width: r.width, height: r.height });
-            frame.style.opacity = '1';
-            void frame.offsetWidth; // reflow
+            if (!isVideo()) {
+                // Images: start as the thumbnail, then glide to full screen
+                const thumb = triggers[index].querySelector('img');
+                const r = thumb.getBoundingClientRect();
+                frame.style.transition = 'none';
+                syncFrame({ left: r.left, top: r.top, width: r.width, height: r.height });
+                frame.style.opacity = '1';
+                void frame.offsetWidth; // reflow
 
-            // …then glide to the centered full-screen box
-            if (!reduceMotion) frame.style.transition = 'left .55s cubic-bezier(0.22,1,0.36,1), top .55s cubic-bezier(0.22,1,0.36,1), width .55s cubic-bezier(0.22,1,0.36,1), height .55s cubic-bezier(0.22,1,0.36,1)';
+                if (!reduceMotion) frame.style.transition = 'left .55s cubic-bezier(0.22,1,0.36,1), top .55s cubic-bezier(0.22,1,0.36,1), width .55s cubic-bezier(0.22,1,0.36,1), height .55s cubic-bezier(0.22,1,0.36,1)';
+            } else {
+                // Videos: fade in centered at a fixed 16:9 fit
+                active.style.transition = 'none';
+                active.style.opacity = '0';
+                syncFrame(targetRect());
+                void active.offsetWidth;
+                if (!reduceMotion) active.style.transition = 'opacity .3s ease';
+                requestAnimationFrame(() => { active.style.opacity = '1'; });
+            }
+
             syncFrame(targetRect());
-
             requestAnimationFrame(() => fadeUi(true));
             document.body.style.overflow = 'hidden';
             box.querySelector('[data-lb-close]').focus({ preventScroll: true });
@@ -145,15 +202,21 @@
             open = false;
             fadeUi(false);
 
-            const thumb = triggers[index].querySelector('img');
-            const r = thumb.getBoundingClientRect();
-            frame.style.transition = reduceMotion ? 'none' : 'left .45s cubic-bezier(0.22,1,0.36,1), top .45s cubic-bezier(0.22,1,0.36,1), width .45s cubic-bezier(0.22,1,0.36,1), height .45s cubic-bezier(0.22,1,0.36,1), opacity .3s ease';
-            syncFrame({ left: r.left, top: r.top, width: r.width, height: r.height });
+            if (!isVideo()) {
+                const thumb = triggers[index].querySelector('img');
+                const r = thumb.getBoundingClientRect();
+                frame.style.transition = reduceMotion ? 'none' : 'left .45s cubic-bezier(0.22,1,0.36,1), top .45s cubic-bezier(0.22,1,0.36,1), width .45s cubic-bezier(0.22,1,0.36,1), height .45s cubic-bezier(0.22,1,0.36,1), opacity .3s ease';
+                syncFrame({ left: r.left, top: r.top, width: r.width, height: r.height });
+            } else {
+                video.style.transition = reduceMotion ? 'none' : 'opacity .3s ease';
+                video.style.opacity = '0';
+            }
 
             setTimeout(() => {
                 if (open) return;
                 box.classList.add('hidden');
                 frame.style.transition = 'none';
+                stopVideo();
                 document.body.style.overflow = '';
                 if (lastFocus) lastFocus.focus({ preventScroll: true });
             }, reduceMotion ? 0 : 460);
@@ -161,11 +224,18 @@
 
         const step = (dir) => {
             if (!open) return;
-            frame.style.opacity = '0';
+            const active = isVideo() ? video : frame;
+            active.style.opacity = '0';
             setTimeout(() => {
                 load(index + dir);
-                const ready = () => { syncFrame(targetRect()); frame.style.opacity = '1'; };
-                frame.complete ? ready() : frame.addEventListener('load', ready, { once: true });
+                const next = isVideo() ? video : frame;
+                if (isVideo()) {
+                    syncFrame(targetRect());
+                    next.style.opacity = '1';
+                } else {
+                    const ready = () => { syncFrame(targetRect()); next.style.opacity = '1'; };
+                    frame.complete ? ready() : frame.addEventListener('load', ready, { once: true });
+                }
             }, 140);
         };
 

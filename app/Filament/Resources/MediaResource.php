@@ -27,19 +27,18 @@ class MediaResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\Layout\Stack::make([
-                    Tables\Columns\ImageColumn::make('url')
-                        ->size('100%')
-                        ->square()
-                        ->getStateUsing(fn (Media $record) => filled($record->url()) ? url($record->url()) : null)
-                        ->defaultImageUrl(url('/images/placeholder.png')),
+                    Tables\Columns\ViewColumn::make('thumbnail')
+                        ->view('filament.tables.columns.media-thumb'),
                     Tables\Columns\TextColumn::make('name')
-                        ->searchable()
+                        ->searchable(['name', 'path'])
                         ->weight('bold')
                         ->description(fn (Media $record): string => $record->humanSize()),
                 ]),
             ])
             ->contentGrid(['md' => 3, 'xl' => 4])
             ->filters([
+                Tables\Filters\SelectFilter::make('type')
+                    ->options(['image' => 'Images', 'video' => 'Videos']),
                 Tables\Filters\SelectFilter::make('extension')
                     ->options(collect(config('media.allowed_extensions'))->mapWithKeys(fn ($e) => [$e => strtoupper($e)])->all()),
                 Tables\Filters\TernaryFilter::make('is_legacy')
@@ -48,6 +47,15 @@ class MediaResource extends Resource
                     ->falseLabel('Uploaded'),
             ])
             ->actions([
+                Tables\Actions\Action::make('preview')
+                    ->label('Preview')
+                    ->icon('heroicon-m-eye')
+                    ->color('gray')
+                    ->visible(fn (Media $record): bool => auth()->user()->can('view', $record))
+                    ->modalHeading(fn (Media $record): string => $record->name)
+                    ->modalContent(fn (Media $record) => view('filament.tables.media-preview', ['media' => $record]))
+                    ->modalSubmitAction(false)
+                    ->modalWidth('5xl'),
                 Tables\Actions\Action::make('delete')
                     ->label('Delete')
                     ->icon('heroicon-m-trash')
@@ -69,7 +77,7 @@ class MediaResource extends Resource
                                 Notification::make()
                                     ->danger()
                                     ->title('Cannot delete')
-                                    ->body('This image is in use by '.$record->usages->count().' item(s)'.($labels !== [] ? ': '.implode(', ', $labels) : '').'. Reassign or remove those references first, or force-delete.')
+                                    ->body('This file is in use by '.$record->usages->count().' item(s)'.($labels !== [] ? ': '.implode(', ', $labels) : '').'. Reassign or remove those references first, or force-delete.')
                                     ->send();
 
                                 return;

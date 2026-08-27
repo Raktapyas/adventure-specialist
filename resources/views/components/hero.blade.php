@@ -143,16 +143,25 @@
                 aria-hidden="{{ $i === 0 ? 'false' : 'true' }}"
                 :aria-hidden="(index === {{ $i }}).toString()"
             >
-                {{-- Layered background: Ken Burns image + scrims + vignette --}}
+                {{-- Layered background: Ken Burns media + scrims + vignette --}}
                 <div class="absolute inset-0 overflow-hidden">
-                    <div class="absolute inset-0 will-change-transform" :style="parallaxStyle({{ $i }})">
-                        <img
-                            src="{{ $slide['image'] }}"
-                            alt=""
-                            class="hero-img h-full w-full object-cover brightness-[1.08] saturate-[0.95] {{ $slide['kenburns'] ?? 'animate-hero-zoom-in' }}"
-                            loading="eager"
-                            referrerpolicy="no-referrer"
-                        >
+                    <div class="absolute inset-0 will-change-transform {{ $slide['kenburns'] ?? 'animate-hero-zoom-in' }}" :style="parallaxStyle({{ $i }})">
+                        @if (($slide['type'] ?? 'image') === 'video')
+                            <video
+                                src="{{ $slide['image'] }}"
+                                class="h-full w-full object-cover brightness-[1.08] saturate-[0.95]"
+                                autoplay muted loop playsinline preload="auto"
+                                referrerpolicy="no-referrer"
+                            ></video>
+                        @else
+                            <img
+                                src="{{ $slide['image'] }}"
+                                alt=""
+                                class="hero-img h-full w-full object-cover brightness-[1.08] saturate-[0.95]"
+                                loading="eager"
+                                referrerpolicy="no-referrer"
+                            >
+                        @endif
                     </div>
                     <div class="absolute inset-0 bg-gradient-to-t from-pine-deep/95 via-pine-deep/30 to-pine-deep/10"></div>
                     <div class="absolute inset-0 bg-gradient-to-r from-pine-deep/60 via-pine-deep/15 to-transparent"></div>

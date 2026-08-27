@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\MediaPicker;
 use App\Filament\Resources\HeroSlideResource\Pages;
 use App\Models\HeroSlide;
-use App\Models\Media;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -32,37 +32,9 @@ class HeroSlideResource extends Resource
                 Forms\Components\Section::make('Slide')
                     ->columns(2)
                     ->schema([
-                        Select::make('image_path')
-                            ->label('Image (from Media Library)')
-                            ->searchable()
-                            ->preload()
-                            ->allowHtml()
-                            ->columnSpan(2)
-                            ->getSearchResultsUsing(function (string $search): array {
-                                return Media::query()
-                                    ->where('name', 'like', "%{$search}%")
-                                    ->limit(20)
-                                    ->get()
-                                    ->mapWithKeys(fn (Media $media): array => [
-                                        $media->path => self::mediaOptionLabel($media),
-                                    ])
-                                    ->all();
-                            })
-                            ->getOptionLabelUsing(function ($value): ?string {
-                                $media = Media::where('path', $value)->first();
-
-                                return $media ? self::mediaOptionLabel($media) : e($value);
-                            })
+                        MediaPicker::make('image_path', 'Image or video (from Media Library)')
                             ->required()
-                            // Validation state is a plain string here; normalize to a host-relative path.
-                            ->mutateStateForValidationUsing(fn ($state): ?string => Media::normalizePath($state))
-                            ->rules([
-                                'string',
-                                'max:255',
-                                'starts_with:/',
-                                'not_regex:/\/\//',
-                                'not_regex:/\.\./',
-                            ]),
+                            ->columnSpan(2),
                         TextInput::make('eyebrow')
                             ->label('Eyebrow')
                             ->maxLength(80)
@@ -113,9 +85,14 @@ class HeroSlideResource extends Resource
                             ])
                             ->default('animate-hero-zoom-in'),
                         TextInput::make('sort_order')
+                            ->label('Sort order')
                             ->numeric()
-                            ->default(0)
-                            ->label('Sort order'),
+                            ->integer()
+                            ->minValue(0)
+                            ->nullable()
+                            ->placeholder('Auto — next available')
+                            ->helperText('Leave blank to auto-assign next position.')
+                            ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
                         Toggle::make('is_published')
                             ->label('Published')
                             ->default(true),
@@ -127,10 +104,9 @@ class HeroSlideResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image_path')
-                    ->label('Image')
-                    ->getStateUsing(fn (HeroSlide $record): ?string => filled($record->image_path) ? url($record->image_path) : null)
-                    ->square(),
+                Tables\Columns\ViewColumn::make('thumbnail')
+                    ->label('Media')
+                    ->view('filament.tables.columns.media-thumb', ['sizeClass' => 'h-11 w-11']),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
@@ -154,6 +130,7 @@ class HeroSlideResource extends Resource
             ])
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
+            ->modifyQueryUsing(fn ($query) => $query->with('media'))
             ->filters([
                 //
             ])
@@ -182,15 +159,5 @@ class HeroSlideResource extends Resource
             'create' => Pages\CreateHeroSlide::route('/create'),
             'edit' => Pages\EditHeroSlide::route('/{record}/edit'),
         ];
-    }
-
-    private static function mediaOptionLabel(Media $media): string
-    {
-        $url = filled($media->url()) ? url($media->url()) : url('/images/placeholder.png');
-
-        return '<div class="flex items-center gap-3">'
-            .'<img src="'.e($url).'" alt="'.e($media->name).'" class="h-10 w-10 rounded object-cover">'
-            .'<span>'.e($media->name).'</span>'
-            .'</div>';
     }
 }

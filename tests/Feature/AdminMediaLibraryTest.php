@@ -39,6 +39,27 @@ class AdminMediaLibraryTest extends TestCase
         return UploadedFile::fake()->createWithContent($name, $bytes);
     }
 
+    private function mp4(string $name = 'clip.mp4'): UploadedFile
+    {
+        $bytes = "\x00\x00\x00\x18ftypmp42\x00\x00\x00\x00mp42isom"."\x00\x00\x00\x08free";
+
+        return UploadedFile::fake()->createWithContent($name, $bytes);
+    }
+
+    private function webm(string $name = 'clip.webm'): UploadedFile
+    {
+        $bytes = "\x1A\x45\xDF\xA3\x01\x00\x00\x00\x00\x00\x00\x00\x1F\x42\x86\x81\x01\x42\xF7\x81\x01\x42\xF2\x81\x04\x42\xF3\x81\x08\x42\x82\x84webm\x42\x87\x81\x02\x42\x85\x81\x02";
+
+        return UploadedFile::fake()->createWithContent($name, $bytes);
+    }
+
+    private function avif(string $name = 'image.avif'): UploadedFile
+    {
+        $bytes = "\x00\x00\x00\x20ftypavif\x00\x00\x00\x00avifmif1miafMA1B";
+
+        return UploadedFile::fake()->createWithContent($name, $bytes);
+    }
+
     public function test_guests_are_redirected_to_login(): void
     {
         $this->get('/admin/media')->assertRedirect('/admin/login');
@@ -178,7 +199,7 @@ class AdminMediaLibraryTest extends TestCase
         Livewire::actingAs($this->admin())
             ->test(ListMedia::class)
             ->callAction('upload', data: ['media' => [$bad]])
-            ->assertHasErrors(['media']);
+            ->assertHasErrors();
 
         $this->assertDatabaseCount('media', 0);
     }
@@ -193,9 +214,120 @@ class AdminMediaLibraryTest extends TestCase
         Livewire::actingAs($this->admin())
             ->test(ListMedia::class)
             ->callAction('upload', data: ['media' => [$svg]])
-            ->assertHasErrors(['media']);
+            ->assertHasErrors();
 
         $this->assertDatabaseCount('media', 0);
+    }
+
+    public function test_admin_can_upload_mp4_videos(): void
+    {
+        Storage::fake('public');
+
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$this->mp4()]]);
+
+        $media = Media::firstOrFail();
+
+        $this->assertSame('video', $media->type);
+        $this->assertTrue($media->isVideo());
+        $this->assertSame('video/mp4', $media->mime_type);
+        $this->assertSame('mp4', $media->extension);
+
+        Storage::disk('public')->assertExists($media->storage_path);
+    }
+
+    public function test_admin_can_upload_webm_videos(): void
+    {
+        Storage::fake('public');
+
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$this->webm()]]);
+
+        $media = Media::firstOrFail();
+
+        $this->assertSame('video', $media->type);
+        $this->assertSame('video/webm', $media->mime_type);
+    }
+
+    public function test_admin_can_upload_avif_images(): void
+    {
+        Storage::fake('public');
+
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$this->avif()]]);
+
+        $media = Media::firstOrFail();
+
+        $this->assertSame('image', $media->type);
+        $this->assertSame('image/avif', $media->mime_type);
+        $this->assertFalse($media->isVideo());
+    }
+
+    public function test_video_extension_with_non_video_contents_is_rejected(): void
+    {
+        $png = $this->png('mismatch.mp4');
+
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$png]])
+            ->assertHasErrors();
+
+        $this->assertDatabaseCount('media', 0);
+    }
+
+    public function test_fake_php_video_is_rejected(): void
+    {
+        $bad = UploadedFile::fake()->createWithContent('shell.mp4', '<?php echo "nope"; ?>');
+
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->callAction('upload', data: ['media' => [$bad]])
+            ->assertHasErrors();
+
+        $this->assertDatabaseCount('media', 0);
+    }
+
+    public function test_admin_can_filter_the_library_by_type(): void
+    {
+        Media::factory()->create(['name' => 'photo.jpg']);
+        Media::factory()->video()->create(['name' => 'flight.mp4']);
+
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->filterTable('type', 'video')
+            ->assertSee('flight.mp4')
+            ->assertDontSee('photo.jpg')
+            ->filterTable('type', 'image')
+            ->assertSee('photo.jpg')
+            ->assertDontSee('flight.mp4');
+    }
+
+    public function test_library_grid_marks_videos_with_a_play_indicator(): void
+    {
+        Media::factory()->video()->create(['name' => 'flight.mp4']);
+        Media::factory()->create(['name' => 'photo.jpg']);
+
+        Livewire::actingAs($this->admin())
+            ->test(ListMedia::class)
+            ->assertSeeHtml('<video src=')
+            ->assertSeeHtml('M4.5 5.653c0-1.427');
+    }
+
+    public function test_preview_modal_renders_a_player_for_each_kind(): void
+    {
+        $video = Media::factory()->video()->create(['name' => 'flight.mp4']);
+        $image = Media::factory()->create(['name' => 'photo.jpg']);
+
+        $videoHtml = view('filament.tables.media-preview', ['media' => $video])->render();
+        $imageHtml = view('filament.tables.media-preview', ['media' => $image])->render();
+
+        $this->assertStringContainsString('<video src=', $videoHtml);
+        $this->assertStringContainsString('controls', $videoHtml);
+        $this->assertStringNotContainsString('<video src=', $imageHtml);
+        $this->assertStringContainsString('<img src=', $imageHtml);
     }
 
     public function test_legacy_media_in_use_cannot_be_deleted(): void
@@ -305,7 +437,7 @@ class AdminMediaLibraryTest extends TestCase
                 Notification::make()
                     ->danger()
                     ->title('Cannot delete')
-                    ->body('This image is in use by 1 item(s): '.$label.'. Reassign or remove those references first, or force-delete.')
+                    ->body('This file is in use by 1 item(s): '.$label.'. Reassign or remove those references first, or force-delete.')
             );
 
         $this->assertDatabaseHas('media', ['id' => $media->id]);

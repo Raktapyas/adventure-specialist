@@ -71,21 +71,40 @@ class MediaUploadLimitRegressionTest extends TestCase
     }
 
     /**
-     * The app's declared upload contract must stay at 5 MB and the documented
-     * server requirement must not be lowered below it. This guards against
-     * "fixing" the INI-limit regression by weakening application validation.
+     * The app's declared upload contracts must stay at 5 MB for images and
+     * 50 MB for videos, and the documented server requirement must not be
+     * lowered below them. This guards against "fixing" the INI-limit
+     * regression by weakening application validation.
      */
     public function test_application_upload_limit_contract_is_preserved(): void
     {
-        $this->assertSame(5 * 1024 * 1024, config('media.max_upload_bytes'));
+        $this->assertSame(5 * 1024 * 1024, config('media.max_image_bytes'));
+        $this->assertSame(50 * 1024 * 1024, config('media.max_video_bytes'));
 
-        $file = UploadedFile::fake()->create('big.png', 6000); // ~5.86 MB
+        // A VALID image past the cap must reach the size check (not be
+        // rejected earlier by the MIME sniff) and report the 5 MB contract.
+        $file = UploadedFile::fake()->createWithContent('big.png', $this->paddedPng(6 * 1024 * 1024));
 
         try {
             app(MediaUploader::class)->store($file, null);
             $this->fail('Expected ValidationException for an oversized file.');
         } catch (ValidationException $e) {
             $this->assertSame(['The file must not exceed 5 MB.'], $e->errors()['media']);
+        }
+    }
+
+    public function test_oversized_video_is_rejected_at_the_video_cap(): void
+    {
+        config()->set('media.max_video_bytes', 2 * 1024 * 1024);
+
+        $mp4 = "\x00\x00\x00\x18ftypmp42\x00\x00\x00\x00mp42isom"."\x00\x00\x00\x08free";
+        $file = UploadedFile::fake()->createWithContent('clip.mp4', $mp4.str_repeat('x', 3 * 1024 * 1024));
+
+        try {
+            app(MediaUploader::class)->store($file, null);
+            $this->fail('Expected ValidationException for an oversized video.');
+        } catch (ValidationException $e) {
+            $this->assertSame(['The file must not exceed 2 MB.'], $e->errors()['media']);
         }
     }
 

@@ -19,6 +19,7 @@ class HomeController extends Controller
             'heroSlides' => HeroSlide::published()
                 ->orderBy('sort_order')
                 ->orderBy('id')
+                ->with('media')
                 ->get()
                 ->map(fn (HeroSlide $slide): array => $slide->toSlide())
                 ->values()
@@ -28,7 +29,7 @@ class HomeController extends Controller
                 ->with(['children' => fn ($q) => $q->published()])
                 ->orderBy('sort_order')->orderBy('title')->get(),
             'packages' => Package::published()->orderBy('sort_order')->orderBy('title')->limit(4)->get(),
-            'galleryImages' => GalleryImage::orderBy('sort_order')->orderBy('id')->limit(6)->get(),
+            'galleryImages' => GalleryImage::orderBy('sort_order')->orderBy('id')->with('media')->limit(6)->get(),
             'stats' => $settings->statsRows(),
             'cta' => $settings->ctaBlock(),
         ]);

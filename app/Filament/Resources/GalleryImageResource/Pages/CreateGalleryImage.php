@@ -2,13 +2,17 @@
 
 namespace App\Filament\Resources\GalleryImageResource\Pages;
 
+use App\Filament\Resources\Concerns\AutoAssignsSortOrder;
 use App\Filament\Resources\GalleryImageResource;
+use App\Models\GalleryImage;
 use App\Models\Media;
 use App\Services\MediaUsageService;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateGalleryImage extends CreateRecord
 {
+    use AutoAssignsSortOrder;
+
     protected static string $resource = GalleryImageResource::class;
 
     protected function getRedirectUrl(): string
@@ -23,6 +27,7 @@ class CreateGalleryImage extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['image_url'] = Media::normalizePath($data['image_url'] ?? null);
+        $data = $this->assignSortOrder($data, GalleryImage::class);
 
         return $data;
     }

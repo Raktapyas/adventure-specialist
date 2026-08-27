@@ -43,4 +43,16 @@ class MediaFactory extends Factory
             'created_by' => null,
         ]);
     }
+
+    public function video(): static
+    {
+        $name = fake()->slug(2).'.mp4';
+
+        return $this->state(fn () => [
+            'name' => $name,
+            'path' => '/assets/images/'.$name,
+            'mime_type' => 'video/mp4',
+            'extension' => 'mp4',
+        ]);
+    }
 }

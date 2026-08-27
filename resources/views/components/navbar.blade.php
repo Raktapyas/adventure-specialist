@@ -80,7 +80,7 @@
                 {{-- AST Services --}}
                 <div class="relative" @mouseenter="services = true" @mouseleave="services = false">
                     <a href="/ast-services/" class="nav-link flex items-center gap-1" :class="activeServices ? (scrolled ? 'text-royal' : 'text-royal-bright') : ''">
-                        AST Services
+                        Services
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 transition-transform" :class="services ? 'rotate-180' : ''"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" /></svg>
                     </a>
                     <div x-show="services" x-cloak x-transition:enter="transition ease-out duration-200"
@@ -117,7 +117,7 @@
                 </div>
 
                 <a href="/gallery/" class="nav-link" :class="activeGallery ? (scrolled ? 'text-royal' : 'text-royal-bright') : ''">Gallery</a>
-                <a href="/contact/" class="nav-link" :class="activeContact ? (scrolled ? 'text-royal' : 'text-royal-bright') : ''">Contact Us</a>
+                <a href="/contact/" class="nav-link" :class="activeContact ? (scrolled ? 'text-royal' : 'text-royal-bright') : ''">Contact</a>
 
                 <a href="/contact/#enquiry" class="btn btn-royal px-5! py-2.5! text-xs uppercase tracking-wider">
                     Plan a Trip
@@ -146,10 +146,10 @@
                     <a href="{{ $child->getPath() }}" class="block rounded py-2 pl-7 pr-3 text-sm text-ink-soft hover:bg-paper-soft hover:text-royal">{{ $child->title }}</a>
                 @endforeach
             @endforeach
-            <a href="/ast-services/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">AST Services</a>
+            <a href="/ast-services/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">Services</a>
             <a href="/destination/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">Destination</a>
             <a href="/gallery/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">Gallery</a>
-            <a href="/contact/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">Contact Us</a>
+            <a href="/contact/" class="block rounded px-3 py-2.5 text-base text-ink hover:bg-paper-soft hover:text-royal">Contact</a>
             <div class="border-t border-line pt-4">
                 <p class="px-3 text-xs font-semibold uppercase tracking-wider text-ink-faint">Contact</p>
                 <a href="tel:+97715173283" class="mt-1 block rounded px-3 py-2 text-sm text-ink-soft hover:text-royal">+977 1 5173283</a>

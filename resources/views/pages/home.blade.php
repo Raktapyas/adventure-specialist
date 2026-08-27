@@ -315,10 +315,14 @@
                 </div>
                 {{-- Living gallery — Manthey-inspired fluid container-query grid: hovered expands, pushes neighbors, inactive dim/desaturate --}}
                 @php
+                    $isVideoItem = fn ($image) => $image->media?->isVideo() ?? false;
+                    // Pad empty tiles with an IMAGE when possible so autoplaying
+                    // clips are never duplicated across the grid.
+                    $padSource = $galleryImages->first(fn ($g) => ! $isVideoItem($g)) ?? $galleryImages->first();
                     $fluidImages = $galleryImages->take(6)->values();
-                    while ($fluidImages->count() < 6) { $fluidImages->push($galleryImages->first()); }
+                    while ($fluidImages->count() < 6) { $fluidImages->push($padSource); }
                     $fluidCols = $fluidImages->chunk(2);
-                    while ($fluidCols->count() < 3) { $fluidCols->push(collect([$galleryImages->first(), $galleryImages->first()])); }
+                    while ($fluidCols->count() < 3) { $fluidCols->push(collect([$padSource, $padSource])); }
                 @endphp
                 <div class="mt-14 w-full [container-type:inline-size]">
                     <div class="group/gallery relative grid h-[78vmin] max-h-[560px] min-h-[380px] w-full gap-3 transition-all duration-500 ease-in-out md:grid-cols-[1fr_1fr_1fr] has-[>div:nth-child(1):hover]:md:grid-cols-[4fr_1fr_1fr] has-[>div:nth-child(2):hover]:md:grid-cols-[1fr_4fr_1fr] has-[>div:nth-child(3):hover]:md:grid-cols-[1fr_1fr_4fr] before:pointer-events-none before:absolute before:inset-0 before:rounded-card before:bg-white/0 before:blur-[60px] hover:before:bg-white/[0.04] before:transition-all before:duration-500 before:ease-in-out lg:gap-4">
@@ -327,8 +331,11 @@
                                 @foreach ($col->take(2) as $image)
                                     <article class="group/item relative overflow-hidden rounded-card cursor-pointer shadow-card reveal" style="transition-delay: {{ $loop->parent->index * 80 + $loop->index * 40 }}ms">
                                         <a href="/gallery/" class="absolute inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-royal focus-visible:ring-offset-2" aria-label="View gallery">
-                                            <img src="{{ $image->image_url }}" alt="{{ $image->caption ?? 'Gallery image' }}" loading="lazy"
-                                                 class="h-full w-full object-cover transition-all duration-500 ease-in-out blur-0 group-hover/gallery:blur-[0.5px] group-hover/gallery:hover:blur-0 brightness-100 group-hover/gallery:brightness-[0.72] group-hover/gallery:hover:brightness-100 contrast-100 group-hover/gallery:contrast-[1.15] group-hover/gallery:hover:contrast-100 saturate-[0.85] group-hover/gallery:saturate-0 group-hover/gallery:hover:saturate-100 scale-100 group-hover/gallery:scale-[0.98] group-hover/gallery:hover:scale-[1.12] will-change-transform">
+                                            <x-media-file
+                                                :src="$image->image_url"
+                                                :type="$isVideoItem($image) ? 'video' : 'image'"
+                                                :alt="$image->caption ?? 'Gallery image'"
+                                                class="h-full w-full object-cover transition-all duration-500 ease-in-out blur-0 group-hover/gallery:blur-[0.5px] group-hover/gallery:hover:blur-0 brightness-100 group-hover/gallery:brightness-[0.72] group-hover/gallery:hover:brightness-100 contrast-100 group-hover/gallery:contrast-[1.15] group-hover/gallery:hover:contrast-100 saturate-[0.85] group-hover/gallery:saturate-0 group-hover/gallery:hover:saturate-100 scale-100 group-hover/gallery:scale-[0.98] group-hover/gallery:hover:scale-[1.12] will-change-transform"/>
                                         </a>
                                     </article>
                                 @endforeach

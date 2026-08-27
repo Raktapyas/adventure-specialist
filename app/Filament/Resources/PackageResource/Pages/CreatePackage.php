@@ -2,13 +2,16 @@
 
 namespace App\Filament\Resources\PackageResource\Pages;
 
+use App\Filament\Resources\Concerns\AutoAssignsSortOrder;
 use App\Filament\Resources\Concerns\NormalizesCoverImage;
 use App\Filament\Resources\PackageResource;
+use App\Models\Package;
 use App\Services\MediaUsageService;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePackage extends CreateRecord
 {
+    use AutoAssignsSortOrder;
     use NormalizesCoverImage;
 
     protected static string $resource = PackageResource::class;
@@ -25,6 +28,7 @@ class CreatePackage extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['cover_image'] = $this->normalizeCoverImage($data['cover_image'] ?? null);
+        $data = $this->assignSortOrder($data, Package::class);
 
         return $data;
     }

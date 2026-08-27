@@ -9,7 +9,7 @@ class GalleryController extends Controller
     public function __invoke()
     {
         return view('pages.gallery', [
-            'images' => GalleryImage::orderBy('sort_order')->orderBy('id')->get(),
+            'images' => GalleryImage::orderBy('sort_order')->orderBy('id')->with('media')->get(),
         ]);
     }
 }

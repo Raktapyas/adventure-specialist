@@ -22,12 +22,22 @@ class MediaUploader
         'image/png' => ['png'],
         'image/webp' => ['webp'],
         'image/gif' => ['gif'],
+        'image/avif' => ['avif'],
+        'video/mp4' => ['mp4'],
+        'video/webm' => ['webm'],
     ];
+
+    /**
+     * Image formats getimagesize() can measure. AVIF and every video kind are
+     * gated by finfo alone (libgd cannot decode them), so they skip the
+     * dimension probe instead of being wrongly rejected.
+     */
+    private const DIMENSION_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
     private static ?\finfo $finfo = null;
 
     /**
-     * Validate and persist a single uploaded image.
+     * Validate and persist a single uploaded image or video.
      *
      * @throws ValidationException
      * @throws RuntimeException
@@ -50,6 +60,7 @@ class MediaUploader
                 'disk' => $disk,
                 'storage_path' => $storagePath,
                 'mime_type' => $safe['mime_type'],
+                'type' => $safe['type'],
                 'extension' => $safe['extension'],
                 'size' => $file->getSize(),
                 'alt_text' => $altText,
@@ -78,9 +89,10 @@ class MediaUploader
 
     /**
      * Reject path traversal / control characters and verify that the uploaded
-     * bytes really are an allowed image whose extension matches its contents.
+     * bytes really are an allowed image or video whose extension matches its
+     * contents.
      *
-     * @return array{extension: string, mime_type: string}
+     * @return array{extension: string, mime_type: string, type: string}
      *
      * @throws ValidationException
      */
@@ -90,7 +102,6 @@ class MediaUploader
         $extension = strtolower($file->getClientOriginalExtension());
         $allowedExtensions = config('media.allowed_extensions');
         $allowedMimes = config('media.allowed_mimes');
-        $maxBytes = config('media.max_upload_bytes');
 
         if ($name === '' || str_contains($name, '/') || str_contains($name, '..') || str_contains($name, "\0")) {
             $this->fail('The filename is not allowed.');
@@ -98,10 +109,6 @@ class MediaUploader
 
         if (! in_array($extension, $allowedExtensions, true)) {
             $this->fail('The file extension is not allowed.');
-        }
-
-        if ($file->getSize() > $maxBytes) {
-            $this->fail('The file must not exceed '.round($maxBytes / 1048576).' MB.');
         }
 
         $path = $file->getRealPath();
@@ -112,14 +119,27 @@ class MediaUploader
 
         $sniffedMime = (self::$finfo ??= new \finfo(FILEINFO_MIME_TYPE))->file($path);
 
+        // Some fileinfo builds report generic MP4 as application/mp4; it is
+        // the same container, so normalize to the canonical video type.
+        $sniffedMime = $sniffedMime === 'application/mp4' ? 'video/mp4' : $sniffedMime;
+
         if (! in_array($sniffedMime, $allowedMimes, true)) {
-            $this->fail('The file must be an image ('.implode(', ', $allowedExtensions).').');
+            $this->fail('The file must be an image or a video ('.implode(', ', $allowedExtensions).').');
         }
 
-        $size = @getimagesize($path);
+        $kind = str_starts_with((string) $sniffedMime, 'video/') ? 'video' : 'image';
+        $maxBytes = (int) config("media.max_{$kind}_bytes", config('media.max_upload_bytes', 5 * 1024 * 1024));
 
-        if ($size === false || $size[0] <= 0 || $size[1] <= 0) {
-            $this->fail('The file is not a valid image.');
+        if ($file->getSize() > $maxBytes) {
+            $this->fail('The file must not exceed '.round($maxBytes / 1048576).' MB.');
+        }
+
+        if (in_array($sniffedMime, self::DIMENSION_MIMES, true)) {
+            $size = @getimagesize($path);
+
+            if ($size === false || $size[0] <= 0 || $size[1] <= 0) {
+                $this->fail('The file is not a valid image.');
+            }
         }
 
         $mimeExtensions = self::MIME_EXTENSIONS[$sniffedMime] ?? null;
@@ -128,7 +148,7 @@ class MediaUploader
             $this->fail('The file extension does not match its contents.');
         }
 
-        return ['extension' => $extension, 'mime_type' => $sniffedMime];
+        return ['extension' => $extension, 'mime_type' => $sniffedMime, 'type' => $kind];
     }
 
     /**

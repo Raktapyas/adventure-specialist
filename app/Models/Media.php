@@ -19,6 +19,7 @@ class Media extends Model
         'disk',
         'storage_path',
         'mime_type',
+        'type',
         'extension',
         'size',
         'alt_text',
@@ -32,6 +33,15 @@ class Media extends Model
             'size' => 'integer',
             'is_legacy' => 'boolean',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // Derive the kind from the sniffed MIME type whenever it is not given,
+        // so uploads, factories, seeders and imports all stay consistent.
+        static::creating(function (self $media): void {
+            $media->type ??= str_starts_with((string) $media->mime_type, 'video/') ? 'video' : 'image';
+        });
     }
 
     public function uploader(): BelongsTo
@@ -59,6 +69,26 @@ class Media extends Model
             $q->where('name', 'like', "%{$search}%")
                 ->orWhere('path', 'like', "%{$search}%");
         });
+    }
+
+    /**
+     * Filter by kind: "image" or "video".
+     */
+    public function scopeOfType(Builder $query, ?string $type): Builder
+    {
+        return in_array($type, ['image', 'video'], true)
+            ? $query->where('type', $type)
+            : $query;
+    }
+
+    public function isVideo(): bool
+    {
+        return $this->type === 'video';
+    }
+
+    public function isImage(): bool
+    {
+        return ! $this->isVideo();
     }
 
     /**

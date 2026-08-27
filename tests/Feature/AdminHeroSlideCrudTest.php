@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Filament\Resources\HeroSlideResource\Pages\CreateHeroSlide;
 use App\Filament\Resources\HeroSlideResource\Pages\EditHeroSlide;
 use App\Models\HeroSlide;
+use App\Models\Media;
 use App\Models\User;
+use App\Services\MediaUsageService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -112,5 +114,103 @@ class AdminHeroSlideCrudTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertDontSee('Hidden slide');
+    }
+
+    public function test_creating_a_slide_links_the_media_usage(): void
+    {
+        $media = Media::factory()->create(['path' => '/assets/images/banners/1.jpg']);
+
+        Livewire::actingAs($this->admin())
+            ->test(CreateHeroSlide::class)
+            ->fillForm([
+                'image_path' => '/assets/images/banners/1.jpg',
+                'title' => 'Usage slide',
+            ])
+            ->call('create')
+            ->assertHasNoErrors();
+
+        $slide = HeroSlide::where('title', 'Usage slide')->firstOrFail();
+
+        $this->assertDatabaseHas('media_usages', [
+            'media_id' => $media->id,
+            'model_type' => $slide->getMorphClass(),
+            'model_id' => $slide->id,
+            'field' => 'image_path',
+        ]);
+    }
+
+    public function test_editing_a_slide_relinks_the_media_usage(): void
+    {
+        $old = Media::factory()->create(['path' => '/assets/images/banners/1.jpg']);
+        $new = Media::factory()->create(['path' => '/assets/images/banners/2.jpg']);
+        $slide = HeroSlide::factory()->create(['image_path' => '/assets/images/banners/1.jpg']);
+
+        app(MediaUsageService::class)->sync($slide, 'image_path', $slide->image_path);
+
+        Livewire::actingAs($this->admin())
+            ->test(EditHeroSlide::class, ['record' => $slide->getKey()])
+            ->fillForm(['image_path' => '/assets/images/banners/2.jpg'])
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseMissing('media_usages', ['media_id' => $old->id, 'model_id' => $slide->id]);
+        $this->assertDatabaseHas('media_usages', [
+            'media_id' => $new->id,
+            'model_type' => $slide->getMorphClass(),
+            'model_id' => $slide->id,
+            'field' => 'image_path',
+        ]);
+    }
+
+    public function test_deleting_a_slide_purges_the_media_usage(): void
+    {
+        $media = Media::factory()->create();
+        $slide = HeroSlide::factory()->create(['image_path' => $media->path]);
+
+        app(MediaUsageService::class)->sync($slide, 'image_path', $slide->image_path);
+
+        Livewire::actingAs($this->admin())
+            ->test(EditHeroSlide::class, ['record' => $slide->getKey()])
+            ->callAction('delete');
+
+        $this->assertDatabaseMissing('hero_slides', ['id' => $slide->id]);
+        $this->assertDatabaseMissing('media_usages', [
+            'media_id' => $media->id,
+            'model_id' => $slide->id,
+        ]);
+    }
+
+    public function test_slides_can_reference_videos_from_the_library(): void
+    {
+        Media::factory()->video()->create(['path' => '/assets/images/flight.mp4']);
+
+        Livewire::actingAs($this->admin())
+            ->test(CreateHeroSlide::class)
+            ->fillForm([
+                'image_path' => '/assets/images/flight.mp4',
+                'title' => 'Video slide',
+            ])
+            ->call('create')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('hero_slides', [
+            'title' => 'Video slide',
+            'image_path' => '/assets/images/flight.mp4',
+        ]);
+    }
+
+    public function test_homepage_renders_video_slides_as_video_elements(): void
+    {
+        Media::factory()->video()->create(['path' => '/assets/images/flight.mp4']);
+        HeroSlide::factory()->create(['image_path' => '/assets/images/flight.mp4', 'title' => 'Video slide']);
+
+        $home = $this->get('/');
+        $content = $home->getContent();
+
+        $home->assertOk()
+            ->assertSee('Video slide')
+            ->assertSee('<video', false);
+
+        $this->assertStringContainsString('autoplay muted loop playsinline', $content);
     }
 }

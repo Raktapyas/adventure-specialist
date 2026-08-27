@@ -10,24 +10,36 @@ return [
     | The MIME and extension allowlists are checked server-side against the
     | sniffed file contents (finfo), never against the client-declared type.
     | SVG is intentionally excluded because untrusted SVG can execute script
-    | when served inline.
+    | when served inline. Videos are short cinematic clips; AV1 footage rides
+    | inside MP4/WebM containers and is accepted through those MIME types.
     |
     */
 
-    'allowed_mimes' => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+    'allowed_mimes' => [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+        'image/avif',
+        'video/mp4',
+        'video/webm',
+    ],
 
-    'allowed_extensions' => ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+    'allowed_extensions' => ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'mp4', 'webm'],
 
     /*
     |--------------------------------------------------------------------------
-    | Size limit
+    | Size limits
     |--------------------------------------------------------------------------
     |
-    | Maximum upload size in bytes (default 5 MB).
+    | Maximum upload size in bytes per kind of media. Images default to 5 MB;
+    | short cinematic videos are allowed up to 50 MB.
     |
     */
 
-    'max_upload_bytes' => 5 * 1024 * 1024,
+    'max_image_bytes' => 5 * 1024 * 1024,
+
+    'max_video_bytes' => 50 * 1024 * 1024,
 
     /*
     |--------------------------------------------------------------------------

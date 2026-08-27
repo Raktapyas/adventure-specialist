@@ -100,6 +100,15 @@ class ImportLegacyData extends Command
             DB::connection($target)->table($table)->insert($rows);
         }
 
+        // The legacy source predates the media "type" column; derive it from
+        // the sniffed MIME type so re-imports stay consistent. Targets that
+        // have not been migrated yet simply keep their old schema.
+        if ($table === 'media' && Schema::connection($target)->hasColumn('media', 'type')) {
+            $connection = DB::connection($target);
+            $connection->table('media')->where('mime_type', 'like', 'video/%')->update(['type' => 'video']);
+            $connection->table('media')->whereNull('type')->update(['type' => 'image']);
+        }
+
         $this->info("Imported {$table}: ".count($rows).' rows.');
     }
 

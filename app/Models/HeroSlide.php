@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class HeroSlide extends Model
 {
@@ -28,6 +29,14 @@ class HeroSlide extends Model
         'sort_order' => 'integer',
     ];
 
+    /**
+     * The central Media Library record this slide references by web path.
+     */
+    public function media(): HasOne
+    {
+        return $this->hasOne(Media::class, 'path', 'image_path');
+    }
+
     public function scopePublished($query)
     {
         return $query->where('is_published', true);
@@ -36,7 +45,7 @@ class HeroSlide extends Model
     /**
      * Shape expected by the <x-hero> slider component.
      *
-     * @return array{image: string, eyebrow: ?string, title: string, lede: ?string, kenburns: string, ctas: array<int, array{label: string, href: string, style: string}>}
+     * @return array{image: string, type: string, eyebrow: ?string, title: string, lede: ?string, kenburns: string, ctas: array<int, array{label: string, href: string, style: string}>}
      */
     public function toSlide(): array
     {
@@ -52,6 +61,7 @@ class HeroSlide extends Model
 
         return [
             'image' => $this->image_path,
+            'type' => $this->media?->isVideo() ? 'video' : 'image',
             'eyebrow' => $this->eyebrow,
             'title' => $this->title,
             'lede' => $this->lede,

@@ -136,6 +136,8 @@ class ServiceResource extends Resource
                     ->integer()
                     ->minValue(0)
                     ->nullable()
+                    ->placeholder('Auto — next available')
+                    ->helperText('Leave blank to auto-assign next position.')
                     ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
                 Forms\Components\Select::make('is_published')
                     ->label('Status')

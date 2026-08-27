@@ -19,17 +19,22 @@ class ListMedia extends ListRecords
     {
         return [
             Actions\Action::make('upload')
-                ->label('Upload images')
+                ->label('Upload media')
                 ->icon('heroicon-m-arrow-up-tray')
                 ->visible(fn (): bool => auth()->user()->can('create', Media::class))
                 ->authorize('create', Media::class)
                 ->form([
                     FileUpload::make('media')
                         ->multiple()
-                        ->image()
+                        ->acceptedFileTypes([
+                            ...config('media.allowed_mimes'),
+                            // Some browsers/OSes report MP4 as application/mp4.
+                            'application/mp4',
+                        ])
                         ->disk('public')
-                        ->maxSize(5120)
+                        ->maxSize((int) round(config('media.max_video_bytes') / 1024))
                         ->required()
+                        ->helperText('Images up to '.round(config('media.max_image_bytes') / 1048576).' MB (jpg, png, webp, gif, avif); videos up to '.round(config('media.max_video_bytes') / 1048576).' MB (mp4, webm).')
                         ->saveUploadedFileUsing(function (FileUpload $component, UploadedFile $file, string|array|null $state): string {
                             $media = app(MediaUploader::class)->store($file, auth()->id());
 

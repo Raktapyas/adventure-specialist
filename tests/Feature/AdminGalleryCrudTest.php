@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Components\MediaPicker;
 use App\Filament\Resources\GalleryImageResource;
 use App\Filament\Resources\GalleryImageResource\Pages\CreateGalleryImage;
 use App\Filament\Resources\GalleryImageResource\Pages\EditGalleryImage;
@@ -176,5 +177,59 @@ class AdminGalleryCrudTest extends TestCase
                     'disabled' => false,
                 ],
             ]);
+    }
+
+    public function test_picker_labels_mark_videos_with_a_play_badge(): void
+    {
+        $video = Media::factory()->video()->create([
+            'name' => 'flight.mp4',
+            'path' => '/assets/images/flight.mp4',
+        ])->fresh();
+
+        $label = MediaPicker::optionLabel($video);
+
+        $this->assertStringContainsString('<svg', $label);
+        $this->assertStringNotContainsString('<img', $label);
+        $this->assertStringContainsString(e('flight.mp4'), $label);
+
+        $image = Media::factory()->create(['name' => 'summit.jpg'])->fresh();
+        $this->assertStringContainsString('<img', MediaPicker::optionLabel($image));
+    }
+
+    public function test_picker_search_results_include_videos(): void
+    {
+        $media = Media::factory()->video()->create([
+            'name' => 'flight.mp4',
+            'path' => '/assets/images/flight.mp4',
+        ])->fresh();
+
+        Livewire::actingAs($this->admin())
+            ->test(CreateGalleryImage::class)
+            ->call('getFormSelectSearchResults', 'data.image_url', 'flight')
+            ->assertReturned([
+                [
+                    'label' => MediaPicker::optionLabel($media),
+                    'value' => '/assets/images/flight.mp4',
+                    'disabled' => false,
+                ],
+            ]);
+    }
+
+    public function test_gallery_items_can_reference_videos(): void
+    {
+        Media::factory()->video()->create(['path' => '/assets/images/flight.mp4']);
+
+        Livewire::actingAs($this->admin())
+            ->test(CreateGalleryImage::class)
+            ->fillForm([
+                'image_url' => '/assets/images/flight.mp4',
+                'caption' => 'Cinematic flight',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('gallery_images', [
+            'image_url' => '/assets/images/flight.mp4',
+        ]);
     }
 }
