@@ -46,37 +46,6 @@ A full-stack **Laravel + Filament** operation with two faces:
 
 ---
 
-## 🔮 Summoning Ritual (Local Setup)
-
-```bash
-# Acquire the repository
-git clone git@github.com:Raktapyas/adventure-specialist.git
-cd adventure-specialist
-
-# Install the dependencies (resistance is futile)
-composer install
-npm install
-
-# Forge your environment
-cp .env.example .env
-php artisan key:generate
-
-# Raise the local lair (PHP + MySQL via Sail)
-./vendor/bin/sail up -d
-./vendor/bin/sail artisan migrate --seed
-
-# Forge the assets
-npm run dev
-```
-
-The seeder imports the entire legacy empire: every page, service, destination,
-package, gallery image and media file — plus roles and an admin account from
-`ADMIN_EMAIL` / `ADMIN_PASSWORD`.
-
-> ⚠️ Local artisan commands must run through Sail. `DB_HOST=mysql` only resolves
-> inside the container network. Outside it, you're shouting into the void.
-
----
 
 ## 🔐 The Secrets (Environment)
 
