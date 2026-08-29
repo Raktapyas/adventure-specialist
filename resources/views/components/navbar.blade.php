@@ -178,13 +178,15 @@
                 @endif
 
                 <a href="/contact/" class="nav-link" :class="activeContact ? (scrolled ? 'text-accent' : 'text-accent-bright') : ''">Contact</a>
+            </div>
 
-                {{-- Search icon — desktop (inside hidden nav), keep clickable --}}
-                <div class="relative" @click.outside="searchOpen = false; suggestions = []; selected = -1;">
-                    <button type="button" @click="searchOpen = !searchOpen; if(searchOpen) $nextTick(() => $refs.searchInput && $refs.searchInput.focus())" :class="scrolled ? 'text-ink-soft hover:text-accent' : 'text-paper/90 hover:text-accent-bright'" class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-transparent transition-colors hover:border-line focus:outline-none focus:ring-2 focus:ring-accent/20" aria-label="Search" :aria-expanded="searchOpen.toString()">
+            {{-- Right actions: search + CTA (always visible, search dropdown is desktop-only) --}}
+            <div class="flex items-center gap-3">
+                <div class="relative hidden lg:block" @click.outside="searchOpen = false; suggestions = []; selected = -1;">
+                    <button type="button" @click.stop="searchOpen = !searchOpen; if(searchOpen) $nextTick(() => $refs.searchInput && $refs.searchInput.focus())" :class="scrolled ? 'text-ink-soft hover:text-accent' : 'text-paper/90 hover:text-accent-bright'" class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/5 backdrop-blur-sm transition-colors hover:border-line hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-accent/20" aria-label="Search" :aria-expanded="searchOpen.toString()">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" /></svg>
                     </button>
-                    <div x-show="searchOpen" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="absolute right-0 top-full mt-3 w-[28rem] max-w-[90vw] rounded-card border border-line bg-paper-soft p-1.5 shadow-card z-50">
+                    <div x-show="searchOpen" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="absolute right-0 top-full mt-3 w-[28rem] max-w-[90vw] rounded-card border border-line bg-paper-soft p-1.5 shadow-card z-[60]">
                         <form method="GET" action="{{ route('search') }}" class="flex items-center gap-2">
                             <input x-ref="searchInput" name="q" x-model="searchQuery" @input="onSearchInput()" @keydown="onSearchKeydown($event)" placeholder="Search treks, permits, best time..." class="w-full rounded bg-paper px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent/20" autocomplete="off" role="combobox" :aria-expanded="searchOpen.toString()" aria-haspopup="listbox" aria-controls="search-suggestions" aria-autocomplete="list" :aria-activedescendant="selected >= 0 ? 'suggestion-' + selected : null" />
                             <button type="submit" class="shrink-0 rounded bg-accent px-4 py-2 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-accent-dark">Go</button>
@@ -206,9 +208,10 @@
                     </div>
                 </div>
 
-                <a href="/contact/#enquiry" class="btn btn-royal px-5! py-2.5! text-xs uppercase tracking-wider">
+                <a href="/contact/#enquiry" class="hidden btn btn-royal px-5! py-2.5! text-xs uppercase tracking-wider lg:inline-flex">
                     Plan a Trip
                 </a>
+
             </div>
 
             {{-- Mobile toggle --}}
