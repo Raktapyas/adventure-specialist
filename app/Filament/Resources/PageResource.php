@@ -48,7 +48,7 @@ class PageResource extends Resource
                     ->searchable()
                     ->preload()
                     ->nullable()
-                    ->helperText('A page can only be nested directly under a top-level page.')
+                    ->helperText('About → About Us dropdown. Top-level with children → its own dropdown (/about-us/{slug}/). Max 1 level.')
                     ->rules([
                         'nullable',
                         'integer',
@@ -107,7 +107,7 @@ class PageResource extends Resource
                     ->minValue(0)
                     ->nullable()
                     ->placeholder('Auto — next available')
-                    ->helperText('Leave blank to auto-assign next position.')
+                    ->helperText('Lower = first in navbar dropdown (ordered by sort_order, then title).')
                     ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
                 Forms\Components\Select::make('is_published')
                     ->label('Status')
@@ -115,6 +115,7 @@ class PageResource extends Resource
                         true => 'Published',
                         false => 'Draft',
                     ])
+                    ->helperText('Draft = hidden from navbar; Published = visible.')
                     ->default(false)
                     ->nullable(),
             ]);

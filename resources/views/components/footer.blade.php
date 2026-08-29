@@ -19,9 +19,9 @@
 
         {{-- Clean 3-column layout — gold headings bigger, white links bigger bold --}}
         <div class="mt-14 grid gap-10 border-t border-white/15 pt-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
-            {{-- Services --}}
-            <nav aria-label="Footer services">
-                <p class="text-sm font-black uppercase tracking-[0.2em] text-[#C9A86A]">Services</p>
+            {{-- Trekking & Activities --}}
+            <nav aria-label="Footer trekking and activities">
+                <p class="text-sm font-black uppercase tracking-[0.2em] text-[#C9A86A]">Trekking &amp; Activities</p>
                 <ul class="mt-5 space-y-3 text-base font-semibold">
                     @forelse ($navServices as $service)
                         <li><a href="{{ $service->getPath() }}" class="text-white transition-colors hover:text-[#C9A86A]">{{ $service->title }}</a></li>

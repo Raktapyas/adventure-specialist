@@ -48,7 +48,7 @@ class DestinationResource extends Resource
                     ->searchable()
                     ->preload()
                     ->nullable()
-                    ->helperText('A destination can only be nested directly under a top-level destination.')
+                    ->helperText('Top-level → Destinations dropdown (/destination/...), slug nepal → standalone Nepal menu. Max 2 levels.')
                     ->rules([
                         'nullable',
                         'integer',
@@ -131,7 +131,7 @@ class DestinationResource extends Resource
                     ->minValue(0)
                     ->nullable()
                     ->placeholder('Auto — next available')
-                    ->helperText('Leave blank to auto-assign next position.')
+                    ->helperText('Lower = first in Destinations/Nepal dropdown (sort_order, then title).')
                     ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
                 Forms\Components\Select::make('is_published')
                     ->label('Status')
@@ -139,6 +139,7 @@ class DestinationResource extends Resource
                         true => 'Published',
                         false => 'Draft',
                     ])
+                    ->helperText('Draft = hidden from navbar; Published = visible.')
                     ->default(false)
                     ->nullable(),
             ]);

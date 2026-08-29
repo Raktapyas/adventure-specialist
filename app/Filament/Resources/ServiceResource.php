@@ -48,7 +48,7 @@ class ServiceResource extends Resource
                     ->searchable()
                     ->preload()
                     ->nullable()
-                    ->helperText('A service can only be nested directly under a top-level service.')
+                    ->helperText('Top-level → Trekking & Activities dropdown (/ast-services/...). Child → under its parent. Max 1 level.')
                     ->rules([
                         'nullable',
                         'integer',
@@ -137,7 +137,7 @@ class ServiceResource extends Resource
                     ->minValue(0)
                     ->nullable()
                     ->placeholder('Auto — next available')
-                    ->helperText('Leave blank to auto-assign next position.')
+                    ->helperText('Lower = first in Trekking dropdown (sort_order, then title).')
                     ->dehydrated(fn ($state): bool => $state !== null && $state !== ''),
                 Forms\Components\Select::make('is_published')
                     ->label('Status')
@@ -145,6 +145,7 @@ class ServiceResource extends Resource
                         true => 'Published',
                         false => 'Draft',
                     ])
+                    ->helperText('Draft = hidden from navbar; Published = visible.')
                     ->default(false)
                     ->nullable(),
             ]);

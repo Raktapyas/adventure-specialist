@@ -42,10 +42,11 @@ class NavComposer
         $view->with('navDestinations', $this->cache['destinations']);
         $view->with('navNepal', $this->cache['nepal']);
         $view->with('siteContact', $this->cache['siteContact']);
+        $view->with('siteBranding', $this->cache['branding']);
     }
 
     /**
-     * @return array{aboutPages: Collection, topLevelPages: Collection, services: Collection, destinations: Collection, nepal: ?Destination, siteContact: array<string, ?string>}
+     * @return array{aboutPages: Collection, topLevelPages: Collection, services: Collection, destinations: Collection, nepal: ?Destination, siteContact: array<string, ?string>, branding: array{logo: string, logo_white: string}}
      */
     protected function load(): array
     {
@@ -84,6 +85,7 @@ class NavComposer
                 ->with(['children' => fn ($q) => $q->published()])
                 ->first(),
             'siteContact' => SiteSetting::current()->contactBlock(),
+            'branding' => SiteSetting::current()->brandingBlock(),
         ];
     }
 }

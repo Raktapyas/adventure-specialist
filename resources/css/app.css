@@ -32,6 +32,12 @@
     --color-royal-faint: #aec6ef;
     --color-royal-ink: #0a3aa8;
 
+    /* Burnt orange — strictly for nav active/hover + critical conversion triggers */
+    --color-accent: #ea580c;
+    --color-accent-dark: #c2410c;
+    --color-accent-bright: #fb923c;
+    --color-accent-faint: #ffedd5;
+
     --radius-card: 0.3125rem;
 
     --shadow-card: 0 5px 20px rgba(0, 0, 0, 0.1);
@@ -264,6 +270,25 @@
     .btn-royal {
         color: #fff;
         background-image: linear-gradient(to right, #2475fc, #1129b9);
+    }
+
+    .btn-accent {
+        color: #fff;
+        background-image: linear-gradient(to right, #fb923c, #ea580c);
+    }
+
+    .btn-accent::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: #171717;
+        clip-path: circle(0% at 50% 50%);
+        transition: clip-path 0.8s cubic-bezier(0, 0.96, 0.58, 1.1);
+    }
+
+    .btn-accent:hover::after {
+        clip-path: circle(100% at 50% 50%);
     }
 
     .btn-royal::after {
@@ -503,14 +528,14 @@
         bottom: -4px;
         height: 2px;
         width: 100%;
-        background: var(--color-royal);
+        background: var(--color-accent);
         transform: scaleX(0);
         transform-origin: left;
         transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .nav-link:hover {
-        color: var(--color-royal);
+        color: var(--color-accent);
         transform: translateY(-1px);
     }
 

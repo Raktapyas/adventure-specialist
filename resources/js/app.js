@@ -1,8 +1,8 @@
 import Alpine from 'alpinejs';
 
-Alpine.start();
-
 window.Alpine = Alpine;
+
+Alpine.start();
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

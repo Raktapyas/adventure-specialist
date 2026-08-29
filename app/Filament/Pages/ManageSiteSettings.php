@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Components\MediaPicker;
 use App\Models\Media;
 use App\Models\SiteSetting;
 use Filament\Forms\Components\Repeater;
@@ -110,6 +111,20 @@ class ManageSiteSettings extends Page implements HasForms
                                 'not_regex:/\/\//',
                                 'not_regex:/\.\./',
                             ]),
+                    ])
+                    ->collapsible(),
+
+                Section::make('Branding')
+                    ->description('Main navigation logo. Leave empty to use bundled public/images. White logo is for transparent hero (optional).')
+                    ->schema([
+                        MediaPicker::make('logo', 'Main logo (colored)')
+                            ->helperText('Used in navbar (left, always visible). Falls back to /images/logo.png')
+                            ->nullable()
+                            ->rules(['nullable', 'string', 'max:255', 'starts_with:/']),
+                        MediaPicker::make('logo_white', 'White logo (for transparent hero)')
+                            ->helperText('Optional — white variant for dark hero background. Falls back to /images/logo-white.png')
+                            ->nullable()
+                            ->rules(['nullable', 'string', 'max:255', 'starts_with:/']),
                     ])
                     ->collapsible(),
 

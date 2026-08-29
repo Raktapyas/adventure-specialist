@@ -6,13 +6,15 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <script>document.documentElement.classList.add('js');</script>
+        <style>[x-cloak]{display:none!important}</style>
 
         <title>@yield('title', 'Adventure Specialist Travel') · Adventure Specialist Travel Pvt. Ltd.</title>
         <meta name="description" content="@yield('meta_description', 'Specialist in preparing your holiday programs in Nepal, Bhutan, Sikkim, Tibet and Myanmar.')">
 
         @fonts
 
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <link rel="stylesheet" href="{{ asset('build/assets/app-rJ-iGh4P.css') }}">
+        <script type="module" src="{{ asset('build/assets/app-Cixylveo.js') }}"></script>
     </head>
 
     <body class="min-h-screen bg-paper text-ink antialiased">

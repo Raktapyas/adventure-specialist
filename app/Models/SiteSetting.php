@@ -13,6 +13,8 @@ class SiteSetting extends Model
         'cta_button_label',
         'cta_button_url',
         'cta_image',
+        'logo',
+        'logo_white',
         'contact_company',
         'contact_address',
         'contact_phone_primary',
@@ -88,6 +90,19 @@ class SiteSetting extends Model
             'email' => $this->contact_email,
             'hours' => $this->contact_hours,
             'facebook_url' => $this->contact_facebook_url,
+        ];
+    }
+
+    /**
+     * Branding block for navbar logo. Falls back to bundled public/images.
+     *
+     * @return array{logo: string, logo_white: string}
+     */
+    public function brandingBlock(): array
+    {
+        return [
+            'logo' => $this->logo ?: '/images/logo.png',
+            'logo_white' => $this->logo_white ?: '/images/logo-white.png',
         ];
     }
 
