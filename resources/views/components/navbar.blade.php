@@ -179,30 +179,30 @@
 
                 <a href="/contact/" class="nav-link" :class="activeContact ? (scrolled ? 'text-accent' : 'text-accent-bright') : ''">Contact</a>
 
-                {{-- Search icon — desktop (inside hidden nav), keep clickable --}}
-                <div class="relative" @click.outside="searchOpen = false; suggestions = []; selected = -1;">
-                    <button type="button" @click.stop="searchOpen = !searchOpen; if(searchOpen) $nextTick(() => $refs.searchInput && $refs.searchInput.focus())" :class="scrolled ? 'text-ink-soft hover:text-accent' : 'text-paper/90 hover:text-accent-bright'" class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-transparent transition-colors hover:border-line focus:outline-none focus:ring-2 focus:ring-accent/20" aria-label="Search" :aria-expanded="searchOpen.toString()">
+                {{-- Search — smooth dropdown below magnifier, :focus-within glass, orange accent, no push --}}
+                <div class="relative group">
+                    <button
+                        type="button"
+                        aria-label="Search"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                        :class="scrolled ? 'text-ink-soft hover:text-accent hover:border-line' : 'text-paper/90 hover:text-accent-bright hover:border-white/20'"
+                        onclick="this.nextElementSibling.querySelector('input').focus()"
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" /></svg>
                     </button>
-                    <div x-show="searchOpen" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="absolute right-0 top-full mt-3 w-[28rem] max-w-[90vw] rounded-card border border-line bg-paper-soft p-1.5 shadow-card z-50">
-                        <form method="GET" action="{{ route('search') }}" class="flex items-center gap-2">
-                            <input x-ref="searchInput" name="q" x-model="searchQuery" @input="onSearchInput()" @keydown="onSearchKeydown($event)" placeholder="Search treks, permits, best time..." class="w-full rounded bg-paper px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent/20" autocomplete="off" role="combobox" :aria-expanded="searchOpen.toString()" aria-haspopup="listbox" aria-controls="search-suggestions" aria-autocomplete="list" :aria-activedescendant="selected >= 0 ? 'suggestion-' + selected : null" />
-                            <button type="submit" class="shrink-0 rounded bg-accent px-4 py-2 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-accent-dark">Go</button>
+                    <div class="absolute right-0 top-full mt-3 w-[22rem] max-w-[90vw] rounded-card border border-white/20 bg-white/10 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.18)] opacity-0 -translate-y-2 pointer-events-none group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] z-50">
+                        <form method="GET" action="{{ route('search') }}" class="flex items-center gap-2 p-2">
+                            <input
+                                name="q"
+                                type="search"
+                                value="{{ request('q') }}"
+                                placeholder="Search treks, permits, best time..."
+                                aria-label="Search treks and destinations"
+                                autocomplete="off"
+                                class="w-full rounded-full border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-white/60 caret-[var(--color-accent)] focus:border-[var(--color-accent)] focus:bg-white/20 focus:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-colors"
+                            />
+                            <button type="submit" class="shrink-0 rounded-full bg-[var(--color-accent)] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-[var(--color-accent-dark)] transition-colors">Go</button>
                         </form>
-                        <div x-show="loading" x-cloak class="px-3 py-2 text-center text-xs text-ink-faint">Searching…</div>
-                        <ul x-show="suggestions.length > 0" id="search-suggestions" role="listbox" class="mt-2 max-h-[60vh] overflow-y-auto divide-y divide-line/60">
-                            <template x-for="(item, idx) in suggestions" :key="item.url">
-                                <li role="option" :id="'suggestion-' + idx" :aria-selected="(selected === idx).toString()">
-                                    <a :href="item.url" @mouseenter="selected = idx" :class="selected === idx ? 'bg-paper text-accent' : 'hover:bg-paper hover:text-accent'" class="flex flex-col gap-0.5 rounded px-3 py-2.5 text-sm transition-colors">
-                                        <span class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em]" :class="selected === idx ? 'text-accent' : 'text-ink-faint'"><span x-text="item.type === 'Trekking & Activities' ? '⛰' : item.type === 'Destinations' ? '◎' : item.type === 'Packages' ? '◈' : '▤'"></span><span x-text="item.type"></span></span>
-                                        <span class="font-semibold leading-tight" x-html="highlight(item.title)"></span>
-                                        <span x-show="item.excerpt" class="line-clamp-1 text-xs text-ink-faint" x-text="item.excerpt"></span>
-                                    </a>
-                                </li>
-                            </template>
-                        </ul>
-                        <div x-show="searchQuery.trim().length >= 2 && !loading && suggestions.length === 0" x-cloak class="px-3 py-3 text-center text-sm text-ink-faint">No matches — press Enter to search all</div>
-                        <a x-show="suggestions.length > 0" :href="'/search?q=' + encodeURIComponent(searchQuery)" class="mt-2 block rounded bg-paper px-3 py-2 text-center text-xs font-bold uppercase tracking-wider text-accent hover:bg-accent hover:text-white transition-colors">View all results →</a>
                     </div>
                 </div>
 
