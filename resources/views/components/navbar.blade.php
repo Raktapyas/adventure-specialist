@@ -51,10 +51,12 @@
                 e.preventDefault();
                 if (!this.suggestions.length) return;
                 this.selected = (this.selected + 1) % this.suggestions.length;
+                this.$nextTick(() => { const el = document.getElementById('suggestion-' + this.selected); if (el) el.scrollIntoView({block:'nearest'}); });
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 if (!this.suggestions.length) return;
                 this.selected = this.selected <= 0 ? this.suggestions.length - 1 : this.selected - 1;
+                this.$nextTick(() => { const el = document.getElementById('suggestion-' + this.selected); if (el) el.scrollIntoView({block:'nearest'}); });
             } else if (e.key === 'Enter') {
                 if (this.selected >= 0 && this.suggestions[this.selected]) {
                     e.preventDefault();
@@ -64,6 +66,7 @@
                 this.searchOpen = false;
                 this.suggestions = [];
                 this.selected = -1;
+                this.$nextTick(() => { if (this.$refs.searchInput) this.$refs.searchInput.focus(); });
             }
         },
         highlight(text) {
@@ -183,15 +186,15 @@
                     </button>
                     <div x-show="searchOpen" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="absolute right-0 top-full mt-3 w-[28rem] max-w-[90vw] rounded-card border border-line bg-paper-soft p-1.5 shadow-card z-50">
                         <form method="GET" action="{{ route('search') }}" class="flex items-center gap-2">
-                            <input x-ref="searchInput" name="q" x-model="searchQuery" @input="onSearchInput()" @keydown="onSearchKeydown($event)" placeholder="Search treks, permits, best time..." class="w-full rounded bg-paper px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent/20" autocomplete="off" role="combobox" :aria-expanded="searchOpen.toString()" aria-haspopup="listbox" aria-controls="search-suggestions" aria-autocomplete="list" />
+                            <input x-ref="searchInput" name="q" x-model="searchQuery" @input="onSearchInput()" @keydown="onSearchKeydown($event)" placeholder="Search treks, permits, best time..." class="w-full rounded bg-paper px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent/20" autocomplete="off" role="combobox" :aria-expanded="searchOpen.toString()" aria-haspopup="listbox" aria-controls="search-suggestions" aria-autocomplete="list" :aria-activedescendant="selected >= 0 ? 'suggestion-' + selected : null" />
                             <button type="submit" class="shrink-0 rounded bg-accent px-4 py-2 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-accent-dark">Go</button>
                         </form>
                         <div x-show="loading" x-cloak class="px-3 py-2 text-center text-xs text-ink-faint">Searching…</div>
                         <ul x-show="suggestions.length > 0" id="search-suggestions" role="listbox" class="mt-2 max-h-[60vh] overflow-y-auto divide-y divide-line/60">
                             <template x-for="(item, idx) in suggestions" :key="item.url">
-                                <li role="option" :aria-selected="(selected === idx).toString()">
+                                <li role="option" :id="'suggestion-' + idx" :aria-selected="(selected === idx).toString()">
                                     <a :href="item.url" @mouseenter="selected = idx" :class="selected === idx ? 'bg-paper text-accent' : 'hover:bg-paper hover:text-accent'" class="flex flex-col gap-0.5 rounded px-3 py-2.5 text-sm transition-colors">
-                                        <span class="text-[11px] font-bold uppercase tracking-[0.14em]" :class="selected === idx ? 'text-accent' : 'text-ink-faint'" x-text="item.type"></span>
+                                        <span class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em]" :class="selected === idx ? 'text-accent' : 'text-ink-faint'"><span x-text="item.type === 'Trekking & Activities' ? '⛰' : item.type === 'Destinations' ? '◎' : item.type === 'Packages' ? '◈' : '▤'"></span><span x-text="item.type"></span></span>
                                         <span class="font-semibold leading-tight" x-html="highlight(item.title)"></span>
                                         <span x-show="item.excerpt" class="line-clamp-1 text-xs text-ink-faint" x-text="item.excerpt"></span>
                                     </a>

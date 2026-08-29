@@ -13,8 +13,7 @@
 
         @fonts
 
-        <link rel="stylesheet" href="{{ asset('build/assets/app-rJ-iGh4P.css') }}">
-        <script type="module" src="{{ asset('build/assets/app-Cixylveo.js') }}"></script>
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
 
     <body class="min-h-screen bg-paper text-ink antialiased">

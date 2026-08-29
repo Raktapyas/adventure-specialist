@@ -23,14 +23,19 @@
                 <div class="mt-12 rounded-card border border-line bg-paper-soft p-8 text-center">
                     <p class="text-lg font-semibold text-ink">No results for “{{ $q }}”</p>
                     <p class="mt-2 text-sm text-ink-faint">Try a broader term like “trek”, “permits”, “Chitwan” or “best time”.</p>
+                    <div class="mt-6 flex flex-wrap justify-center gap-2">
+                        <a href="/ast-services/" class="rounded-card border border-line bg-paper px-4 py-2 text-xs font-bold uppercase tracking-wider text-ink hover:border-accent hover:text-accent">Browse Treks</a>
+                        <a href="/destination/" class="rounded-card border border-line bg-paper px-4 py-2 text-xs font-bold uppercase tracking-wider text-ink hover:border-accent hover:text-accent">Browse Destinations</a>
+                        <a href="/special-package/" class="rounded-card border border-line bg-paper px-4 py-2 text-xs font-bold uppercase tracking-wider text-ink hover:border-accent hover:text-accent">Browse Packages</a>
+                    </div>
                 </div>
             @else
-                <p class="mt-10 text-sm font-semibold text-ink-faint">{{ $total }} {{ Str::plural('result', $total) }} found</p>
+                <p class="mt-10 text-sm font-semibold text-ink-faint">{{ $total }} {{ Str::plural('result', $total) }} found — showing up to 12 per category. Refine your query for more specific results.</p>
 
                 @if ($services->isNotEmpty())
                     <div class="mt-10">
-                        <h2 class="text-lg font-bold tracking-tight text-ink">Trekking &amp; Activities</h2>
-                        <p class="mt-1 text-sm text-ink-faint">{{ $services->count() }} matches</p>
+                        <h2 class="flex items-center gap-2 text-lg font-bold tracking-tight text-ink"><span>⛰</span> Trekking &amp; Activities</h2>
+                        <p class="mt-1 text-sm text-ink-faint">{{ $services->count() }} matches @if($services->count() === 12) <span class="text-accent">(limited to 12)</span> @endif</p>
                         <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             @foreach ($services as $service)
                                 <x-service-card :service="$service" />
@@ -44,8 +49,8 @@
 
                 @if ($destinations->isNotEmpty())
                     <div class="mt-12">
-                        <h2 class="text-lg font-bold tracking-tight text-ink">Destinations</h2>
-                        <p class="mt-1 text-sm text-ink-faint">{{ $destinations->count() }} matches</p>
+                        <h2 class="flex items-center gap-2 text-lg font-bold tracking-tight text-ink"><span>◎</span> Destinations</h2>
+                        <p class="mt-1 text-sm text-ink-faint">{{ $destinations->count() }} matches @if($destinations->count() === 12) <span class="text-accent">(limited to 12)</span> @endif</p>
                         <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             @foreach ($destinations as $destination)
                                 <x-destination-card :destination="$destination" />
@@ -59,8 +64,8 @@
 
                 @if ($pages->isNotEmpty())
                     <div class="mt-12">
-                        <h2 class="text-lg font-bold tracking-tight text-ink">Travel information</h2>
-                        <p class="mt-1 text-sm text-ink-faint">{{ $pages->count() }} matches</p>
+                        <h2 class="flex items-center gap-2 text-lg font-bold tracking-tight text-ink"><span>▤</span> Travel information</h2>
+                        <p class="mt-1 text-sm text-ink-faint">{{ $pages->count() }} matches @if($pages->count() === 12) <span class="text-accent">(limited to 12)</span> @endif</p>
                         <ul class="mt-6 divide-y divide-line rounded-card border border-line bg-paper-soft">
                             @foreach ($pages as $page)
                                 <li>
@@ -78,8 +83,8 @@
 
                 @if (($packages ?? collect())->isNotEmpty())
                     <div class="mt-12">
-                        <h2 class="text-lg font-bold tracking-tight text-ink">Packages</h2>
-                        <p class="mt-1 text-sm text-ink-faint">{{ $packages->count() }} matches</p>
+                        <h2 class="flex items-center gap-2 text-lg font-bold tracking-tight text-ink"><span>◈</span> Packages</h2>
+                        <p class="mt-1 text-sm text-ink-faint">{{ $packages->count() }} matches @if($packages->count() === 12) <span class="text-accent">(limited to 12)</span> @endif</p>
                         <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             @foreach ($packages as $package)
                                 <x-package-card :package="$package" />
