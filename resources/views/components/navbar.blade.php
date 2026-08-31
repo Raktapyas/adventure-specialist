@@ -95,23 +95,23 @@
             <div class="hidden items-center gap-7 lg:flex text-paper/90" :class="scrolled ? '!text-ink-soft' : ''">
                 <a href="/" class="nav-link" :class="activeHome ? (scrolled ? 'text-accent' : 'text-accent-bright') : ''">Home</a>
 
-                {{-- About Us --}}
-                <div class="relative group" @mouseenter="about = true" @mouseleave="about = false" @focusin="about = true" @focusout="about = false">
+                {{-- About Us — flyout (image style: single column list) --}}
+                <div class="relative group flyout-parent" @mouseenter="about = true" @mouseleave="about = false" @focusin="about = true" @focusout="about = false">
                     <a href="/about-us/" class="nav-link flex items-center gap-1" aria-haspopup="true" :aria-expanded="about.toString()" :class="activePages ? (scrolled ? 'text-accent' : 'text-accent-bright') : ''">
                         About Us
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 transition-transform" :class="about ? 'rotate-180' : ''"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" /></svg>
                     </a>
-                    <div role="menu" class="absolute left-0 top-full hidden w-72 rounded-card border border-line bg-paper-soft/95 p-2 text-ink-soft shadow-card backdrop-blur-sm group-hover:block group-focus-within:block">
-                        <a href="/about-us/" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-accent">About Us</a>
+                    <div role="menu" class="absolute left-0 top-full z-50 mt-2 hidden w-[235px] flyout flyout--has-children group-hover:block group-focus-within:block">
+                        <a href="/about-us/" class="flex items-center justify-between border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors hover:bg-accent hover:text-white">About Us</a>
                         @foreach ($navAboutPages as $page)
-                            <a href="{{ $page->getPath() }}" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-accent">{{ $page->title }}</a>
+                            <a href="{{ $page->getPath() }}" class="flex items-center justify-between border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors last:border-0 hover:bg-accent hover:text-white">{{ $page->title }}</a>
                         @endforeach
                     </div>
                 </div>
 
-                {{-- Standalone top-level pages (managed in Filament > Pages) --}}
+                {{-- Standalone top-level pages (managed in Filament > Pages) — each own flyout --}}
                 @foreach ($navTopLevelPages as $section)
-                    <div class="relative group" @mouseenter="topOpen = {{ $section->id }}" @mouseleave="topOpen = null" @focusin="topOpen = {{ $section->id }}" @focusout="topOpen = null">
+                    <div class="relative group flyout-parent" @mouseenter="topOpen = {{ $section->id }}" @mouseleave="topOpen = null" @focusin="topOpen = {{ $section->id }}" @focusout="topOpen = null">
                         <a href="{{ $section->getPath() }}" class="nav-link flex items-center gap-1" aria-haspopup="true" :aria-expanded="(topOpen === {{ $section->id }}).toString()" :class="activePages ? (scrolled ? 'text-accent' : 'text-accent-bright') : ''">
                             {{ $section->title }}
                             @if ($section->children->isNotEmpty())
@@ -119,47 +119,100 @@
                             @endif
                         </a>
                         @if ($section->children->isNotEmpty())
-                            <div role="menu" class="absolute left-0 top-full hidden w-72 rounded-card border border-line bg-paper-soft/95 p-2 text-ink-soft shadow-card backdrop-blur-sm group-hover:block group-focus-within:block">
-                                <a href="{{ $section->getPath() }}" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-accent">{{ $section->title }}</a>
+                            <div role="menu" class="absolute left-0 top-full z-50 mt-2 hidden w-[235px] flyout flyout--has-children group-hover:block group-focus-within:block">
                                 @foreach ($section->children as $child)
-                                    <a href="{{ $child->getPath() }}" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-accent">{{ $child->title }}</a>
+                                    <div class="flyout-item-wrap relative">
+                                        <a href="{{ $child->getPath() }}" class="flex items-center justify-between gap-2 border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors last:border-0 hover:bg-accent hover:text-white">
+                                            <span>{{ $child->title }}</span>
+                                            @if($child->children->isNotEmpty())
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 shrink-0 text-ink-faint transition-colors"><path fill-rule="evenodd" d="M7.21 14.78a.75.75 0 0 1 0-1.06L10.94 10 7.21 6.28a.75.75 0 1 1 1.06-1.06l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0Z" clip-rule="evenodd"/></svg>
+                                            @endif
+                                        </a>
+                                        @if($child->children->isNotEmpty())
+                                            <div class="absolute left-full top-0 z-50 hidden w-[235px] flyout flyout-sub ml-1">
+                                                @foreach($child->children as $grand)
+                                                    <a href="{{ $grand->getPath() }}" class="flex items-center border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors last:border-0 hover:bg-accent hover:text-white">{{ $grand->title }}</a>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
                                 @endforeach
                             </div>
                         @endif
                     </div>
                 @endforeach
 
-                {{-- Trekking & Activities (Services) --}}
-                <div class="relative group" @mouseenter="trekkingOpen = true" @mouseleave="trekkingOpen = false" @focusin="trekkingOpen = true" @focusout="trekkingOpen = false">
+                {{-- Trekking & Activities (Services) — flyout with nested sub-flyout (matches Image 1) --}}
+                <div class="relative group flyout-parent" @mouseenter="trekkingOpen = true" @mouseleave="trekkingOpen = false" @focusin="trekkingOpen = true" @focusout="trekkingOpen = false">
                     <a href="/ast-services/" class="nav-link flex items-center gap-1" aria-haspopup="true" :aria-expanded="trekkingOpen.toString()" :class="activeServices ? (scrolled ? 'text-accent' : 'text-accent-bright') : ''">
                         Trekking &amp; Activities
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 transition-transform" :class="trekkingOpen ? 'rotate-180' : ''"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" /></svg>
                     </a>
-                    <div role="menu" class="absolute left-0 top-full hidden w-72 rounded-card border border-line bg-paper-soft/95 p-2 text-ink-soft shadow-card backdrop-blur-sm group-hover:block group-focus-within:block">
-                        <a href="/ast-services/" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-accent">All Trekking &amp; Activities</a>
-                        @foreach ($navServices as $service)
-                            <a href="{{ $service->getPath() }}" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-accent">{{ $service->title }}</a>
+                    <div role="menu" class="absolute left-0 top-full z-50 mt-2 hidden w-[235px] flyout flyout--has-children group-hover:block group-focus-within:block">
+                        @foreach($navServices as $service)
+                            <div class="flyout-item-wrap relative">
+                                <a href="{{ $service->getPath() }}" class="flex items-center justify-between gap-2 border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors last:border-0 hover:bg-accent hover:text-white">
+                                    <span>{{ $service->title }}</span>
+                                    @if($service->children->isNotEmpty())
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 shrink-0 text-ink-faint transition-colors"><path fill-rule="evenodd" d="M7.21 14.78a.75.75 0 0 1 0-1.06L10.94 10 7.21 6.28a.75.75 0 1 1 1.06-1.06l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0Z" clip-rule="evenodd"/></svg>
+                                    @endif
+                                </a>
+                                @if($service->children->isNotEmpty())
+                                    <div class="absolute left-full top-0 z-50 hidden w-[235px] flyout flyout-sub ml-1">
+                                        @foreach($service->children as $child)
+                                            <div class="flyout-item-wrap relative">
+                                                <a href="{{ $child->getPath() }}" class="flex items-center justify-between gap-2 border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors last:border-0 hover:bg-accent hover:text-white">
+                                                    <span>{{ $child->title }}</span>
+                                                    @if($child->children->isNotEmpty())
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 shrink-0 text-ink-faint transition-colors"><path fill-rule="evenodd" d="M7.21 14.78a.75.75 0 0 1 0-1.06L10.94 10 7.21 6.28a.75.75 0 1 1 1.06-1.06l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0Z" clip-rule="evenodd"/></svg>
+                                                    @endif
+                                                </a>
+                                                @if($child->children->isNotEmpty())
+                                                    <div class="absolute left-full top-0 z-50 hidden w-[235px] flyout flyout-sub ml-1">
+                                                        @foreach($child->children as $grand)
+                                                            <a href="{{ $grand->getPath() }}" class="flex items-center border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors last:border-0 hover:bg-accent hover:text-white">{{ $grand->title }}</a>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
                         @endforeach
                     </div>
                 </div>
 
-                {{-- Destinations --}}
-                <div class="relative group" @mouseenter="destination = true" @mouseleave="destination = false" @focusin="destination = true" @focusout="destination = false">
+                {{-- Destinations — flyout, right-aligned --}}
+                <div class="relative group flyout-parent" @mouseenter="destination = true" @mouseleave="destination = false" @focusin="destination = true" @focusout="destination = false">
                     <a href="/destination/" class="nav-link flex items-center gap-1" aria-haspopup="true" :aria-expanded="destination.toString()" :class="activeDestinations ? (scrolled ? 'text-accent' : 'text-accent-bright') : ''">
                         Destinations
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 transition-transform" :class="destination ? 'rotate-180' : ''"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" /></svg>
                     </a>
-                    <div role="menu" class="absolute left-0 top-full hidden w-72 rounded-card border border-line bg-paper-soft/95 p-2 text-ink-soft shadow-card backdrop-blur-sm group-hover:block group-focus-within:block">
-                        <a href="/destination/" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-accent">All Destinations</a>
-                        @foreach ($navDestinations as $destination)
-                            <a href="{{ $destination->getPath() }}" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-accent">{{ $destination->title }}</a>
+                    <div role="menu" class="absolute right-0 top-full z-50 mt-2 hidden w-[235px] flyout flyout--has-children group-hover:block group-focus-within:block">
+                        @foreach($navDestinations as $destination)
+                            <div class="flyout-item-wrap relative">
+                                <a href="{{ $destination->getPath() }}" class="flex items-center justify-between gap-2 border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors last:border-0 hover:bg-accent hover:text-white">
+                                    <span>{{ $destination->title }}</span>
+                                    @if($destination->children->isNotEmpty())
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 shrink-0 text-ink-faint transition-colors"><path fill-rule="evenodd" d="M7.21 14.78a.75.75 0 0 1 0-1.06L10.94 10 7.21 6.28a.75.75 0 1 1 1.06-1.06l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0Z" clip-rule="evenodd"/></svg>
+                                    @endif
+                                </a>
+                                @if($destination->children->isNotEmpty())
+                                    <div class="absolute right-full top-0 z-50 hidden w-[235px] flyout flyout-sub mr-1">
+                                        @foreach($destination->children as $child)
+                                            <a href="{{ $child->getPath() }}" class="flex items-center border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors last:border-0 hover:bg-accent hover:text-white">{{ $child->title }}</a>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
                         @endforeach
                     </div>
                 </div>
 
-                {{-- Nepal (standalone) --}}
+                {{-- Nepal (standalone) — flyout, right-aligned --}}
                 @if ($navNepal)
-                    <div class="relative group" @mouseenter="nepal = true" @mouseleave="nepal = false" @focusin="nepal = true" @focusout="nepal = false">
+                    <div class="relative group flyout-parent" @mouseenter="nepal = true" @mouseleave="nepal = false" @focusin="nepal = true" @focusout="nepal = false">
                         <a href="{{ $navNepal->getPath() }}" class="nav-link flex items-center gap-1" aria-haspopup="true" :aria-expanded="nepal.toString()" :class="activeNepal ? (scrolled ? 'text-accent' : 'text-accent-bright') : ''">
                             {{ $navNepal->title }}
                             @if ($navNepal->children->isNotEmpty())
@@ -167,10 +220,23 @@
                             @endif
                         </a>
                         @if ($navNepal->children->isNotEmpty())
-                            <div role="menu" class="absolute left-0 top-full hidden w-72 rounded-card border border-line bg-paper-soft/95 p-2 text-ink-soft shadow-card backdrop-blur-sm group-hover:block group-focus-within:block">
-                                <a href="{{ $navNepal->getPath() }}" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-accent">{{ $navNepal->title }}</a>
-                                @foreach ($navNepal->children as $child)
-                                    <a href="{{ $child->getPath() }}" class="block rounded px-3 py-2 text-sm hover:bg-paper hover:text-accent">{{ $child->title }}</a>
+                            <div role="menu" class="absolute right-0 top-full z-50 mt-2 hidden w-[235px] flyout flyout--has-children group-hover:block group-focus-within:block">
+                                @foreach($navNepal->children as $child)
+                                    <div class="flyout-item-wrap relative">
+                                        <a href="{{ $child->getPath() }}" class="flex items-center justify-between gap-2 border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors last:border-0 hover:bg-accent hover:text-white">
+                                            <span>{{ $child->title }}</span>
+                                            @if($child->children && $child->children->isNotEmpty())
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 shrink-0 text-ink-faint transition-colors"><path fill-rule="evenodd" d="M7.21 14.78a.75.75 0 0 1 0-1.06L10.94 10 7.21 6.28a.75.75 0 1 1 1.06-1.06l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0Z" clip-rule="evenodd"/></svg>
+                                            @endif
+                                        </a>
+                                        @if($child->children && $child->children->isNotEmpty())
+                                            <div class="absolute right-full top-0 z-50 hidden w-[235px] flyout flyout-sub mr-1">
+                                                @foreach($child->children as $grand)
+                                                    <a href="{{ $grand->getPath() }}" class="flex items-center border-b border-line/60 px-3.5 py-2 text-[13px] font-medium text-ink-soft transition-colors last:border-0 hover:bg-accent hover:text-white">{{ $grand->title }}</a>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
                                 @endforeach
                             </div>
                         @endif
