@@ -33,19 +33,6 @@ A full-stack **Laravel + Filament** operation with two faces:
 
 ---
 
-## ⚔️ The Arsenal
-
-| Weapon | Purpose |
-|--------|---------|
-| PHP 8.5 / Laravel 13 | The skeleton |
-| Filament 3 | The war room UI |
-| MySQL 8.4 | The vault |
-| Tailwind CSS + Alpine.js | The public face's good looks |
-| Vite | Asset forge |
-| PHPUnit | 275 tests. Zero mercy. |
-
----
-
 
 
 
