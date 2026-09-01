@@ -326,24 +326,6 @@ class ManageSiteSettings extends Page implements HasForms
                     ->collapsible()
                     ->collapsed(false),
 
-                Section::make('Navigation Appearance')
-                    ->description('Choose flyout style for all 4 dropdowns (About Us, Activities, Destinations, Trekking). Classic is the original paper-soft + blue hover.')
-                    ->icon('heroicon-o-paint-brush')
-                    ->columns(1)
-                    ->schema([
-                        Select::make('navigation_flyout_style')
-                            ->label('Flyout style')
-                            ->options([
-                                'classic' => 'Classic (paper-soft + blue — original)',
-                                'image' => 'Image (white + green — screenshot)',
-                            ])
-                            ->default('classic')
-                            ->required()
-                            ->helperText('Classic = original paper-soft, blue hover. Image = white panel, green hover.'),
-                    ])
-                    ->collapsible()
-                    ->collapsed(false),
-
                 Section::make('Branding')
                     ->description('Main navigation logo. Leave empty to use bundled public/images. White logo is for transparent hero (optional).')
                     ->schema([
