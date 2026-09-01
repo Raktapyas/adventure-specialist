@@ -91,18 +91,19 @@
     </section>
 
     {{-- AST Services grid (flip cards) --}}
+    @if(($headings['services']['visible'] ?? true))
     <section id="services" class="flex min-h-svh flex-col items-center justify-center border-y border-line bg-paper-soft/60">
         <div class="w-full max-w-[1240px] px-6 py-24 lg:py-28">
             <div class="grid items-end gap-6 lg:grid-cols-[1fr_auto_1fr]">
                 <div class="hidden lg:block" aria-hidden="true"></div>
                 <x-section-heading
-                    eyebrow="What we do"
-                    title="AST Services"
-                    lede="Culture, adventure and wildlife — arranged for groups and individuals across the Himalaya."
+                    :eyebrow="$headings['services']['eyebrow'] ?? 'What we do'"
+                    :title="$headings['services']['title'] ?? 'AST Services'"
+                    :lede="$headings['services']['lede'] ?? 'Culture, adventure and wildlife — arranged for groups and individuals across the Himalaya.'"
                     align="center" />
                 <div class="flex justify-start lg:justify-end">
-                    <a href="/ast-services/" class="btn btn-royal px-5! py-3! text-xs uppercase tracking-wider reveal">
-                        View all services
+                    <a href="{{ $headings['services']['button_url'] ?? '/ast-services/' }}" class="btn btn-royal px-5! py-3! text-xs uppercase tracking-wider reveal">
+                        {{ $headings['services']['button_label'] ?? 'View all services' }}
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" /></svg>
                     </a>
                 </div>
@@ -117,6 +118,7 @@
             @endif
         </div>
     </section>
+    @endif
 
     {{-- Counters band (premium scroll-parallax) --}}
     @if (! empty($stats))
@@ -146,13 +148,14 @@
     @endif
 
     {{-- About / Why choose us --}}
+    @if(($headings['why']['visible'] ?? true))
     <section class="mx-auto max-w-[1240px] px-6 py-24 lg:py-32">
         <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <div class="lg:col-span-5">
                 <x-section-heading
-                    eyebrow="About us"
-                    title="Why Choose AST?"
-                    lede="Adventure Specialist Travel is very concerned about your comfort, your safety and the quality of your time in the mountains." />
+                    :eyebrow="$headings['why']['eyebrow'] ?? 'About us'"
+                    :title="$headings['why']['title'] ?? 'Why Choose AST?'"
+                    :lede="$headings['why']['lede'] ?? 'Adventure Specialist Travel is very concerned about your comfort, your safety and the quality of your time in the mountains.'" />
 
                 {{-- Impressive magnetic gallery: thumbnail → full-container promo + mouse parallax --}}
                 <div class="group/gallery relative mt-8 reveal reveal-img" data-gallery-magnetic>
@@ -237,8 +240,10 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- Destinations --}}
+    @if(($headings['destinations']['visible'] ?? true))
     <section class="relative overflow-hidden border-y border-line bg-pine-deep text-paper">
         {{-- Parallax background layer --}}
         <div class="parallax-bg" aria-hidden="true">
@@ -250,9 +255,9 @@
 
         <div class="relative mx-auto max-w-[1240px] px-6 py-24 lg:py-28">
             <x-section-heading
-                eyebrow="Where we go"
-                title="Destinations"
-                lede="From the Kathmandu Valley to the roof of the world — five countries, one standard of care."
+                :eyebrow="$headings['destinations']['eyebrow'] ?? 'Where we go'"
+                :title="$headings['destinations']['title'] ?? 'Destinations'"
+                :lede="$headings['destinations']['lede'] ?? 'From the Kathmandu Valley to the roof of the world — five countries, one standard of care.'"
                 align="center"
                 dark />
 
@@ -273,14 +278,17 @@
             @endif
         </div>
     </section>
+    @endif
 
     {{-- Special packages — header centered like AST Services --}}
+    @if(($headings['packages']['visible'] ?? true))
     <section class="mx-auto max-w-[1240px] px-6 py-24 lg:py-32">
         <div class="grid items-end gap-6 lg:grid-cols-[1fr_auto_1fr]">
             <div class="hidden lg:block" aria-hidden="true"></div>
             <x-section-heading
-                eyebrow="Signature programs"
-                title="AST Special Package Program"
+                :eyebrow="$headings['packages']['eyebrow'] ?? 'Signature programs'"
+                :title="$headings['packages']['title'] ?? 'AST Special Package Program'"
+                :lede="$headings['packages']['lede'] ?? ''"
                 align="center" />
             <div class="flex justify-start lg:justify-end">
                 <a href="/special-package/" class="btn btn-royal px-5! py-3! text-xs uppercase tracking-wider reveal">
@@ -298,14 +306,19 @@
             </div>
         @endif
     </section>
+    @endif
 
     {{-- Gallery preview — centered header + living fluid grid --}}
-    @if ($galleryImages->isNotEmpty())
+    @if ($galleryImages->isNotEmpty() && ($headings['gallery']['visible'] ?? true))
         <section class="border-t border-line bg-paper-soft/60">
             <div class="mx-auto max-w-[1240px] px-6 pt-24 pb-12 lg:pt-28 lg:pb-14">
                 <div class="grid w-full items-end gap-6 sm:grid-cols-[1fr_auto_1fr]">
                     <div class="hidden sm:block" aria-hidden="true"></div>
-                    <x-section-heading eyebrow="Moments" title="AST Photo Gallery" align="center" />
+                    <x-section-heading
+                        :eyebrow="$headings['gallery']['eyebrow'] ?? 'Moments'"
+                        :title="$headings['gallery']['title'] ?? 'AST Photo Gallery'"
+                        :lede="$headings['gallery']['lede'] ?? ''"
+                        align="center" />
                     <div class="flex justify-center sm:justify-end">
                         <a href="/gallery/" class="btn btn-royal px-5! py-3! text-xs uppercase tracking-wider reveal">
                             View gallery

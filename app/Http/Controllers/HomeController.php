@@ -32,6 +32,7 @@ class HomeController extends Controller
             'galleryImages' => GalleryImage::orderBy('sort_order')->orderBy('id')->with('media')->limit(6)->get(),
             'stats' => $settings->statsRows(),
             'cta' => $settings->ctaBlock(),
+            'headings' => $settings->homepageHeadings(),
         ]);
     }
 }

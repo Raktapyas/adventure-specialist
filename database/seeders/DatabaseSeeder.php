@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             PackageSeeder::class,
             GallerySeeder::class,
             SyncLegacyMediaSeeder::class,
+            NavigationSeeder::class,
         ]);
     }
 }

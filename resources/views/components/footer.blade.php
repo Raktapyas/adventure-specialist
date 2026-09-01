@@ -19,44 +19,40 @@
 
         {{-- Clean 3-column layout — gold headings bigger, white links bigger bold --}}
         <div class="mt-14 grid gap-10 border-t border-white/15 pt-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
+            @php
+                $footerHeadingsData = $footerHeadings ?? ['services' => 'TREKKING & ACTIVITIES', 'destinations' => 'DESTINATIONS', 'contact' => 'Contact Us'];
+                $footerServicesData = $footerServices ?? ($navServices ?? collect());
+                $footerDestinationsData = $footerDestinations ?? ($navDestinations ?? collect());
+                $hasFooterServices = $footerServicesData instanceof \Illuminate\Support\Collection ? $footerServicesData->isNotEmpty() : !empty($footerServicesData);
+                $hasFooterDestinations = $footerDestinationsData instanceof \Illuminate\Support\Collection ? $footerDestinationsData->isNotEmpty() : !empty($footerDestinationsData);
+            @endphp
+            @if($hasFooterServices)
             {{-- Trekking & Activities --}}
             <nav aria-label="Footer trekking and activities">
-                <p class="text-sm font-black uppercase tracking-[0.2em] text-[#C9A86A]">Trekking &amp; Activities</p>
+                <p class="text-sm font-black uppercase tracking-[0.2em] text-[#C9A86A]">{{ $footerHeadingsData['services'] }}</p>
                 <ul class="mt-5 space-y-3 text-base font-semibold">
-                    @forelse ($navServices as $service)
+                    @foreach ($footerServicesData as $service)
                         <li><a href="{{ $service->getPath() }}" class="text-white transition-colors hover:text-[#C9A86A]">{{ $service->title }}</a></li>
-                    @empty
-                        <li><a href="/ast-services/" class="text-white transition-colors hover:text-[#C9A86A]">Mountain Flight</a></li>
-                        <li><a href="/ast-services/" class="text-white transition-colors hover:text-[#C9A86A]">Short Hiking</a></li>
-                        <li><a href="/ast-services/" class="text-white transition-colors hover:text-[#C9A86A]">Jungle Safari</a></li>
-                        <li><a href="/ast-services/" class="text-white transition-colors hover:text-[#C9A86A]">Paragliding</a></li>
-                        <li><a href="/ast-services/" class="text-white transition-colors hover:text-[#C9A86A]">Bungee Jumping</a></li>
-                        <li><a href="/ast-services/" class="text-white transition-colors hover:text-[#C9A86A]">Rafting</a></li>
-                    @endforelse
+                    @endforeach
                 </ul>
             </nav>
+            @endif
 
+            @if($hasFooterDestinations)
             {{-- Destinations --}}
             <nav aria-label="Footer destinations">
-                <p class="text-sm font-black uppercase tracking-[0.2em] text-[#C9A86A]">Destinations</p>
+                <p class="text-sm font-black uppercase tracking-[0.2em] text-[#C9A86A]">{{ $footerHeadingsData['destinations'] }}</p>
                 <ul class="mt-5 space-y-3 text-base font-semibold">
-                    @forelse ($navDestinations as $destination)
+                    @foreach ($footerDestinationsData as $destination)
                         <li><a href="{{ $destination->getPath() }}" class="text-white transition-colors hover:text-[#C9A86A]">{{ $destination->title }}</a></li>
-                    @empty
-                        <li><a href="/destination/" class="text-white transition-colors hover:text-[#C9A86A]">Myanmar</a></li>
-                        <li><a href="/destination/" class="text-white transition-colors hover:text-[#C9A86A]">Sikkim</a></li>
-                        <li><a href="/destination/" class="text-white transition-colors hover:text-[#C9A86A]">Bhutan</a></li>
-                        <li><a href="/destination/" class="text-white transition-colors hover:text-[#C9A86A]">Tibet</a></li>
-                    @endforelse
-                    @if ($navNepal)
-                        <li><a href="{{ $navNepal->getPath() }}" class="text-white transition-colors hover:text-[#C9A86A]">{{ $navNepal->title }}</a></li>
-                    @endif
+                    @endforeach
                 </ul>
             </nav>
+            @endif
 
             {{-- Contact --}}
             <div>
-                <p class="text-sm font-black uppercase tracking-[0.2em] text-[#C9A86A]">Contact Us</p>
+                <p class="text-sm font-black uppercase tracking-[0.2em] text-[#C9A86A]">{{ $footerHeadingsData['contact'] }}</p>
                 <address class="mt-5 space-y-3 text-base font-medium not-italic leading-relaxed [overflow-wrap:anywhere]">
                     @if (filled($siteContact['company']))
                         <p class="font-black tracking-tight text-white">{{ $siteContact['company'] }}</p>

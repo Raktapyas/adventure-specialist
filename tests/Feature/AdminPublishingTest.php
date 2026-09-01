@@ -33,7 +33,7 @@ class AdminPublishingTest extends TestCase
 
     public function test_unpublished_services_return_404_publicly(): void
     {
-        Service::factory()->create(['slug' => 'trekking', 'title' => 'Trekking', 'is_published' => false]);
+        Service::factory()->create(['slug' => 'trekking', 'title' => 'ZebraUnpublishedTrek123', 'is_published' => false]);
 
         $this->assertSame(404, $this->finalStatus('/ast-services/trekking/'));
 
@@ -41,7 +41,7 @@ class AdminPublishingTest extends TestCase
         $request->headers->set('host', 'localhost');
         $response = $this->app->handle($request);
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringNotContainsString('Trekking', $response->getContent());
+        $this->assertStringNotContainsString('ZebraUnpublishedTrek123', $response->getContent());
     }
 
     public function test_unpublished_destinations_return_404_publicly(): void

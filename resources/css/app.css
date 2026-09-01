@@ -561,6 +561,52 @@
     /* parent panels that contain nested flyouts must allow overflow visible */
     .flyout--has-children {
         overflow: visible;
+        max-height: none;
+    }
+
+    .flyout-sub {
+        max-height: 70vh;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-line-strong) transparent;
+    }
+
+    /* ---- Flyout variant matching screenshot (white + orange border/hover) ---- */
+    .flyout--image {
+        background: #fff;
+        border: 1px solid #F97316;
+        border-top: 4px solid #F97316;
+        border-radius: 2px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        overflow: visible;
+        max-height: none;
+    }
+
+    .flyout--image .flyout-item-wrap > a {
+        color: #374151;
+        background: #fff;
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+    .flyout--image .flyout-item-wrap:hover > a,
+    .flyout--image .flyout-item-wrap:focus-within > a {
+        background: #F97316;
+        color: #fff;
+    }
+
+    .flyout--image .flyout-item-wrap:hover > a svg,
+    .flyout--image .flyout-item-wrap:focus-within > a svg {
+        color: #fff;
+    }
+
+    .flyout-sub--image {
+        background: #fff;
+        border: 1px solid #F97316;
+        border-top: 1px solid #F97316;
+        border-radius: 2px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        max-height: 70vh;
+        overflow-y: auto;
     }
 
     .flyout-panel {
